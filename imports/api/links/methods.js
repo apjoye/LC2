@@ -245,7 +245,7 @@ export const ToggleFactory = new ValidatedMethod({
   name: 'producers.toggle',
   validate ({}) {},
 
-  run ({producerId, currentStatus}) {
+  run ({producerId, currentStatus, gameCode, baseId}) {
     // Producers.find()
     Producers.update({"_id": producerId}, {$set: {"running": !currentStatus}});
     Acts.insert({
@@ -253,8 +253,11 @@ export const ToggleFactory = new ValidatedMethod({
       "key": "factoryToggle",
       "producerId": producerId,
       "pastStatus": currentStatus,
-      "newStatus": !currentStatus
+      "newStatus": !currentStatus,
+      "gameCode": gameCode,
+      "baseId": baseId
     });
+    //***TODO: add game code, groupId, groupName
   }
 });
 
@@ -265,9 +268,7 @@ export const MakeLog = new ValidatedMethod({
   run ({key, log}) {
     log["key"] = key;
     log["time"] = (new Date()).getTime();
-    Acts.insert({
-      log
-    });
+    Acts.insert(log);
   }
 })
 
@@ -579,7 +580,7 @@ export const TradeResources = new ValidatedMethod({
       fromres = fromGroup.res;
       toGroup = Games.findOne({$and: [{"gameCode": to.gameCode},  {"group": to.group}, {"role": "base"}]});
       tores = toGroup.res;
-      logObj = {"from": from, "to": to, "amount": amount, "resource": resource};
+      logObj = {"from": from, "to": to, "amount": amount, "resource": resource, "gameCode": from.gameCode, "togameCode": to.gameCode};
       // tores = Cities.findOne({"name": to}).res;
       if(parseInt(fromres[resource]) >= amount){
         fromres[resource] = parseInt(fromres[resource]) - parseInt(amount);

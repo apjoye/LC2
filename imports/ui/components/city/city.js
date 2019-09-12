@@ -270,7 +270,7 @@ Template.cityFactory.events({
       //alert("Everybody's already employed!");
     }
     else {
-      ToggleFactory.call({"producerId": this._id, "currentStatus": this.running}, function (err, res) {
+      ToggleFactory.call({"producerId": this._id, "currentStatus": this.running, "gameCode": FlowRouter.getParam("gameCode"), "baseId": Meteor.userId()}, function (err, res) {
         if (err) {
           console.log(err);
         }
