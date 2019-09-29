@@ -129,6 +129,17 @@ Template.factoryList.onCreated(function helloOnCreated() {
   Meteor.subscribe('games.minerunning');
 });
 
+Template.factory.onRendered(function () {
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  });
+
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  });
+
+});
+
 Template.factory.helpers({
   OutputIcon() {
     factoryOutputType = {
@@ -186,72 +197,29 @@ Template.factory.helpers({
 
    thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"playerId": Meteor.userId()}]});
 
+   outval = {
+     "class": "btn-info",
+     "popoverText": ""
+   };
+   
    valtext = "0";
    affordability = true;
-   
+   outval["popoverText"] = "The icon on the left of the row, is the resource you're bidding for this factory. ";
   if (bid != undefined){
     valtext = bid.bidVal;
     if (thisGame.res[this.bidKind] < bid.bidVal) {
-      valtext += " - Can't Afford!";
-       affordability = false;
-       // console.log(affordability);
-       // console.log(this._id);
-       // UpdateBid.call({"bidId": this._id, "affordability": affordability});
+      outval["popoverText"] += "You've bid more than you have!";
+      outval["class"] = "btn-danger";
+      affordability = false;
 
     }
     else {
 
-       // console.log(affordability);
-       // console.log(this._id);
-       // UpdateBid.call({"bidId": this._id, "affordability": affordability});
     }
-     // console.log(bid.bidVal);
   }
-
-  // else if (valtext = ""){
-  //     valtext = 0;
-  //   }
-
-   return valtext;
+  outval["text"] = valtext;
+  return outval;
  },
-
-
-
-
- // ProdInfo() {
- //   costText = "";
- //   factoryOutputType = {
- //      "m1": "../img/icons/gold_sml.png",
- //      "f1": "../img/icons/food_sml.png",
- //      "m2": "../img/icons/steel_sml.png",
- //      "f2": "../img/icons/cotton_sml.png"
- //    };
- //   for (r in this.prodCosts) {
- //     if (this.prodCosts[r] != 0) {
- //       costText += this.prodCosts[r] + " " + r + ", ";
- //       costText += '<img class="resourceIcon" src="' + factoryOutputType[r] + '" />';
- //     }
- //   }
- //   console.log(this);
-
- //   if (this.prodCosts.poll != 0) {
- //     costText += ' and ' + this.prodValues.poll + '<img class="resourceIcon" src="../img/icons/pollution_sml.png" />';
- //     // console.log(costText);
- //   }
- //   // console.log(costText);
- //   return costText;
- // },
-
-  // CostInfo() {
-  //   costText = "";
-  //   costIcon = "";
-  //   for (r in this.buyCost) {
-  //     if (this.buyCost[r] != 0) {
-  //       costText += this.buyCost[r] + " " + r + ", ";
-  //     }
-  //   }
-  //   return costText;
-  // },
 
   ProductionText () {
     prodText = "";
@@ -287,13 +255,15 @@ Template.factory.events({
     // console.log(event.target.text);
     console.log(event.target.name);
     val = parseInt(event.target.name);
-    thisGroup = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"playerId": Meteor.userId()}]});
-    // console.log(thisGroup);
-    if (thisGroup.role != "base") {
-      FlowRouter.go('home');
-    }
-    else{
-      MakeBid.call({"baseId": Meteor.userId(), "producer": this._id, "group": thisGroup.group, "gameCode": FlowRouter.getParam("gameCode"), "change": val, "bidKind": this.bidKind});
+    if (val == "+1" || val == "-1") {
+      thisGroup = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"playerId": Meteor.userId()}]});
+      // console.log(thisGroup);
+      if (thisGroup.role != "base") {
+        FlowRouter.go('home');
+      }
+      else{
+        MakeBid.call({"baseId": Meteor.userId(), "producer": this._id, "group": thisGroup.group, "gameCode": FlowRouter.getParam("gameCode"), "change": val, "bidKind": this.bidKind});
+      }
     }
   }
 });

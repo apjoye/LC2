@@ -1,5 +1,5 @@
 <template name="factoryList">
-  <div class="container-fluid">
+  <div class="container">
     <div class="row">
       <div class="col-md-12" style="text-align: center; font-size:18px; "> Marketplace </div>
     </div>
@@ -8,7 +8,7 @@
         <div class="col-md-2 "><img src="{{ResourceIcon this}}" /></div>
         <div class="col-md-10">
           {{#each PublicFactories this}}
-            <div class="col-md-3 col-xs-3" bgcolor="{{factoryColor}}" >
+            <div class="col-md-3" bgcolor="{{factoryColor}}" >
               <div class="factoryInfo" style="border: solid black 2px; padding: 5px; background: {{factoryBidColor}}" >
                 <img class="factoryIcon" src="{{factoryIcon}}">
                 {{> factory}}
@@ -24,20 +24,42 @@
 
 
 <template name="factory">
-    <div id="productionValues">
-      <span class="productionLabel">Produces</span>
-      {{{CostInfo this.prodValues ""}}} 
-    </div>
-    <br />
-    <div id="consuptionValue">
-      <span class="productionLabel">Consumes</span>
-    {{{CostInfo this.prodCosts ""}}}
+  <!-- <div class="row"> -->
+    <!-- <div class="col-md-5"> -->
+      <div id="productionValues">
+        <span class="productionLabel">Produces</span>
+        {{{CostInfo this.prodValues ""}}} 
+      </div>
+      <br />
+      <div id="consumptionValue">
+        <span class="productionLabel">Consumes</span>
+      {{{CostInfo this.prodCosts ""}}}
+      </div>
+  <!-- </div> -->
+
+    <div class="btn-group btn-group-justified" role="group" aria-label="...">
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default bid" name="-1">
+          <!-- <span class="glyphicon glyphicon-chevron-down" aria-hidden="false"></span> -->
+          -1
+        </button>
+      </div>
+       <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default bid" name="+1">
+          <!-- <span class="glyphicon glyphicon-chevron-up" aria-hidden="false"></span> -->
+          +1
+        </button>
+      </div>
+
+      <div class="btn-group" role="group">
+        <button type="button" class="btn {{FactoryBid.class}}" data-container="body" data-toggle="popover" data-placement="top" title="Bids for this Building" data-content="{{FactoryBid.popoverText}}">{{FactoryBid.text}}</button>
+      </div>
+     
     </div>
 
-    <br />
-    <div class="biddingArea" style="text-align: center; font-weight: bold;">
+    <!-- <div class="biddingArea" style="text-align: center; font-weight: bold;">
       <button type="button" class="btn btn-outline-primary bid" name="-1" style="
     margin-right: 6px;"> -1 </button>  Bid:  {{FactoryBid}} <button type="button" class="btn btn-outline-primary bid" name="+1" style="
     margin-left: 6px;"> +1</button>
-    </div>
+    </div> -->
 </template>

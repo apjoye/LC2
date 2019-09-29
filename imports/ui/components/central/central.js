@@ -2,6 +2,13 @@ import './central.html';
 import { Meteor } from 'meteor/meteor';
 // import { Cities } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
+// import d3 from 'd3';
+
+
+// Template.body.onRendered(function () {
+//   d3.select('#d3-container').append('<h1>hello kitty</h1>');
+// })
+
 // import { TradeResources } from '/imports/api/links/methods.js';
 // import { ResetAll } from '/imports/api/links/methods.js';
 
@@ -10,6 +17,13 @@ Template.cityStates.onCreated(function helloOnCreated() {
   // this.counter = new ReactiveVar(0);
   Meteor.subscribe('games.all');
   // Meteor.subscribe('producers.all');
+
+});
+
+Template.cityStates.onRendered(function () {
+  // d3.select('#d3-container').append('<h1>hello kitty</h1>');
+  
+
 });
 
 Template.cityStates.helpers({

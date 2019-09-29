@@ -104,6 +104,7 @@ Template.city.helpers({
 
   roundProduction() {
     prodOutput = {"m1": 0, "m2": 0, "f1": 0, "f2": 0, "pollution": 0};
+    prodOutStr = {"m1": "+0", "m2": "+0", "f1": "+0", "f2": "+0", "pollution": "+0"};
     runningProds = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
     var parks = 0;
     runningProds.forEach(function (prod) {
@@ -137,9 +138,16 @@ Template.city.helpers({
     }
     prodOutput["population"] = popChange;
     prodOutput["happiness"] = happChange;
+
+    for (k in prodOutput) {
+      if (prodOutput[k] >= 0) {
+        prodOutStr[k] = "+" + prodOutput[k].toString();
+      }
+    }
+
     // console.log(thisgame);
     // console.log(prodOutput);
-    return prodOutput;
+    return prodOutStr;
   }
 
 });

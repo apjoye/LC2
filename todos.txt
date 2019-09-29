@@ -5,10 +5,35 @@ TODOS
     //- enable changing teams
     //- enable changing roles (make a base, or remove a base)
 
-- do better data logging
-  - every click on enable/disable, even if it fails
+//- do better data logging
+  //- every click on enable/disable, even if it fails
   - add log in updatebid method
 
 - fix data subs
   - first for running
   - next for gamecodes
+
+
+- CLS workshop
+  neighbors ui
+
+  in between round reflection
+  make register link bigger if possible
+
+  change play games to live games 
+  change groups to cities
+
+
+what do people like or not like about the game?
+how they see it fitting into curricular designs?
+
+possible questions for different audiences
+one about learning, and integrating into history class, science class, etc
+  fliexibility for different contexts
+
+hci - designing information on different screens – engage in different ways in more manageable ways – individual screens are supposed to be manageable
+  * What would you change? What do you like and what do you dislike? Have layout conversation
+
+ask people about the different data streams, and how they would use it
+  
+let's come up with questions

@@ -2,9 +2,9 @@
   <table cellpadding="10" class="cityTable">
     <tr >
       {{#each citySet}}
-        <td class="cityRow">
+        <!-- <td class="cityRow"> -->
           {{> city}}
-        </td>
+        <!-- </td> -->
       {{/each}}
     </tr>
   </table>
@@ -13,95 +13,130 @@
 <template name="city">
   <!-- {{}} -->
   <div id="cityBox">
-    <p class="cityName">{{name}} </p>
-    <section id=resourceBox>
-      <h3>Your City's Resources</h3>
-      <section id="metalResourceBox">
-        <div id="m1Items">  <img class="cityIcon" src="../img/icons/gold_sml.png"> {{res.m1}}</div>  
-        <div id="m2Items"><img class="cityIcon" src="../img/icons/steel_sml.png">  {{res.m2}}</div>
-      </section>
-      <section id=foodResourceBox>
-        <div id="f1Items"> <img class="cityIcon" src="../img/icons/food_sml.png"> {{res.f1}} </div>   
-        <div id="f2Items"> <img class="cityIcon" src="../img/icons/cotton_sml.png"> {{res.f2}} </div>
-      </section>
-    </section>
-    <section id="scoresBox">
-      <h3>Your City's Metrics</h3>
-      <div class="cityMetric"> <img class="cityIcon" src="../img/icons/pollution_med.png"> {{pollution}} </div>
+    <!-- <p class="cityName">{{name}} </p> -->
+    <!-- <h3>Your City's Production</h3> -->
 
-      <div class="cityMetric"> <img class="cityIcon" src="../img/icons/population_med.png"> {{population}} </div>
+   <!--  <div class="container pull-right">
+      <h4> Resources </h4>
+      <img class="cityIcon" src="../img/icons/gold_sml.png"> {{res.m1}} {{roundProduction.m1}}
+      <img class="cityIcon" src="../img/icons/steel_sml.png"> {{res.m2}} {{roundProduction.m2}}
+      <img class="cityIcon" src="../img/icons/food_sml.png"> {{res.f1}} {{roundProduction.f1}}
+      <img class="cityIcon" src="../img/icons/cotton_sml.png"> {{res.f2}} {{roundProduction.f1}}
+      <h4> Metrics </h4>
+      <img class="cityIcon" src="../img/icons/pollution_med.png"> {{pollution}} {{roundProduction.pollution}}
+      <img class="cityIcon" src="../img/icons/population_med.png"> {{population}} {{roundProduction.population}}
+      <img class="cityIcon" src="../img/icons/happiness_med.png"> {{happiness}} {{roundProduction.happiness}}
+    </div> -->
 
-      <div class="cityMetric"><img class="cityIcon" src="../img/icons/happiness_med.png"> {{happiness}} </div>
-    </section>
-    
-      <section class="scoreBoxStyle">
-        <h3>With chosen factories, your production will be:</h3>
-        <div class="cityMetric"> <img class="cityIcon" src="../img/icons/gold_sml.png"> {{roundProduction.m1}} </div>
-        <div class="cityMetric"> <img class="cityIcon" src="../img/icons/steel_sml.png"> {{roundProduction.m2}} </div>
-        <div class="cityMetric"> <img class="cityIcon" src="../img/icons/food_sml.png"> {{roundProduction.f1}} </div>
-        <div class="cityMetric"> <img class="cityIcon" src="../img/icons/cotton_sml.png"> {{roundProduction.f2}} </div>
 
-        <div class="cityMetric"> <img class="cityIcon" src="../img/icons/pollution_med.png"> {{roundProduction.pollution}} </div>
-        <div class="cityMetric"> <img class="cityIcon" src="../img/icons/population_med.png"> {{roundProduction.population}} </div>
-        <div class="cityMetric"><img class="cityIcon" src="../img/icons/happiness_med.png"> {{roundProduction.happiness}} </div>
-
-      </section>
-      <!-- <p> -->
-        <h5>
+    <div class="container">
+      <div class="row">
+        
+        <div class="col-md-2">
+          <h2> Resources </h2>
+        </div>
+        <div class="col-xs-3 col-md-1">
+          <h1><img class="cityIcon" src="../img/icons/gold_sml.png"> {{res.m1}} </h1> <h3>{{roundProduction.m1}}</h3>
+        </div>
+        <div class="col-xs-3 col-md-1">
+          <h1><img class="cityIcon" src="../img/icons/steel_sml.png"> {{res.m2}} 
+          </h1> 
+          <h3>{{roundProduction.m2}}</h3>
+        </div>
+        <div class="col-xs-3 col-md-1">
+          <h1><img class="cityIcon" src="../img/icons/food_sml.png"> {{res.f1}}
+          </h1>
+          <h3>{{roundProduction.f1}}</h3>
+        </div>
+        <div class="col-xs-3 col-md-1">
+          <h1><img class="cityIcon" src="../img/icons/cotton_sml.png"> {{res.f2}}
+          </h1>
+          <h3>{{roundProduction.f1}}</h3>
+        </div>
+        <div class="col-md-2">
+          <h2> Metrics </h2>
+        </div>
+        <div class="col-xs-4 col-md-1">
+          <h1><img class="cityIcon" src="../img/icons/pollution_med.png"> {{pollution}}
+          </h1>
+          <h3>{{roundProduction.pollution}}</h3>
+        </div>
+        <div class="col-xs-4 col-md-1">
+          <h1><img class="cityIcon" src="../img/icons/population_med.png"> {{population}}
+          </h1>
+          <h3>{{roundProduction.population}}</h3>
+        </div>
+        <div class="col-xs-4 col-md-1">
+          <h1><img class="cityIcon" src="../img/icons/happiness_med.png"> {{happiness}}
+          </h1>
+          <h3>{{roundProduction.happiness}}</h3>
+        </div>
+      </div>
+    </div>
+     <!-- <p> -->
+        
+        <!-- <h5>
           If your food is 2x your pollution, people are well fed, and population increases. If it's less than 0.7x, it drops! <br />
           If you have enough parks (0.4x your population), happiness increases. If parks are too low (0.2x), it drops.
-        </h5>
+        </h5> -->
+
+
       <!-- </p> -->
-      <!-- <section class="scoreBoxStyle">
-        <div id="m1Items">  <img class="cityIcon" src="../img/icons/gold_sml.png"> {{roundProduction.m1}}</div>  
-        <div id="m2Items">  <img class="cityIcon" src="../img/icons/steel_sml.png">  {{roundProduction.m2}}</div>
-      </section>
-      <section id=foodResourceBox>
-        <div id="f1Items"> <img class="cityIcon" src="../img/icons/food_sml.png"> {{roundProduction.f1}} </div>   
-        <div id="f2Items"> <img class="cityIcon" src="../img/icons/cotton_sml.png"> {{roundProduction.f2}} </div>
-      </section> -->
-        <!-- f1: {{roundProduction.f1}}, f2: {{roundProduction.f2}}, m1: {{roundProduction.m1}}, m2: {{roundProduction.m2}}, pollution: {{roundProduction.pollution}},  -->
-        <!-- Food to pollution: {{roundProduction.foodToPoll}},
-        Parks to population: {{roundProduction.parksToPop}} -->
-      <!-- </p> -->
-      <section id="factoryBox">
-      <h3>Your City's Production</h3>
-      <table cellpadding="10" class="productionBox">
-        <tr>
-          {{#each cityFactories}}
-            <td style="{{producerColor}}" class="cityFactoryInfo">
-              {{> cityFactory}}
-            </td>
-          {{/each}}
-        </tr>
-        <tr>Notes from last run: {{#each roundNotes}}  {{this}} <br />   {{/each}}</tr>
-      </table>
-    </section>
-  </div>
+ 
+<!--     <section id="factoryBox">
       
+      <table cellpadding="10" class="productionBox">
+        <tr> --> 
+          <!-- {{#each cityFactories}} -->
+            <!-- <td style="{{producerColor}}" class="cityFactoryInfo"> -->
+              <!-- {{> cityFactory}} -->
+            <!-- </td> -->
+          <!-- {{/each}} -->
+        <!-- </tr> -->
+        <!-- <tr>Notes from last run: {{#each roundNotes}}  {{this}} <br />   {{/each}}</tr> -->
+      <!-- </table> -->
+    <!-- </section> -->
+
+    <div class="row">
+      {{#each cityFactories}}
+        <div class="col-xs-1 col-sm-2 col-md-3" style="border: solid black 2px; padding: 5px; {{producerColor}}">
+          {{> cityFactory}}
+        </div>
+      {{/each}}
+    </div>
+  </div>
 </template>
 
 <template name="cityFactory">
-  <div class="cityFactoryInner">
+  <div class="row">
+    <div class="col-md-5">
+      <!-- <div class="cityFactoryInner"> -->
       <img class="factoryIcon" src="{{factoryIcon}}">
       <!-- {{> factory}} -->
-  
-    <div id="productionValues">
-      <span class="productionLabel">Produces</span>
-      {{{CostInfo this.prodValues ""}}} 
+      <br />
+
+      <button type="button" class="btn btn-outline-primary toggleRunning" data-toggle="button" aria-pressed="false" autocomplete="off">
+        {{runningStatus}}
+      </button>        
+      
     </div>
-    <br />
-    <div id="consumptionValue">
-      <span class="productionLabel">Consumes</span>
-      {{{CostInfo this.prodCosts ""}}}
+
+    <div class="col-md-7">
+      <div id="productionValues">
+          <span class="productionLabel">Produces</span>
+          {{{CostInfo this.prodValues ""}}} 
+        </div>
+        <br />
+        <div id="consumptionValue">
+          <span class="productionLabel">Consumes</span>
+          {{{CostInfo this.prodCosts ""}}}
+        </div>
     </div>
+        
   </div>
   
-  <br />
-  <button type="button" class="btn btn-outline-primary toggleRunning" data-toggle="button" aria-pressed="false" autocomplete="off">
-    {{runningStatus}}
-  </button>
-  <div class="cityFacotryNotes">
+  
+  <div class="cityFactoryNotes">
   Notes from last run: {{#each roundNotes}}  {{this}} <br />   {{/each}}
   </div>
 </template>

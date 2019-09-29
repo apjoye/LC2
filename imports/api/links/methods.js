@@ -851,8 +851,13 @@ export const MakeBid = new ValidatedMethod({
         });
       }
       else {
+        // console.log(existBid.bidVal.toString());
         change = existBid.bidVal + change;
         if (change < 0) {
+          change = 0;
+        }
+        if (change.toString() == "NaN") {
+          // console.log("change is nan?");
           change = 0;
         }
         Bids.update({"_id": existBid._id}, {$set: {"bidVal": change}});
