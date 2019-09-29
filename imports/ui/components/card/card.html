@@ -1,16 +1,17 @@
 <template name="factoryList">
   <div class="container">
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-md-12" style="text-align: center; font-size:18px; "> Marketplace </div>
-    </div>
+    </div> -->
+    <h4> Marketplace </h4>
     {{#each bidKinds}}
-      <div class="row vcenter">
+      <div class="row vcenter container-fluid">
         <div class="col-md-2 "><img src="{{ResourceIcon this}}" /></div>
         <div class="col-md-10">
           {{#each PublicFactories this}}
-            <div class="col-md-3" bgcolor="{{factoryColor}}" >
-              <div class="factoryInfo" style="border: solid black 2px; padding: 5px; background: {{factoryBidColor}}" >
-                <img class="factoryIcon" src="{{factoryIcon}}">
+            <div class="col-md-3 col-xs-6"  style="padding: 3pt">
+              <div class="factoryInfo" style="border: solid black 2pt; margin:2pt; padding: 3pt; background: {{factoryBidColor}}" >
+                <img class="factoryIcon" src="{{factoryIcon}}" style="max-width: 45%;">
                 {{> factory}}
               </div>
             </div>
@@ -29,15 +30,15 @@
       <div id="productionValues">
         <span class="productionLabel">Produces</span>
         {{{CostInfo this.prodValues ""}}} 
-      </div>
+      <!-- </div> -->
       <br />
-      <div id="consumptionValue">
+      <!-- <div id="consumptionValue"> -->
         <span class="productionLabel">Consumes</span>
       {{{CostInfo this.prodCosts ""}}}
       </div>
   <!-- </div> -->
 
-    <div class="btn-group btn-group-justified" role="group" aria-label="...">
+    <div style="padding-top: 8pt" class="btn-group btn-group-justified" role="group" aria-label="...">
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-default bid" name="-1">
           <!-- <span class="glyphicon glyphicon-chevron-down" aria-hidden="false"></span> -->

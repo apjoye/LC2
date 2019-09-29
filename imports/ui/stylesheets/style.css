@@ -3,8 +3,8 @@
 }
 
 .cityIcon {
-    max-height: 50px;
-    max-width: 50px;
+    /*max-height: 50px;*/
+    max-width: 90%;
     margin: 2px;
 }
 .cityName {
@@ -108,7 +108,7 @@
 }
 
 .factoryIcon {
-	max-width: 100%;
+	/*max-width: 50pt;*/
   padding: 5pt;
 }
 
@@ -125,16 +125,11 @@
     margin-bottom: 5px;*/
 }
 
-.productionLabel {
+/*.productionLabel {
 	font-size: 18px;
 	font-weight: bold;
-}
+}*/
 
-.factoryCards {
-	width: 33%;
-  	font-weight: bold;
-  	padding: 5px;
-}
 
 table {
 	border-collapse: separate;
@@ -153,10 +148,10 @@ button {
     font-weight: normal;
 }
 
-.cityMetric {
+/*.cityMetric {
 	float:left;
     margin-right: 15px;
-}
+}*/
 
 #marketHeader {
 	margin-top: 10px;

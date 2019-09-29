@@ -35,20 +35,20 @@
         <div class="col-md-2">
           <h2> Resources </h2>
         </div>
-        <div class="col-xs-3 col-md-1">
+        <div class="col-sm-3 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/gold_sml.png"> {{res.m1}} </h1> <h3>{{roundProduction.m1}}</h3>
         </div>
-        <div class="col-xs-3 col-md-1">
+        <div class="col-sm-3 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/steel_sml.png"> {{res.m2}} 
           </h1> 
           <h3>{{roundProduction.m2}}</h3>
         </div>
-        <div class="col-xs-3 col-md-1">
+        <div class="col-sm-3 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/food_sml.png"> {{res.f1}}
           </h1>
           <h3>{{roundProduction.f1}}</h3>
         </div>
-        <div class="col-xs-3 col-md-1">
+        <div class="col-sm-3 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/cotton_sml.png"> {{res.f2}}
           </h1>
           <h3>{{roundProduction.f1}}</h3>
@@ -56,17 +56,17 @@
         <div class="col-md-2">
           <h2> Metrics </h2>
         </div>
-        <div class="col-xs-4 col-md-1">
+        <div class="col-sm-4 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/pollution_med.png"> {{pollution}}
           </h1>
           <h3>{{roundProduction.pollution}}</h3>
         </div>
-        <div class="col-xs-4 col-md-1">
+        <div class="col-sm-4 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/population_med.png"> {{population}}
           </h1>
           <h3>{{roundProduction.population}}</h3>
         </div>
-        <div class="col-xs-4 col-md-1">
+        <div class="col-sm-4 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/happiness_med.png"> {{happiness}}
           </h1>
           <h3>{{roundProduction.happiness}}</h3>
@@ -97,10 +97,12 @@
       <!-- </table> -->
     <!-- </section> -->
 
-    <div class="row">
+    <div class="row" style = "padding: 6pt;">
       {{#each cityFactories}}
-        <div class="col-xs-1 col-sm-2 col-md-3" style="border: solid black 2px; padding: 5px; {{producerColor}}">
-          {{> cityFactory}}
+        <div class="col-xs-6 col-sm-4 col-md-3">
+          <div style="border: solid black 1pt; padding: 2pt; margin:2pt; {{producerColor}}">
+            {{> cityFactory}}
+          </div>
         </div>
       {{/each}}
     </div>
@@ -109,9 +111,9 @@
 
 <template name="cityFactory">
   <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6 col-xs-6">
       <!-- <div class="cityFactoryInner"> -->
-      <img class="factoryIcon" src="{{factoryIcon}}">
+      <img class="factoryIcon" src="{{factoryIcon}}" style="width:100%;">
       <!-- {{> factory}} -->
       <br />
 
@@ -121,7 +123,7 @@
       
     </div>
 
-    <div class="col-md-7">
+    <div class="col-md-6 col-xs-6">
       <div id="productionValues">
           <span class="productionLabel">Produces</span>
           {{{CostInfo this.prodValues ""}}} 
