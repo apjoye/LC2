@@ -6,6 +6,7 @@ import { Producers } from '../links.js';
 import { Cities } from '../links.js';
 import { Games } from '../links.js';
 import { Bids } from '../links.js';
+import { Acts } from '../links.js';
 
 import { Assets } from '../links.js';
 
@@ -80,6 +81,10 @@ Meteor.publish('bids.all', function () {
 Meteor.publish('bids.local', function () {
   // console.log(this.users());
   return Bids.find({"baseId": Meteor.userId()});
+});
+
+Meteor.publish('acts.game', function (gameCode) {
+  return Acts.find({"gameCode": gameCode});
 });
 
 
