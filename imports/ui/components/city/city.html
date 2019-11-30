@@ -75,10 +75,14 @@
     </div>
      <!-- <p> -->
         
-        <!-- <h5>
+        <h5>
           If your food is 2x your pollution, people are well fed, and population increases. If it's less than 0.7x, it drops! <br />
           If you have enough parks (0.4x your population), happiness increases. If parks are too low (0.2x), it drops.
-        </h5> -->
+        </h5>
+
+        <button type="button" style="max-width:400pt" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="right" data-html="true" title="Events over last round" data-content="<ul>{{#each roundNotes}} <li>{{this}} </li> {{/each}}">Notes from Last Run</button>
+
+        <!-- <p>Notes from last run: {{#each roundNotes}}  <p> {{this}}  </p>  -->
 
 
       <!-- </p> -->
@@ -117,19 +121,19 @@
       <!-- {{> factory}} -->
       <br />
 
-      <button type="button" class="btn btn-outline-primary toggleRunning" data-toggle="button" aria-pressed="false" autocomplete="off">
+      <button type="button" class="btn btn-default toggleRunning" data-toggle="button" aria-pressed="false" autocomplete="off">
         {{runningStatus}}
       </button>        
       
     </div>
 
     <div class="col-md-6 col-xs-6">
-      <div id="productionValues">
+      <div class="productionValues">
           <span class="productionLabel">Produces</span>
           {{{CostInfo this.prodValues ""}}} 
         </div>
         <br />
-        <div id="consumptionValue">
+        <div class="consumptionValue">
           <span class="productionLabel">Consumes</span>
           {{{CostInfo this.prodCosts ""}}}
         </div>
@@ -139,6 +143,7 @@
   
   
   <div class="cityFactoryNotes">
-  Notes from last run: {{#each roundNotes}}  {{this}} <br />   {{/each}}
+    <button type="button" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="top" data-html="true" title="Events over last round" data-content="<ul>{{#each roundNotes}} <li>{{this}} </li> {{/each}}">Factory Log</button>
+  <!-- Factory log: {{#each roundNotes}}  {{this}} <br />   {{/each}} -->
   </div>
 </template>

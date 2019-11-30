@@ -5,6 +5,7 @@ import { check } from 'meteor/check';
 
 import { Assets } from './links.js';
 
+import { Maps } from './links.js';
 import { Links } from './links.js';
 import { Games } from './links.js';
 
@@ -38,7 +39,6 @@ export const RandomProducer = new ValidatedMethod({
   name: 'producers.makeRandom',
   validate ({}) {},
   run({chosenType, gameCode, bidKind}) {
-    // const todo = Todos.findOne(todoId);
     chosenType = Math.floor(Math.random()*6);
     if (!this.isSimulation) {
         var buyCosts = {
@@ -144,14 +144,89 @@ export const RunBids = new ValidatedMethod({
     // console.log(player + " " + producer);
 
     if (!this.isSimulation) {
-      Producers.find({$and: [{"gameCode": gameCode}, {"owned": false}]}).forEach(function (prod) {
-        // prodBids = Bids.find({$and: [{"gameCode": gameCode}, {"producer": prod._id}]}).fetch();
+      /*
 
-        // allBids = Bids.find({$and: [{"gameCode": gameCode}, {"affordability": true}, {"producer": prod._id}]}, {sort: {"bidVal": -1}}).fetch();
+      async function clearBids (producer) {
+        return await Bids.
+        >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
+      }
+
+      async function commitBid (bid, teams, resources) {
+        >> check affordability
+
+        >> change team resources
+        newRes = resources[bid["group"]]
+        newRes["res"][bid["bidKind"]] -=  bid["bidVal"];
+        if (newRes["res"][bid["bidKind"]] < 0) {
+          console.log("somehow this bid won though it's unaffordable what the fck " + JSON.stringify(bid));
+        }
+        else {
+          thisGame = Games.findOne({$and: [{"playerName": bid.group}, {"role": "base"}, {"gameCode": bid.gameCode}]});
+          Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
+        >> change producer owner
+          await Producers.update({"_id": bid.producer}, {$set: { "owned": true,  "ownerId": thisGame.playerId, "ownerGameId": thisGame._id, "ownerName": thisGame.group}});
+        >> add log about producer purchase
+          AddLog()
+        >> give notes to teams whose bids failed
+        >> change game phase to post-bid
+        // return await resourceChange();
+      }
+
+      async function bidTieMessage (bidTeams) {
+        return await updateTeamNotes();
+      }
+
+      async function resolveBids (producer, gameCode) {
+        prodBids = await Bids.find({"producer": prod._id}, {sort: {"bidVal": -1}}); // << Do I care about this sorting?
+        producerBids = prodBids.fetch();
+        diffTeams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
+        diffTeams = diffTeams.fetch();
+        teamResources = diffTeams.reduce( function(map, obj) {map[obj.playerName] = obj.res; return map;}, {});
+
+        maxBid = 0;
+        maxTie = false;
+        bidResources = producer.bidKind;
+        bid = {};
+        for (pb in producerBids) {
+          bid = producerBids[pb];
+          bidValue = bid.bidVal;
+          if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["group"]]) {
+            if (bidValue == maxBid) {
+              maxTie = true;
+            }
+            else if (bidValue > maxBid) {
+              maxBid = bidValue;
+              maxTie = false;
+            }
+          }
+        }
+        if (maxBid == 0) {
+          return await noBids();   // ugh can skip
+        }
+        else if (maxTie == false){
+          return await commitBid(maxBid, diffTeams, teamResources);
+        }
+        else {
+          return await bidTieMessage(bidTeams);   // ugh can skip
+        }
+      }
+
+      async function runThroughBids(gameCode) {
+        allProds = await Producers.find({$and: [{"gameCode": gameCode}, {"owned": false}]});
+        allProducers = allProds.fetch();
+        for (ap in allProducers) {
+          await resolveBids(allProducers[ap], gameCode);
+          await clearBids(allProducers[ap]);
+        }
+      }
+      
+      runThroughBids(gameCode);
+      */
+
+      Producers.find({$and: [{"gameCode": gameCode}, {"owned": false}]}).forEach(function (prod) {
+
         allBids = Bids.find({$and: [{"gameCode": gameCode}, {"producer": prod._id}]}, {sort: {"bidVal": -1}}).fetch();
         // maybe write another function to ensure removal of unaffordable bids?
-        //
-        // console.log(allBids);
         purchased = "not yet";
         affBids = []
         for (i in allBids) {
@@ -247,15 +322,29 @@ export const ToggleFactory = new ValidatedMethod({
 
   run ({producerId, currentStatus, gameCode, baseId}) {
     // Producers.find()
-    Producers.update({"_id": producerId}, {$set: {"running": !currentStatus}});
+    thisGame = Games.findOne({$and: [{"playerId": baseId}, {"gameCode": gameCode}, {"status": "running"}, {"role": "base"}]});
+    runners = Producers.find({$and: [{"running": true}, {"gameCode": gameCode}, {"owned": true}, {"ownerId": baseId}]}).fetch();
+    newStatus = currentStatus;
+    changed = false;
+    if (runners.length < thisGame.population && currentStatus == false) {
+      newStatus = true;
+      changed = true;
+    }
+    if (currentStatus == true) {
+      newStatus = false;
+      changed = true;
+    }
+
+    Producers.update({"_id": producerId}, {$set: {"running": newStatus}});
     Acts.insert({
       "time": (new Date()).getTime(),
       "key": "factoryToggle",
       "producerId": producerId,
       "pastStatus": currentStatus,
-      "newStatus": !currentStatus,
+      "newStatus": newStatus,
       "gameCode": gameCode,
-      "baseId": baseId
+      "baseId": baseId,
+      "changed": changed
     });
     //***TODO: add game code, groupId, groupName
   }
@@ -270,7 +359,7 @@ export const MakeLog = new ValidatedMethod({
     log["time"] = (new Date()).getTime();
     Acts.insert(log);
   }
-})
+});
 
 export const ConsumeResources = new ValidatedMethod({
   name: 'producers.consume',
@@ -280,8 +369,12 @@ export const ConsumeResources = new ValidatedMethod({
     // city = Cities.findOne({"name": prod["owner"]});
     if (!this.isSimulation){
       admin = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
+      
+      if ("year" in admin) { currYear = admin.year; }
+      else { currYear = 1; }
+
       allBases = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch();
-      ResetFactoryNotes.call({gameCode});
+      // ResetFactoryNotes.call({gameCode});
 
       for (b in allBases){
         base = allBases[b];
@@ -384,38 +477,32 @@ export const ConsumeResources = new ValidatedMethod({
           newpop = newpop - 1;
           roundNotes.push("Your city is too depressing, people don't want to live there!");
         }
-        if (newhapp < 0) {
-          newhapp = 0;
-        }
-        if (newpoll < 0) {
-          newpoll = 0;
-        }
-        if (newpop < 0) {
-          newpop = 0;
-        }
+        if (newhapp < 0) { newhapp = 0; }
+        if (newpoll < 0) { newpoll = 0; }
+        if (newpop < 0) { newpop = 0; }
+
         newStats = {
           "res": res,
           "pollution": newpoll,
           "happiness": newhapp,
           "population": newpop,
-          "roundNotes": roundNotes
+          "roundNotes": roundNotes,
+          "year": (currYear + 1)
         }
         Games.update({"_id": base._id}, {$set: newStats});
         newStats["baseID"] = base._id;
         MakeLog.call({"key": "cityUpdate", "log": newStats})
         
       }
+      console.log(currYear);
+      Games.update({$and: [ {"gameCode": admin.gameCode}]}, {$set: {"year": (currYear + 1)}});
+      Games.update({"_id": admin._id}, {$set: {"phase": "pre-bid"}})
+      console.log("finishing round end");
 
-      SpreadPollution.call({"gameCode": gameCode});
+      // change game phase
 
-      // SpreadPollution.call({"gameCode": gameCode}, function (err, res) {
-      //   if (err) {console.log(err);}
-      //   else {console.log(res);}
-      // });
+      return true;
     }
-      // RunBids
-      // History.insert({"time": new Date().getTime(), "city": city.name, "cityid": city._id, "res": res, "pollution": newpoll, "happiness": newhapp, "population": newpop});
-    // });
   }
 });
 
@@ -423,7 +510,7 @@ export const SpreadPollution = new ValidatedMethod({
   name: 'pollution.spread',
   validate({}) {},
   run ({gameCode}) {
-    allBases = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch();
+    allBases = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch(); //*****sort descending by pollution amount
     for (ab in allBases) {
       newpoll = parseInt(allBases[ab].pollution);
       base = allBases[ab];
@@ -431,18 +518,29 @@ export const SpreadPollution = new ValidatedMethod({
         pollLeak = (newpoll - 3 ) / 3;
         pollLeak = parseInt(pollLeak);
         console.log("leaking pollution " + pollLeak);
-        // roundNotes.push("High pollution, leaking onto neighbors!");
-        // gnumber = admin.groupList.indexOf(base.playerName);
-        // neighbors = 
-        // console.log("pollution leaaaakk");
+        
         if (pollLeak > 0){
           for (n in base.neighbors){
             console.log("hitting the neighbs " + base.neighbors[n] + " " + pollLeak);
-            neighGame = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": base.neighbors[n]}]});
-            // console.log(neighGame);
-            // console.log("neighbor pollution " + parseInt(neighGame.pollution));
-            // console.log(Games.findOne({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": base.neighbors[n]}]}));
-            // Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": base.neighbors[n]}]}, {$inc: {"pollution": pollLeak}}, {$push: {"notes": "A neighbor leaked pollution on to you!"}});  
+            // neighGame = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": base.neighbors[n]}]}); 
+            neighGame = allBases.filter(obj => {
+              return obj.playerName == base.neighbors[n];
+            });
+            neighGameIndex = allBases.findIndex(obj => {
+              return obj.playerName == base.neighbors[n];
+            });
+
+            if (neighGame.length != 1) {
+              console.log("why are there more or less than 1 base with this name wtf?! " + base.neighbors[n] + " " + JSON.stringify(neighGame) + " " + JSON.stringify(base.playerName) + " " + JSON.stringify(allBases));
+            }
+            else {
+              //add a check that this neighbor's pollution is a valid number that can be added to
+              allBases[neighGameIndex].pollution += pollLeak;
+              allBases[neighGameIndex].roundNotes.push("A neighbor leaked pollution on to you!");
+              allBases[b].roundNotes.push("You leaked " + pollLeak + " pollution on to " + base.neighbors[n]);
+            }
+
+            /*
             if(neighGame != undefined) {
               neighborPollution = parseInt(neighGame.pollution) + parseInt(pollLeak);
               // console.log("new neighbor pollution is " + neighborPollution);
@@ -455,11 +553,14 @@ export const SpreadPollution = new ValidatedMethod({
               leakNote = ["High pollution, leaked " + pollLeak + " pollution to " + base.neighbors[n]];
               AddTeamNote.call({"gameCode": base.gameCode, "baseId": base.playerId, "notes": leakNote}, function (err, res) {
                 if (err) {console.log(err);} });
-            }
+            }*/
             // roundNotes.push("High pollution, leaked " + pollLeak + " pollution to " + base.neighbors[n]);
           }
         }
       }
+    }
+    for  (ab in allBases) {
+      Games.update({_id: allBases[ab]._id}, {$set: {"roundNotes": allBases[ab].roundNotes, "pollution": allBases[ab].pollution}});
     }
     // newlog = {"allTeams": Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]}).fetch()};
     // MakeLog.call({"key": "roundEndTeams", "log": newlog});
@@ -501,6 +602,36 @@ export const ResetTeamNotes = new ValidatedMethod({
   }
 });
 
+export const AsyncTest = new ValidatedMethod({
+  name: 'asyncTest',
+  validate ({}) {},
+  run({gameCode}) {
+    async function test3() {
+      console.log(4);
+      console.log(5);
+      // prods = await Producers.find({"owned": false});
+      // console.log(prods.fetch());
+      console.log(6);
+      return true;
+    }
+    async function test2() {
+      console.log(7);
+      console.log(8);
+      await test3();
+      console.log(9);
+      // return true;
+    }
+    async function test1() {
+      console.log(1);
+      console.log(2);
+      console.log(3);
+      return await test2();
+    }
+
+    test1();
+  }
+});
+
 export const NewRound = new ValidatedMethod({
   name: 'newRound',
   validate ({}) {},
@@ -511,7 +642,17 @@ export const NewRound = new ValidatedMethod({
       ResetFactoryNotes.call({"gameCode": gameCode});
 
       ResetTeamNotes.call({"gameCode": gameCode});
+      ConsumeResources.call({"gameCode": gameCode}, (err, res) => {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          console.log("calling back after completion!");
+          SpreadPollution.call({"gameCode": admin.gameCode});
+        }
+      });
 
+      /*      
       ConsumeResources.call({"gameCode": gameCode}, (err, res) => {
         if (err) {console.log(err);}
         else {
@@ -542,6 +683,7 @@ export const NewRound = new ValidatedMethod({
           });
         }
       });
+      */
       
       console.log("new round called");
     }
@@ -645,6 +787,7 @@ export const StartGame = new ValidatedMethod({
     if (!this.isSimulation) {
       // baseList = shuffle(baseUsers);
       baseList = baseUsers;
+      baseList = baseList.slice(0, cityCount);
       allGames = Games.find({}, {"gameCode": 1}).fetch();
       
       gameCodes = [];
@@ -655,6 +798,7 @@ export const StartGame = new ValidatedMethod({
       while (newgc in gameCodes) {
         newgc = parseInt(Math.random()*100000).toString();;
       }
+      var year = 1;
 
       Games.insert({
         "gameCode": newgc, 
@@ -663,7 +807,9 @@ export const StartGame = new ValidatedMethod({
         "role": "admin",
         "status": "running",
         "group": "none",
-        "groupList":  baseList.slice(0,cityCount)
+        // "groupList":  baseList.slice(0,cityCount),
+        "groupList":  baseList,
+        "year": year
       });
       for (var i = 0; i < cityCount; i++) {
         // console.log(baseList[i]);
@@ -738,13 +884,14 @@ export const AddNeighbor = new ValidatedMethod({
   validate({}) {},
   run({gameCode, cityName, neighbor}) {
     if (!this.isSimulation) {
+      console.log(neighbor);
       if (neighbor != "empty") {
         if (Games.findOne({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": neighbor}]}) != undefined){
           Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": cityName}]}, {$addToSet: {"neighbors": neighbor}});
         }
       }
       else {
-
+        console.log("emptying neighbors");
         Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": cityName}]}, {$set: {"neighbors": []}}); 
       }
     }
@@ -830,6 +977,8 @@ export const JoinGame = new ValidatedMethod({
     }
   }
 });
+
+//TODO: fix baseID to be game document ID and not just user document ID
 
 export const MakeBid = new ValidatedMethod({
   name: 'bid.make',

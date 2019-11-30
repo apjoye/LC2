@@ -117,7 +117,7 @@
     margin: 2pt;
 }
 
-#productionValues {
+.productionValues {
 	float: right;
 	/*width: 65%;*/
 	text-align: right;
@@ -185,7 +185,7 @@ body {
     /*margin-bottom: 5px;*/
 }
 
-#consumptionValue {
+.consumptionValue {
   float: right;
   width: 100%;
   text-align: right;

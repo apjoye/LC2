@@ -3,6 +3,7 @@ import '../gameList/gameList.js';
 import { Producers } from '/imports/api/links/links.js';
 // import { Assets } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
+
 import { ChangeStat } from '/imports/api/links/methods.js';
 import { NewRound } from '/imports/api/links/methods.js';
 import { StartGame } from '/imports/api/links/methods.js';
@@ -10,6 +11,9 @@ import { ToggleGameRunning } from '/imports/api/links/methods.js';
 import { ChangeTeam } from '/imports/api/links/methods.js';
 import { MakeBase } from '/imports/api/links/methods.js';
 import { AddNeighbor } from '/imports/api/links/methods.js';
+import { AsyncTest } from '/imports/api/links/methods.js';
+// import {}
+
 import { Games } from '/imports/api/links/links.js';
 
 Template.adminView.onCreated(function helloOnCreated() {
@@ -106,6 +110,17 @@ Template.adminGame.events({
     ResetAll.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
     });
+  },
+
+  'click .asyncTest'(event, instance) {
+    // increment the counter when button is clicked
+    // instance.counter.set(instance.counter.get() + 1);
+    AsyncTest.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) {console.log(err);}
+      else {
+        console.log("round run!");
+      }
+    })
   },
 
   'click .newRound'(event, instance) {

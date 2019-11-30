@@ -1,7 +1,7 @@
 <template name="makeGame">
   <form class = "hostGame form form-inline" role = "form">
     <div class="form-group">
-      <label for="groupSizeTextBox" class="control-label">Groups:</label>
+      <label for="groupSizeTextBox" class="control-label">Cities:</label>
           <input type="number" placeholder="4" name="groups" class = "form-control" id = "groupSizeTextBox"/>
     <input type="submit" value = "Host new game" class = "btn btn-default" /> 
     <sub>(Please enter less than 8 and >=2 if you don't want all the things to break)</sub>
@@ -52,13 +52,25 @@
     </tr>
     {{/each}}
   </table>
-  <p>    <button class="newRound btn btn-default">Next Round</button>  </p>
-  <p>    <button class="reset btn btn-default"> Reset everything </button>  </p>
-  <p>    <button class="btn btn-default seeScore">See scoreboard</button>  </p>
-
-  Status: {{status}}
-  <button class="btn btn-default toggleGameState">Toggle</button>
-
+  <div class="btn-group" role="group" aria-label="Basic example">
+    <button type="button" class="runBids btn btn-primary">Run Bids</button>
+    <button type="button" class="runBuilds btn btn-warning">Run Buildings & End Round</button>
+    <button type="button" class="newRound btn btn-default">Next Round</button>
+  </div>
+  <p> </p>
+<!--   <p>    <button class="runBids btn btn-default">Run Bids</button>  </p>
+  <p>    <button class="runBuilds btn btn-default">Run Builds & End Round</button>  </p>
+  <p>    <button class="newRound btn btn-default">Next Round</button>  </p> -->
+  <div class="btn-group" role="group" aria-label="Basic example">
+    <button type="button" class="asyncTest btn btn-default">Async Test</button>
+    <button type="button" class="reset btn btn-default"> Reset everything </button>
+    <button type="button" class="btn btn-primary seeScore">See scoreboard</button> 
+  </div>
+  <p> </p>
+  <p>
+    Status: {{status}}
+    <button class="btn btn-default toggleGameState">Toggle</button>
+  </p>
   <!--  Change people's teams-->
   <p>
   <form class="changeTeam form-inline">

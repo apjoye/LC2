@@ -17,16 +17,19 @@ Template.navBar.helpers({
      gameCode = FlowRouter.getParam("gameCode");
      // console.log(gameCode);
      group = "";
+     year = "";
      if (gameCode != undefined){
        game = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": gameCode}]});
-       if (game != undefined) {
-         group = game.group
+       if (game != undefined) { 
+         group = game.group; 
+         if ("year" in game) {
+           year = game["year"];
+         }
        }
      }
-     if (group != ""){
-       group = group;
-     }
-     return group;
+     if (group != ""){ group = group; }
+     
+     return {"group": group, "year": year};
    },
 
    gameCode () {

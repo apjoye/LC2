@@ -17,18 +17,6 @@ Template.factoryList.onCreated(function helloOnCreated() {
 
   Meteor.subscribe('producers.public');
   Meteor.subscribe('games.minerunning');
-  // Meteor.subscribe('bids.local');
-  // Meteor.subscribe('assets.all');
-
-  
-  //kind
-  //m1 cost, m2 cost, f1 cost, f2 cost, people cost
-  //production kind: m1, m2, f1, f2
-  //production amount
-  //polluion produced
-
-
-  // this.kind1 = new ReactiveVar(0);
 
 });
 

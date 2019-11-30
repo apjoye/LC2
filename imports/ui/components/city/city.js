@@ -7,6 +7,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import '/imports/ui/stylesheets/style.css';
 
 import { ToggleFactory } from '/imports/api/links/methods.js';
+import 'animate.css/animate.css';
 
 // import { NewRound } from '/imports/api/links/methods.js';
 
@@ -157,8 +158,8 @@ Template.cityFactory.onCreated(function helloOnCreated() {
   // this.counter = new ReactiveVar(0);
   // Meteor.subscribe('cities.all');
   // Meteor.subscribe('producers.public');
-  Meteor.subscribe('producers.owned');
-  Meteor.subscribe('games.running');
+  // Meteor.subscribe('producers.owned');
+  // Meteor.subscribe('games.running');
   
 });
 
@@ -270,20 +271,23 @@ Template.cityFactory.events({
     event.preventDefault();
     // console.log(instance);
     // console.log(this.running);
-    runners = Producers.find({$and: [{"running": true}, {"gameCode": FlowRouter.getParam("gameCode")}, {"owned": true}, {"ownerId": Meteor.userId()}]}).fetch();
-    thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]});
+    // runners = Producers.find({$and: [{"running": true}, {"gameCode": FlowRouter.getParam("gameCode")}, {"owned": true}, {"ownerId": Meteor.userId()}]}).fetch();
+    // thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]});
 
-    if (runners.length >= thisGame.population && this.running == false) {
-      console.log("not enough people!!!");
+    // if (runners.length >= thisGame.population && this.running == false) {
+      // console.log("not enough people!!!");
       //alert("Everybody's already employed!");
-    }
-    else {
+    // }
+    // else {
       ToggleFactory.call({"producerId": this._id, "currentStatus": this.running, "gameCode": FlowRouter.getParam("gameCode"), "baseId": Meteor.userId()}, function (err, res) {
         if (err) {
           console.log(err);
         }
+        else {
+          $('.factoryIcon').addClass('animated bounce');
+        }
       });
-    }
+    // }
   }
 });
 
