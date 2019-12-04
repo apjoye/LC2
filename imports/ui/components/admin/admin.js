@@ -11,6 +11,7 @@ import { ToggleGameRunning } from '/imports/api/links/methods.js';
 import { ChangeTeam } from '/imports/api/links/methods.js';
 import { MakeBase } from '/imports/api/links/methods.js';
 import { AddNeighbor } from '/imports/api/links/methods.js';
+import { RunBids } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
 // import {}
 
@@ -110,6 +111,17 @@ Template.adminGame.events({
     ResetAll.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
     });
+  },
+
+  'click .runBids'(event, instance) {
+    // increment the counter when button is clicked
+    // instance.counter.set(instance.counter.get() + 1);
+    RunBids.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) {console.log(err);}
+      else {
+        console.log("bids run!");
+      }
+    })
   },
 
   'click .asyncTest'(event, instance) {

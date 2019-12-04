@@ -144,70 +144,95 @@ export const RunBids = new ValidatedMethod({
     // console.log(player + " " + producer);
 
     if (!this.isSimulation) {
-      /*
+      
 
       async function clearBids (producer) {
-        return await Bids.
-        >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
+        // return await Bids.
+        // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
       }
 
       async function commitBid (bid, teams, resources) {
-        >> check affordability
+        // >> check affordability
+        console.log(JSON.stringify(resources) + " " + JSON.stringify(bid));
+        newRes = resources[bid["group"]];
+        oldRes = newRes;
+        newRes[bid["bidKind"]] -=  bid["bidVal"];
 
-        >> change team resources
-        newRes = resources[bid["group"]]
-        newRes["res"][bid["bidKind"]] -=  bid["bidVal"];
-        if (newRes["res"][bid["bidKind"]] < 0) {
+        if (newRes[bid["bidKind"]] < 0) {
           console.log("somehow this bid won though it's unaffordable what the fck " + JSON.stringify(bid));
+          return true;
         }
+        // >> change team resources
         else {
+          console.log("committing the bid!!");
           thisGame = Games.findOne({$and: [{"playerName": bid.group}, {"role": "base"}, {"gameCode": bid.gameCode}]});
-          Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
-        >> change producer owner
+          await Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
+
+        // >> change producer owner
           await Producers.update({"_id": bid.producer}, {$set: { "owned": true,  "ownerId": thisGame.playerId, "ownerGameId": thisGame._id, "ownerName": thisGame.group}});
-        >> add log about producer purchase
-          AddLog()
-        >> give notes to teams whose bids failed
-        >> change game phase to post-bid
-        // return await resourceChange();
+
+        // >> add log about producer purchase
+          evLog = bid;
+          evLog["oldRes"] = oldRes;
+          evLog["newRes"] = newRes
+          MakeLog.call({"key": "ProducerAcquire", "log": evLog});
+
+        // >> give note to success of bid?
+
+        // >> give notes to teams whose bids failed
+          // failBids = await Bids.find({$and: [{producer: bid.producer}, {}]})
+          // await Games.update()
+
+        // >> change game phase to post-bid
+          await Games.update({$and: [{"role": "admin"}, {"gameCode": bid.gameCode}]}, {$set: {"phase": "post-bid"}})
+          return true;
+          // return await resourceChange();
+        }
       }
 
       async function bidTieMessage (bidTeams) {
-        return await updateTeamNotes();
+        // return await updateTeamNotes();
       }
 
       async function resolveBids (producer, gameCode) {
-        prodBids = await Bids.find({"producer": prod._id}, {sort: {"bidVal": -1}}); // << Do I care about this sorting?
+        prodBids = await Bids.find({"producer": producer._id}, {sort: {"bidVal": -1}}); // << Do I care about this sorting?
         producerBids = prodBids.fetch();
         diffTeams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
         diffTeams = diffTeams.fetch();
         teamResources = diffTeams.reduce( function(map, obj) {map[obj.playerName] = obj.res; return map;}, {});
 
         maxBid = 0;
+        maxBidObj = {};
         maxTie = false;
         bidResources = producer.bidKind;
         bid = {};
+        // console.log(producerBids);
         for (pb in producerBids) {
           bid = producerBids[pb];
           bidValue = bid.bidVal;
-          if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["group"]]) {
+          teamRes = teamResources[producerBids[pb]["group"]][bid["bidKind"]]
+          // console.log(bidValue +  " " + teamRes);
+          if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["group"]][bid["bidKind"]]) {
             if (bidValue == maxBid) {
               maxTie = true;
             }
             else if (bidValue > maxBid) {
               maxBid = bidValue;
+              maxBidObj = bid;
               maxTie = false;
             }
           }
         }
+        // console.log(maxBid + " " + maxTie + " ");
         if (maxBid == 0) {
-          return await noBids();   // ugh can skip
+          // return await noBids();   // ugh can skip
         }
         else if (maxTie == false){
-          return await commitBid(maxBid, diffTeams, teamResources);
+          // console.log("false maxTie found!");
+          return await commitBid(maxBidObj, diffTeams, teamResources);
         }
         else {
-          return await bidTieMessage(bidTeams);   // ugh can skip
+          // return await bidTieMessage(bidTeams);   // ugh can skip
         }
       }
 
@@ -221,8 +246,8 @@ export const RunBids = new ValidatedMethod({
       }
       
       runThroughBids(gameCode);
-      */
-
+      
+      /*
       Producers.find({$and: [{"gameCode": gameCode}, {"owned": false}]}).forEach(function (prod) {
 
         allBids = Bids.find({$and: [{"gameCode": gameCode}, {"producer": prod._id}]}, {sort: {"bidVal": -1}}).fetch();
@@ -276,6 +301,7 @@ export const RunBids = new ValidatedMethod({
 
         ClearBids.call({"producer": prod._id});
       });
+      */
     }
     return true;
   }
