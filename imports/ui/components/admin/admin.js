@@ -77,6 +77,17 @@ Template.adminGame.helpers({
 
   gameTeams() {
     return Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam("gameCode")}]});
+  },
+
+  gamePhaseClass() {
+    phase = Games.findOne({"gameCode": FlowRouter.getParam("gameCode")}).phase;
+    if (phase == "post-bid") {
+      return {"bids": "btn-warning", "builds": "btn-primary"};
+    }
+    else {
+      return {"bids": "btn-primary", "builds": "btn-secondary"};
+    }
+
   }
 });
 

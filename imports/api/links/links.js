@@ -3,6 +3,8 @@
 import { Mongo } from 'meteor/mongo';
 
 export const Maps = new Mongo.Collection('maps');
+export const Resources = new Mongo.Collection('resources');
+export const Buildings = new Mongo.Collection('buildings');
 
 export const Links = new Mongo.Collection('links');
 

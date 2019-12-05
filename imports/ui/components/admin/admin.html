@@ -27,6 +27,7 @@
   
 </template>
 
+<!-- TODO: try to pass game as argument to reduce template querying -->
 <template name="adminGame">
   <table>
     {{#each allPlayers}}
@@ -53,8 +54,8 @@
     {{/each}}
   </table>
   <div class="btn-group" role="group" aria-label="Basic example">
-    <button type="button" class="runBids btn btn-primary">Run Bids</button>
-    <button type="button" class="runBuilds btn btn-warning">Run Buildings & End Round</button>
+    <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
+    <button type="button" class="runBuilds btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
     <button type="button" class="newRound btn btn-default">Next Round</button>
   </div>
   <p> </p>
