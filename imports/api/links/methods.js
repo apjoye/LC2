@@ -6,6 +6,9 @@ import { check } from 'meteor/check';
 import { Assets } from './links.js';
 
 import { Maps } from './links.js';
+import { Resources } from './links.js';
+import { Buildings } from './links.js';
+
 import { Links } from './links.js';
 import { Games } from './links.js';
 
@@ -19,6 +22,8 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method';
 
 import { baseUsers } from '../../startup/both/index.js';
 
+import { WebApp } from 'meteor/webapp';
+
 Meteor.methods({
   'links.insert'(title, url) {
     check(url, String);
@@ -30,10 +35,23 @@ Meteor.methods({
       createdAt: new Date(),
     });
   },
+
 });
 
 var resources = ["m1", "m2", "f1", "f2"];
 var factoryKinds = ["m1", "m2", "f1", "f2", "p1", "p2"];
+
+WebApp.connectHandlers.use('/hello', (req, res, next) => {
+  res.writeHead(200);
+  res.end(`Hello world from: ${Meteor.release}`);
+});
+
+WebApp.connectHandlers.use('/map', (req, res, next) => {
+  res.writeHead(200);
+  adminGames  = Games.find({"role": "admin"}).fetch();
+  res.end(JSON.stringify(adminGames));
+});
+
 
 export const RandomProducer = new ValidatedMethod({
   name: 'producers.makeRandom',
@@ -803,6 +821,17 @@ export const ResetAll = new ValidatedMethod({
     // Assets.update({$and: [{"name": "m2"}, {"kind": "resource"}]}, {$set: {"name": "m2", "regName": "Gold", "img": "img/icons/gold_med.png", "kind": "resource"}}, {upsert: true});
     // Assets.update({$and: [{"name": "f1"}, {"kind": "resource"}]}, {$set: {"name": "f1", "regName": "Food", "img": "img/icons/food_med.png", "kind": "resource"}}, {upsert: true});
     // Assets.update({$and: [{"name": "f2"}, {"kind": "resource"}]}, {$set: {"name": "f2", "regName": "Cotton", "img": "img/icons/cotton_med.png", "kind": "resource"}}, {upsert: true});
+  }
+});
+
+export const MakeMap = new ValidatedMethod({
+  name: 'map.make',
+  validate ({}) {},
+  run({gameCode}) {
+    //place an ore
+    Resources.insert({"gameCode": gameCode, "category": "ore", "kind": "m1", "name": "Gold Ore"});
+
+    //
   }
 });
 
