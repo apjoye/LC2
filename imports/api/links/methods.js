@@ -41,22 +41,22 @@ Meteor.methods({
 var resources = ["m1", "m2", "f1", "f2"];
 var factoryKinds = ["m1", "m2", "f1", "f2", "p1", "p2"];
 
-WebApp.connectHandlers.use('/hello', (req, res, next) => {
-  res.writeHead(200);
-  res.end(`Hello world from: ${Meteor.release}`);
-});
+// WebApp.connectHandlers.use('/hello', (req, res, next) => {
+//   res.writeHead(200);
+//   res.end(`Hello world from: ${Meteor.release}`);
+// });
 
-WebApp.connectHandlers.use('/map', (req, res, next) => {
-  res.writeHead(200);
-  adminGames  = Games.find({"role": "admin"}).fetch();
-  res.end(JSON.stringify(adminGames));
-});
+// WebApp.connectHandlers.use('/map', (req, res, next) => {
+//   res.writeHead(200);
+//   adminGames  = Games.find({"role": "admin"}).fetch();
+//   res.end(JSON.stringify(adminGames));
+// });
 
 
 export const RandomProducer = new ValidatedMethod({
   name: 'producers.makeRandom',
   validate ({}) {},
-  run({chosenType, gameCode, bidKind}) {
+  run({chosenType, gameCode, bidKind, kindMax = 4}) {
     chosenType = Math.floor(Math.random()*6);
     if (!this.isSimulation) {
         var buyCosts = {
@@ -97,6 +97,9 @@ export const RandomProducer = new ValidatedMethod({
         //make this kindChosen number random, or incrementing
         var kindChosen = kinds[chosenType];
 
+        var thisYear = Games.findOne({$and: [{"role": "admin"}, {"gameCode": gameCode}]});
+        thisYear = thisYear.year;
+
         var currentProd = {
           "kind": kindChosen,
           "buyCost": buyCosts[kindChosen],
@@ -108,7 +111,8 @@ export const RandomProducer = new ValidatedMethod({
           "visible": true,
           "owner": 0,
           "durability": 0,
-          "roundNotes": []
+          "roundNotes": [],
+          "yearAdd": thisYear
         };
 
         //pick a random kind
@@ -117,6 +121,11 @@ export const RandomProducer = new ValidatedMethod({
         /******* GET THE KEY OF THE PRODUCER INSERTED
         make a bid on it from every team
         ********/
+        kindProducers = Producers.find({$and: [{"bidKind": res}, {"gameCode": gameCode}, {"owned": false}, {"visible": true}]}, {sort: {"yearAdd": 1}}).fetch();
+        
+        if (kindProducers.length > kindMax) {
+          Producers.update({"_id": kindProducers[0]["_id"]}, {$set: {"visible": false}});
+        }
     }
     return true;
   }
@@ -676,25 +685,66 @@ export const AsyncTest = new ValidatedMethod({
   }
 });
 
+export const SpawnFactories = new ValidatedMethod({
+  name: 'newFacts',
+  validate ({}) {},
+  run({gameCode, producerCount}) {
+    ///// Randomize resources, and make factories if they don't have 4
+    diffResources = shuffle(resources);
+    if (producerCount == -1) {
+      producerCount = Games.findOne({$and: [{"role": "admin"}, {"gameCode": gameCode}]}).groupList.length - 1
+    }
+
+    console.log(producerCount);
+
+    for (var i = 0; i < producerCount; i++) { 
+      //for each kind of resource 
+        //if there are not 4 factories available with that bidkind, add a factory
+      res = diffResources[(i % resources.length)];
+      RandomProducer.call({"chosenType": i, "gameCode": gameCode, "bidKind": res});
+      
+
+    }
+    
+    endBases = {"allTeams": Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]}).fetch()};
+    MakeLog.call({"key": "roundEndTeams", "log": endBases});
+    ownedFacts = Producers.find({$and: [{"gameCode": gameCode}, {"owned": true}]}).fetch();
+    MakeLog.call({"key": "ownedFactories", "log": ownedFacts});
+    publicFacts = Producers.find({$and: [{"gameCode": gameCode}, {"owned": false}]}).fetch();
+    MakeLog.call({"key": "publicFactories", "log": publicFacts}); 
+  }
+});
+
 export const NewRound = new ValidatedMethod({
   name: 'newRound',
   validate ({}) {},
-  run({gameCode, producerCount = 4}) {
+  run({gameCode, producerCount = -1}) {
     //reset factory notes, and team notes
     if (!this.isSimulation){
       console.log("new rounding");
       ResetFactoryNotes.call({"gameCode": gameCode});
 
       ResetTeamNotes.call({"gameCode": gameCode});
-      ConsumeResources.call({"gameCode": gameCode}, (err, res) => {
-        if (err) {
-          console.log(err);
-        }
+
+      RunBids.call({"gameCode": gameCode}, (err, res) => {
+        if (err) {console.log(err);}
         else {
-          console.log("calling back after completion!");
-          SpreadPollution.call({"gameCode": admin.gameCode});
+          ConsumeResources.call({"gameCode": gameCode}, (err, res) => {
+            if (err) { console.log(err); }
+            else {
+              console.log("calling back after completion!");
+              // SpreadPollution.call({"gameCode": admin.gameCode});
+              SpreadPollution.call({"gameCode": gameCode}, (err, res) => {
+                if (err) { console.log(err); }
+                else {
+                  SpawnFactories.call({"gameCode": gameCode, "producerCount": producerCount});
+                }
+              });
+            }
+          });
         }
-      });
+      })
+          
 
       /*      
       ConsumeResources.call({"gameCode": gameCode}, (err, res) => {
@@ -828,8 +878,55 @@ export const MakeMap = new ValidatedMethod({
   name: 'map.make',
   validate ({}) {},
   run({gameCode}) {
+
+    /*
+    first assign ownership of cells for the first four teams - four corners of the grid - 0,0; 13,0; 0,13; 13,13
+
+    then add 2 ores (m1, m2), and 1 resource (f1) in each team's grid.
+    
+    add some ores and a river in no man's land.
+
+    add 4 2x2 ores, and 1 river through the map
+
+    */
+
+    async function seedResources (gameCode) {
+      
+    }
+
+    async function makeTeamCells (cornerX, cornerY, width, height, gameCode, groupId, groupName, groupGame) {
+      var thisX = cornerX;
+      var thisY = cornerY;
+      for (thisX = cornerX; thisX < cornerX + width; thisX += 1){
+        for (thisY = corners; thisY < cornerY + height; thisY += 1) {
+          await Maps.update(
+            {$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]}, 
+            {$set: {"owner": groupName, "ownerId": "groupId", "ownerGame": groupGame}}, 
+            {upsert: true}
+          );
+        }
+      }
+    }
+
+    async function mapSetup(gameCode) {
+      corners = [[0, 0], [13, 0], [0, 13], [13, 13]];
+      dims = [[4, 4], [4, 4], [4, 4], [4, 4]];
+      teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
+      teams = teams.fetch();
+      for (t in teams) {
+        if (t < 4){
+          await makeTeamCells(corners[t][0], corners[t][1], dims[t][0], dims[t][1], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
+        }
+      }
+
+      await seedResources (gameCode);
+    }
+
+    mapSetup(gameCode);
+    
+
     //place an ore
-    Resources.insert({"gameCode": gameCode, "category": "ore", "kind": "m1", "name": "Gold Ore"});
+    // Resources.insert({"gameCode": gameCode, "category": "ore", "kind": "m1", "name": "Gold Ore"});
 
     //
   }

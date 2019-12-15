@@ -114,8 +114,18 @@ Template.city.helpers({
       }
       for (r in prod.prodValues) {
         prodOutput[r] += prod.prodValues[r];
+        console.log(prod)
+        // prodOutput[r] = prodOutput[r] - prod.prodCosts[r];
+      }
+
+      for (r in prod.prodCosts) {
+        console.log(prod.prodCosts);
+        console.log(r);
+        console.log(prod.prodCosts[r])
+        prodOutput[r] = prodOutput[r] - prod.prodCosts[r];
       }
     });
+
     var thisgame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]})
     var totalFood = thisgame.res.f1 + thisgame.res.f2 + prodOutput["f1"] + prodOutput["f2"];
     var foodToPoll = totalFood / (thisgame.pollution + prodOutput["pollution"]);
@@ -143,6 +153,9 @@ Template.city.helpers({
     for (k in prodOutput) {
       if (prodOutput[k] >= 0) {
         prodOutStr[k] = "+" + prodOutput[k].toString();
+      }
+      else {
+       prodOutStr[k] = prodOutput[k].toString(); 
       }
     }
 
@@ -254,10 +267,10 @@ Template.cityFactory.helpers({
 
   runningStatus() {
     if (this.running == true) {
-      return "Enabled";
+      return "Running";
     }
     else {
-      return "Disabled";
+      return "Turned Off";
     }
   }
 
@@ -284,7 +297,7 @@ Template.cityFactory.events({
           console.log(err);
         }
         else {
-          $('.factoryIcon').addClass('animated bounce');
+          // $('.factoryIcon').addClass('animated bounce');
         }
       });
     // }

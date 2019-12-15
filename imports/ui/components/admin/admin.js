@@ -12,6 +12,9 @@ import { ChangeTeam } from '/imports/api/links/methods.js';
 import { MakeBase } from '/imports/api/links/methods.js';
 import { AddNeighbor } from '/imports/api/links/methods.js';
 import { RunBids } from '/imports/api/links/methods.js';
+import { ConsumeResources } from '/imports/api/links/methods.js';
+import { SpawnFactories } from '/imports/api/links/methods.js';
+
 import { AsyncTest } from '/imports/api/links/methods.js';
 // import {}
 
@@ -85,7 +88,7 @@ Template.adminGame.helpers({
       return {"bids": "btn-warning", "builds": "btn-primary"};
     }
     else {
-      return {"bids": "btn-primary", "builds": "btn-secondary"};
+      return {"bids": "btn-primary", "builds": "btn-warning"};
     }
 
   }
@@ -118,6 +121,26 @@ Template.adminGame.events({
     AddNeighbor.call({"gameCode": FlowRouter.getParam("gameCode"), "cityName": event.target.cityName.value, "neighbor": event.target.neighborName.value});
   },
 
+  'submit .addFacts' (event, instance) {
+    event.preventDefault();
+    facts = event.target.amount.value;
+    if (facts == "") {
+      facts = -1;
+    }
+    SpawnFactories.call({"gameCode": FlowRouter.getParam("gameCode"), "producerCount": facts});
+  },
+
+  'submit .newCustomRound' (event, instance) {
+    event.preventDefault();
+    console.log(event.target.amount.value);
+    facts = event.target.amount.value;
+    if (facts == "") {
+      facts = -1;
+    }
+    NewRound.call({"gameCode": FlowRouter.getParam("gameCode"), "producerCount": facts});
+
+  },
+
   'click .reset' (event, instance) {
     ResetAll.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
@@ -133,6 +156,17 @@ Template.adminGame.events({
         console.log("bids run!");
       }
     })
+  },
+
+  'click .runBuilds'(event, instance) {
+    // increment the counter when button is clicked
+    // instance.counter.set(instance.counter.get() + 1);
+    // ConsumeResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    //   if (err) {console.log(err);}
+    //   else {
+    //     console.log("bids run!");
+    //   }
+    // });
   },
 
   'click .asyncTest'(event, instance) {

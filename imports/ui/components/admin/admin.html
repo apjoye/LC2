@@ -56,8 +56,33 @@
   <div class="btn-group" role="group" aria-label="Basic example">
     <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
     <button type="button" class="runBuilds btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
+
+<!-- 
+    <button type="button" class="addFacts btn btn-default">Add Factories</button>
     <button type="button" class="newRound btn btn-default">Next Round</button>
+ -->
   </div>
+  
+  <p> </p>
+  
+  <form class="addFacts form-inline">
+    <div class="form-group">
+      <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+    </div>
+    <div class="form-group">
+      <input class="form-control" type="submit" value="Add Factories"/>
+    </div>
+  </form>
+
+  <form class="newCustomRound form-inline">
+    <div class="form-group">
+      <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+    </div>
+    <div class="form-group">
+      <input class="form-control" type="submit" value="Next Round"/>
+    </div>
+  </form>
+
   <p> </p>
 <!--   <p>    <button class="runBids btn btn-default">Run Bids</button>  </p>
   <p>    <button class="runBuilds btn btn-default">Run Builds & End Round</button>  </p>
