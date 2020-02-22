@@ -7,7 +7,7 @@ import { Cities } from '../links.js';
 import { Games } from '../links.js';
 import { Bids } from '../links.js';
 import { Acts } from '../links.js';
-
+import { Maps } from '../links.js';
 import { Assets } from '../links.js';
 
 
@@ -42,6 +42,12 @@ Meteor.publish('cities.all', function () {
 Meteor.publish('assets.all', function () {
   return Assets.find();
 });
+
+Meteor.publish('maps.thisGame', function (gameCode) {
+  // console.log(this.users());
+  return Maps.find({$and: [{"gameCode": gameCode }]});
+});
+
 
 Meteor.publish('games.minerunning', function () {
   // console.log(this.users());

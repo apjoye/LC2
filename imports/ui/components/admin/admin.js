@@ -15,9 +15,11 @@ import { RunBids } from '/imports/api/links/methods.js';
 import { ConsumeResources } from '/imports/api/links/methods.js';
 import { SpawnFactories } from '/imports/api/links/methods.js';
 
+import { MakeMap } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
 // import {}
-
+import { Maps } from '/imports/api/links/links.js';
+import { Resources } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
 
 Template.adminView.onCreated(function helloOnCreated() {
@@ -54,6 +56,45 @@ Template.makeGame.helpers({
   }
 });
 
+Template.gameMap.onCreated(function helloOnCreated() {
+  Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
+});
+
+Template.gameMap.helpers({
+  mapRows() {
+    //store map dimensions somewhere
+    mapWidth = 16;    //number of columns
+    mapHeight = 16;   //number of rows
+    rows = [];
+    map = Maps.find({"gameCode": gameCode}).fetch();
+    resMapDict = {}
+    for (m in map) {
+      if ("resource" in map[m]){
+        loc = "x" + map[m].x + "y" + map[m].y;
+        resMapDict[loc] = map[m].resource;  
+      }
+    }
+    console.log(resMapDict);
+
+    for (var i = 0; i < mapHeight; i++) {
+      thisRow = [];
+      for (var j = 0; j < mapHeight; j++) {
+        loc = "x" + j + "y" + i;
+        if (loc in resMapDict) {
+          // console.log(loc + " found!");
+          thisRow.push({"rowCol": resMapDict[loc]});  
+        }
+        else {
+          thisRow.push({"rowCol": ""});
+        }
+        
+      }
+      rows.push(thisRow);
+    }
+    console.log(rows);
+    return rows;
+  }
+}) 
 
 Template.adminGame.onCreated(function helloOnCreated() {
   Meteor.subscribe('games.minerunning');
@@ -176,6 +217,17 @@ Template.adminGame.events({
       if (err) {console.log(err);}
       else {
         console.log("round run!");
+      }
+    })
+  },
+
+  'click .makeMap'(event, instance) {
+    // increment the counter when button is clicked
+    // instance.counter.set(instance.counter.get() + 1);
+    MakeMap.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) {console.log(err);}
+      else {
+        console.log("map made!");
       }
     })
   },

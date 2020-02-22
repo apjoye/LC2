@@ -874,6 +874,82 @@ export const ResetAll = new ValidatedMethod({
   }
 });
 
+export const RunMine = new ValidatedMethod ({
+  name: 'run.mine',
+  validate ({}) {},
+  run({gameCode, loc, kind, groupName}) {
+    // do we need a resource nearby? ideally not
+    // there's a bonus if there's a resource nearby
+
+    //check for use ore flag
+
+    //look for relevant ores in the neighborhood
+
+    //enter ore use mode if ore found
+
+    //produce with presence of ore (i.e. more pollution, and if possible, more metal)
+
+    
+  }
+});
+
+export const RunHunters = new ValidatedMethod ({
+  name: 'run.hunt',
+  validate ({}) {},
+  run({gameCode, loc, kind, groupName}) {
+
+
+  }
+})
+
+export const RunBuildings = new ValidatedMethod({
+  name: 'runall.build',
+  validate ({}) {},
+  run({gameCode, group}) {
+    buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
+    for (b in buildings) {
+      if (b["kind"] == "metalmine"){
+        RunMine.call({"gameCode": gameCode, "build": buildings[b]});
+      }
+    }
+  }
+});
+
+export const AddBuilding = new ValidatedMethod({
+  name: 'add.build',
+  validate ({}) {},
+  run({gameCode, locx, locy, kind, buildingName, groupName}) {
+    //locs = []
+    //owner = ""
+    //type = ""
+
+    //mine kinds include metalmine, claymine, stonemine, etc
+    //farm kinds include fishfarm, 
+    gameObj = Games.findOne({$and: [{"gameCode": gameCode}, {"group": groupName}]});
+    groupGame = gameObj[_id];
+    groupId = gameObj[playerId];
+
+    // Buildings.update(
+    //   {$and: [{"gameCode": gameCode, "location": [locx, locy]}]}, 
+    //   {$set: {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName},
+    //   {upsert: true} );
+    Buildings.insert({"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName}, function (err, res) {
+      if (err) {
+        console.log("Building addition failed!!!");
+      }
+      else {
+        Maps.update(
+          {$and: [{"x": locx}, {"y": locy}]}, 
+          {$set: {"object": "building", "kind": kind, "name": buildingName}}
+        );    
+      }
+    });
+    // build = Buildings.findOne()
+    
+
+  }
+});
+
 export const MakeMap = new ValidatedMethod({
   name: 'map.make',
   validate ({}) {},
@@ -881,6 +957,7 @@ export const MakeMap = new ValidatedMethod({
 
     /*
     first assign ownership of cells for the first four teams - four corners of the grid - 0,0; 13,0; 0,13; 13,13
+        edit - going by current map, it's five teams at 1,1; 9,0; 12,6; 12, 12; 2, 12
 
     then add 2 ores (m1, m2), and 1 resource (f1) in each team's grid.
     
@@ -890,18 +967,93 @@ export const MakeMap = new ValidatedMethod({
 
     */
 
+
     async function seedResources (gameCode) {
+      resLocs = {
+        "woods1": [[0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [0, 10], [0, 11], [0, 12], [0, 13], [0, 14], [0, 15], 
+        [1, 5], [1, 6], [1, 7], [1, 8], [1, 9], [1, 10], [1, 11], [1, 12], [1, 13], [1, 14], [1, 15], 
+        [2, 5], [2, 6], [2, 7], [2, 8], [2, 9], [2, 10], [2, 11]],
+        "woods2": [ [12, 4], [12, 5],
+        [13, 0], [13, 1], [13, 2], [13, 3], [13, 4], [13, 5], 
+        [14, 0], [14, 1], [14, 2], [14, 3], [14, 4], [14, 5], 
+        [15, 0], [15, 1], [15, 2], [15, 3], [15, 4], [15, 5] ],
+        "lake": [ [7, 0], [8, 0], [7, 1], [8, 1], [6, 2], [7, 2], [6, 3], [7, 3], [6, 4], [7, 4],
+        [5, 5], [6, 5], [5, 6], [6, 6], [5, 7], [6, 7], [5, 8], [6, 8], [5, 9], [6, 9], [5, 10], [6, 10], [5, 11], [6, 11],
+        [6, 12], [6, 13], [7, 12], [7, 13], [8, 12], [8, 13], [9, 12], [9, 13], [10, 12], [10, 13], [11, 12], [11, 13], 
+        [10, 14], [11, 14], [10, 15], [11, 15]
+        ],
+        "mine1": [[3, 5], [4, 5], [3, 6], [4, 6]],
+        "mine2": [[14, 10], [14, 11], [15, 10], [15, 11]]
+      };
+      resAmounts = {
+        "woods1": {"lumber": 100, "animals": 30},
+        "woods2": {"lumber": 100, "animals": 30},
+        "lake": {"pollution": 0, "fish": 50},
+        "mine1": {"clay": 30},
+        "mine2": {"stone": 30}
+      }
+
+      //*** TODO: Consider preprocessing and identifying neighbors of resources
+
+      resKinds = {
+        "woods1": "lumber",
+        "woods2": "lumber",
+        "lake": "water",
+        "mine1": "clay",
+        "mine2": "stone"
+      }
+
+      teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
+      teams = teams.fetch();
+
+      // factoryLocs = [
+      //   [
+      //     {"name": "farmBonus", 
+      //     "kind": "f10", 
+      //     "prodCosts": {"m1": 1, "f1": 0, "m2": 0, "f2": 0 }, 
+      //     "prodValues": {"f1": 4, "pollution": 2 }, 
+      //     "location": [1, 4]   },
+          
+      //     {"name": "mineBonus", 
+      //     "kind": "m10", 
+      //     "prodCosts": {"m1": 0, "f1": 1, "m2": 0, "f2": 0 }, 
+      //     "prodValues": {"m1": 5, "pollution": 3 }, 
+      //     "location": [4, 4]},
+      //   ]
+      // ]
+
+      for (res in resLocs) {
+        Resources.insert({"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]}, function (err, insertedRes) {
+          if (err) {console.log("resource insertion faiiled!!");}
+          else {
+            // console.log(resLocs[res]);
+            // console.log(insertedRes);
+            for (l in resLocs[res]) {
+              Maps.update (
+                {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
+                {$set: {"resource": res, "resId": insertedRes}}, 
+                {upsert: true}
+              )
+            }
+          }  
+        });
+        // console.log(res);
+        // await Resources.findOne()
+        
+      }
       
     }
 
     async function makeTeamCells (cornerX, cornerY, width, height, gameCode, groupId, groupName, groupGame) {
+      //groupID is the userID of the group's user object; and groupGame is the _id of the group's game object. 
+      //all instances of orange group across games are the same user but different games
       var thisX = cornerX;
       var thisY = cornerY;
       for (thisX = cornerX; thisX < cornerX + width; thisX += 1){
-        for (thisY = corners; thisY < cornerY + height; thisY += 1) {
+        for (thisY = cornerY; thisY < cornerY + height; thisY += 1) {
           await Maps.update(
             {$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]}, 
-            {$set: {"owner": groupName, "ownerId": "groupId", "ownerGame": groupGame}}, 
+            {$set: {"owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
             {upsert: true}
           );
         }
@@ -909,12 +1061,12 @@ export const MakeMap = new ValidatedMethod({
     }
 
     async function mapSetup(gameCode) {
-      corners = [[0, 0], [13, 0], [0, 13], [13, 13]];
-      dims = [[4, 4], [4, 4], [4, 4], [4, 4]];
+      corners = [[1, 1], [9, 0], [12, 6], [12, 12], [2, 12]];
+      dims = [[4, 4], [4, 4], [4, 4], [4, 4], [4, 4]];
       teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
       teams = teams.fetch();
       for (t in teams) {
-        if (t < 4){
+        if (t < corners.length){
           await makeTeamCells(corners[t][0], corners[t][1], dims[t][0], dims[t][1], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
         }
       }
