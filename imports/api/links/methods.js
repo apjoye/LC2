@@ -926,29 +926,65 @@ export const AddBuilding = new ValidatedMethod({
     //mine kinds include metalmine, claymine, stonemine, etc
     //farm kinds include fishfarm, 
     gameObj = Games.findOne({$and: [{"gameCode": gameCode}, {"group": groupName}]});
-    groupGame = gameObj[_id];
-    groupId = gameObj[playerId];
+    groupGame = gameObj['_id'];
+    groupId = gameObj["playerId"];
 
     // Buildings.update(
     //   {$and: [{"gameCode": gameCode, "location": [locx, locy]}]}, 
     //   {$set: {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName},
     //   {upsert: true} );
-    Buildings.insert({"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName}, function (err, res) {
-      if (err) {
-        console.log("Building addition failed!!!");
-      }
-      else {
-        Maps.update(
-          {$and: [{"x": locx}, {"y": locy}]}, 
-          {$set: {"object": "building", "kind": kind, "name": buildingName}}
-        );    
-      }
-    });
+    // Buildings.insert({"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName}, function (err, buildingId) {
+    //   if (err) {
+    //     console.log("Building addition failed!!!");
+    //   }
+    //   else {
+    //     Maps.update(
+    //       {$and: [{"x": locx}, {"y": locy}]}, 
+    //       {$set: {"building": , "object": "building", "kind": kind, "name": buildingName, "buildingId": buildingId}}
+    //     );    
+    //   }
+    // });
+    buildObj = {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName, "kind": kind};
+    Buildings.insert(buildObj);
+    thisBuild = Buildings.findOne(buildObj);
+    console.log(thisBuild);
+    Maps.update(
+      {$and: [{"x": locx}, {"y": locy}, {"gameCode": gameCode}]}, 
+      {$set: {"building": thisBuild, "buildingId": thisBuild["_id"] }},
+      {upsert: true}
+    ); 
+    // });
     // build = Buildings.findOne()
     
 
   }
 });
+
+export const CellNeighbor = new ValidatedMethod({
+  name: 'neighbor.build',
+  validate ({}) {},
+  run({gameCode, location}) {
+    x = location[0];
+    y = location[1];
+    neighbors = [];
+    neighborCoords = [
+      [(x - 1), y], [(x + 1), y], [x, (y - 1)], [x, (y + 1)]
+    ];
+    for (n in neighborCoords) {
+      neighbors.push(Maps.findOne({$and: [{"gameCode": gameCode}, {"x": neighborCoords[n][0]}, {"y": neighborCoords[n][1]}]}));
+    }
+    return neighbors;
+  }
+});
+
+export const ResetResources = new ValidatedMethod({
+  name: 'resources.reset',
+  validate ({}) {},
+  run({gameCode}) {
+    Resources.remove({"gameCode": gameCode});
+    Maps.update({"gameCode": gameCode}, {$unset: {"resource": "", "resId": ""}});
+  }
+})
 
 export const MakeMap = new ValidatedMethod({
   name: 'map.make',
@@ -1023,20 +1059,33 @@ export const MakeMap = new ValidatedMethod({
       // ]
 
       for (res in resLocs) {
-        Resources.insert({"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]}, function (err, insertedRes) {
-          if (err) {console.log("resource insertion faiiled!!");}
-          else {
-            // console.log(resLocs[res]);
-            // console.log(insertedRes);
-            for (l in resLocs[res]) {
-              Maps.update (
-                {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
-                {$set: {"resource": res, "resId": insertedRes}}, 
-                {upsert: true}
-              )
-            }
-          }  
-        });
+        // await Resources.insert({"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]}, function (err, insertedRes) {
+        //   if (err) {console.log("resource insertion faiiled!!");}
+        //   else {
+        //     // console.log(resLocs[res]);
+        //     console.log(insertedRes);
+        //     for (l in resLocs[res]) {
+        //       Maps.update (
+        //         {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
+        //         {$set: {"resource": res, "resId": insertedRes}}, 
+        //         {upsert: true}
+        //       , function (err, result) {
+        //         if (err) {console.log(err);}
+        //         else {console.log(result);}
+        //       });
+        //     }
+        //   }  
+        // });
+        resObj = {"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]};
+        await Resources.insert(resObj);
+        thisRes = Resources.findOne(resObj);
+        for (l in resLocs[res]) {
+          // console.log(thisRes._id);
+          await Maps.update (
+            {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
+            {$set: {"resource": thisRes, "resId": thisRes["_id"]}}, 
+            {upsert: true});
+        }
         // console.log(res);
         // await Resources.findOne()
         

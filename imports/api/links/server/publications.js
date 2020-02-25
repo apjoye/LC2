@@ -8,6 +8,8 @@ import { Games } from '../links.js';
 import { Bids } from '../links.js';
 import { Acts } from '../links.js';
 import { Maps } from '../links.js';
+import { Resources } from '../links.js';
+import { Buildings } from '../links.js';
 import { Assets } from '../links.js';
 
 
@@ -41,6 +43,16 @@ Meteor.publish('cities.all', function () {
 
 Meteor.publish('assets.all', function () {
   return Assets.find();
+});
+
+Meteor.publish('buildings.thisGame', function (gameCode) {
+  // console.log(this.users());
+  return Buildings.find({$and: [{"gameCode": gameCode }]});
+});
+
+Meteor.publish('resources.thisGame', function (gameCode) {
+  // console.log(this.users());
+  return Resources.find({$and: [{"gameCode": gameCode }]});
 });
 
 Meteor.publish('maps.thisGame', function (gameCode) {

@@ -90,6 +90,7 @@
   <div class="btn-group" role="group" aria-label="Basic example">
     <button type="button" class="asyncTest btn btn-default">Async Test</button>
     <button type="button" class="reset btn btn-default"> Reset everything </button>
+    <button type="button" class="resetRes btn btn-default"> Reset Resources </button>
     <button type="button" class="makeMap btn btn-default"> Make Map </button>
     <button type="button" class="btn btn-primary seeScore">See scoreboard</button> 
 
@@ -149,6 +150,33 @@
     </div>
   </form>
   </p>
+  <!-- Add Building -->
+  <p>
+  <form class="addBuilding form-inline">
+    <div class="form-group">
+      <input class = "form-control" type="number" name="x" placeholder="x-loc" />
+    </div>
+    <div class="form-group">
+      <input class = "form-control" type="number" name="y" placeholder="y-loc" />
+    </div>
+    <div class="form-group">
+      <input class = "form-control" type="text" name="kind" placeholder="kind" />
+    </div>
+    <div class="form-group">
+      <input class = "form-control" type="text" name="buildingName" placeholder="building name" />
+    </div>
+    <div class="form-group">
+      <select class = "form-control" id="groupName" name="groupName">
+        {{#each gameTeams}}
+          <option value = {{playerName}}>{{playerName}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="form-group">
+      <input class="form-control" type="submit" value="Add Building"/>
+    </div>
+  </form>
+  </p>
 
   {{> gameMap}}
 </template>
@@ -160,7 +188,7 @@
       <!-- <pre> -->
         {{#each this}}
         <td>
-          {{rowCol}}&emsp;
+          {{this.text}}&emsp;
         </td>
         {{/each}}
         <!-- {{this.rowCol}}&emsp;

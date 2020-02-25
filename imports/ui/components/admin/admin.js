@@ -11,15 +11,19 @@ import { ToggleGameRunning } from '/imports/api/links/methods.js';
 import { ChangeTeam } from '/imports/api/links/methods.js';
 import { MakeBase } from '/imports/api/links/methods.js';
 import { AddNeighbor } from '/imports/api/links/methods.js';
+import { AddBuilding } from '/imports/api/links/methods.js';
+
 import { RunBids } from '/imports/api/links/methods.js';
 import { ConsumeResources } from '/imports/api/links/methods.js';
 import { SpawnFactories } from '/imports/api/links/methods.js';
 
 import { MakeMap } from '/imports/api/links/methods.js';
+import { ResetResources } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
 // import {}
 import { Maps } from '/imports/api/links/links.js';
 import { Resources } from '/imports/api/links/links.js';
+import { Buildings } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
 
 Template.adminView.onCreated(function helloOnCreated() {
@@ -58,6 +62,8 @@ Template.makeGame.helpers({
 
 Template.gameMap.onCreated(function helloOnCreated() {
   Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
 });
 
 Template.gameMap.helpers({
@@ -67,22 +73,59 @@ Template.gameMap.helpers({
     mapHeight = 16;   //number of rows
     rows = [];
     map = Maps.find({"gameCode": gameCode}).fetch();
-    resMapDict = {}
+    resources = Resources.find({"gameCode": gameCode}).fetch();
+    buildings = Buildings.find({"gameCode": gameCode}).fetch();
+    console.log(resources);
+    resMapDict = {};
+    resDict = {};
+    buildDict = {}
+    
     for (m in map) {
-      if ("resource" in map[m]){
-        loc = "x" + map[m].x + "y" + map[m].y;
-        resMapDict[loc] = map[m].resource;  
-      }
+      // if ("resource" in map[m]){
+      loc = "x" + map[m].x + "y" + map[m].y;
+      resMapDict[loc] = map[m];
+      // }
     }
+
+    for (r in resources) {
+      resDict[resources[r]["_id"]] = resources[r];
+    }
+    for (b in buildings) {
+      buildDict[buildings[b]["_id"]] = buildings[b];
+    }
+    
+
     console.log(resMapDict);
 
+    //add buildings, ownership, and resources stats to each cell
     for (var i = 0; i < mapHeight; i++) {
       thisRow = [];
       for (var j = 0; j < mapHeight; j++) {
         loc = "x" + j + "y" + i;
         if (loc in resMapDict) {
           // console.log(loc + " found!");
-          thisRow.push({"rowCol": resMapDict[loc]});  
+          // thisRow.push({"rowCol": resMapDict[loc]});  
+          rowCol = {};
+          rowCol["attributes"] = "";
+          if ("owner" in resMapDict[loc]) {
+            rowCol["attributes"] = "bgColor = \"red\"";
+          }
+          rowCol["text"] = ""
+          if ("resource" in resMapDict[loc]) {
+            rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
+          }
+          if ("building" in resMapDict[loc]) {
+            rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["kind"]);
+          }
+          if ("owner" in resMapDict[loc]) {
+            rowCol["text"] += JSON.stringify(resMapDict[loc]["owner"]);
+          }
+          thisRow.push(rowCol);
+          // thisRow.push(
+          //   "rowCol": {
+          //     "stats": JSON.stringify(resValDict[resMapDict[loc]]),
+          //     "res": resMapDict[loc]
+          //   });  
         }
         else {
           thisRow.push({"rowCol": ""});
@@ -162,6 +205,12 @@ Template.adminGame.events({
     AddNeighbor.call({"gameCode": FlowRouter.getParam("gameCode"), "cityName": event.target.cityName.value, "neighbor": event.target.neighborName.value});
   },
 
+  'submit .addBuilding' (event, instance) {
+    event.preventDefault();
+    console.log(event.target.x.value + " " + event.target.y.value + event.target.kind.value + event.target.buildingName.value + event.target.groupName.value);
+    AddBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "locx": parseInt(event.target.x.value), "locy": parseInt(event.target.y.value), "kind": event.target.kind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});
+  },
+
   'submit .addFacts' (event, instance) {
     event.preventDefault();
     facts = event.target.amount.value;
@@ -217,6 +266,17 @@ Template.adminGame.events({
       if (err) {console.log(err);}
       else {
         console.log("round run!");
+      }
+    })
+  },
+
+  'click .resetRes'(event, instance) {
+    // increment the counter when button is clicked
+    // instance.counter.set(instance.counter.get() + 1);
+    ResetResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) {console.log(err);}
+      else {
+        console.log("resources reset!");
       }
     })
   },
