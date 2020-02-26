@@ -75,7 +75,7 @@ Template.gameMap.helpers({
     map = Maps.find({"gameCode": gameCode}).fetch();
     resources = Resources.find({"gameCode": gameCode}).fetch();
     buildings = Buildings.find({"gameCode": gameCode}).fetch();
-    console.log(resources);
+    // console.log(resources);
     resMapDict = {};
     resDict = {};
     buildDict = {}
@@ -95,7 +95,7 @@ Template.gameMap.helpers({
     }
     
 
-    console.log(resMapDict);
+    // console.log(resMapDict);
 
     //add buildings, ownership, and resources stats to each cell
     for (var i = 0; i < mapHeight; i++) {
@@ -106,6 +106,7 @@ Template.gameMap.helpers({
           // console.log(loc + " found!");
           // thisRow.push({"rowCol": resMapDict[loc]});  
           rowCol = {};
+          rowCol["loc"] = loc;
           rowCol["attributes"] = "";
           if ("owner" in resMapDict[loc]) {
             rowCol["attributes"] = "bgColor = \"red\"";
@@ -134,10 +135,22 @@ Template.gameMap.helpers({
       }
       rows.push(thisRow);
     }
-    console.log(rows);
+    // console.log(rows);
     return rows;
   }
-}) 
+});
+
+Template.gameMap.events({
+  'click .mapCell' (event, instance) {
+    event.preventDefault();
+    // console.log(event.target.id);
+    console.log(this);
+    console.log(event)
+    // console.log(this.state);
+    // console.log(Template.instance());
+
+  }
+});
 
 Template.adminGame.onCreated(function helloOnCreated() {
   Meteor.subscribe('games.minerunning');
