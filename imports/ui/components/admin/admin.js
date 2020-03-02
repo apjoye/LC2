@@ -3,6 +3,7 @@ import '../gameList/gameList.js';
 import { Producers } from '/imports/api/links/links.js';
 // import { Assets } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
+import { ReactiveVar } from 'meteor/reactive-var'
 
 import { ChangeStat } from '/imports/api/links/methods.js';
 import { NewRound } from '/imports/api/links/methods.js';
@@ -18,6 +19,8 @@ import { ConsumeResources } from '/imports/api/links/methods.js';
 import { SpawnFactories } from '/imports/api/links/methods.js';
 
 import { MakeMap } from '/imports/api/links/methods.js';
+import { RunBuildings } from '/imports/api/links/methods.js';
+import { RemoveBuilds } from '/imports/api/links/methods.js';
 import { ResetResources } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
 // import {}
@@ -25,6 +28,8 @@ import { Maps } from '/imports/api/links/links.js';
 import { Resources } from '/imports/api/links/links.js';
 import { Buildings } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
+
+
 
 Template.adminView.onCreated(function helloOnCreated() {
   Meteor.subscribe('games.minepaused');
@@ -78,14 +83,7 @@ Template.gameMap.helpers({
     // console.log(resources);
     resMapDict = {};
     resDict = {};
-    buildDict = {}
-    
-    for (m in map) {
-      // if ("resource" in map[m]){
-      loc = "x" + map[m].x + "y" + map[m].y;
-      resMapDict[loc] = map[m];
-      // }
-    }
+    buildDict = {};
 
     for (r in resources) {
       resDict[resources[r]["_id"]] = resources[r];
@@ -94,6 +92,23 @@ Template.gameMap.helpers({
       buildDict[buildings[b]["_id"]] = buildings[b];
     }
     
+    for (m in map) {
+      // if ("resource" in map[m]){
+      loc = "x" + map[m].x + "y" + map[m].y;
+      resMapDict[loc] = map[m];
+      if ("buildingId" in map[m]) {
+        // console.log(loc);
+        // console.log(map[m]);
+        resMapDict[loc]["building"] = buildDict[map[m]["buildingId"]];
+      }
+      if ("resId" in map[m]) {
+        resMapDict[loc]["resource"] = resDict[map[m]["resId"]];
+      }
+      // }
+    }
+
+    
+    Template.instance().data["map"] = resMapDict;
 
     // console.log(resMapDict);
 
@@ -111,12 +126,17 @@ Template.gameMap.helpers({
           if ("owner" in resMapDict[loc]) {
             rowCol["attributes"] = "bgColor = \"red\"";
           }
-          rowCol["text"] = ""
+          rowCol["text"] = "";
           if ("resource" in resMapDict[loc]) {
+            // console.log(resMapDict[loc]["resource"]);
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
+            console.log(resMapDict[loc]["building"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["kind"]);
+            if ("bonusResource" in resMapDict[loc]["building"]) {
+              rowCol["text"] += " bonus ore! ";
+            }
           }
           if ("owner" in resMapDict[loc]) {
             rowCol["text"] += JSON.stringify(resMapDict[loc]["owner"]);
@@ -144,11 +164,7 @@ Template.gameMap.events({
   'click .mapCell' (event, instance) {
     event.preventDefault();
     // console.log(event.target.id);
-    console.log(this);
-    console.log(event)
-    // console.log(this.state);
-    // console.log(Template.instance());
-
+    console.log(Template.instance().data.map[event.target.id]);
   }
 });
 
@@ -303,6 +319,28 @@ Template.adminGame.events({
         console.log("map made!");
       }
     })
+  },
+
+  'click .runBuildings'(event, instance) {
+    // increment the counter when button is clicked
+    // instance.counter.set(instance.counter.get() + 1);
+    RunBuildings.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) { console.log(err); }
+      else {
+        console.log("buildings run!");
+      }
+    })
+  },
+
+  'click .removeBuildings'(event, instance) {
+    // increment the counter when button is clicked
+    // instance.counter.set(instance.counter.get() + 1);
+    RemoveBuilds.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) { console.log(err); }
+      else {
+        console.log("removing all buildings!");
+      }
+    });
   },
 
   'click .newRound'(event, instance) {
