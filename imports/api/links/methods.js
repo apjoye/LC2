@@ -924,12 +924,17 @@ export const RunBuildings = new ValidatedMethod({
     // buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
     buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
     for (b in buildings) {
-      bb = buildings[b];
-      console.log(bb["kind"]);
 
-      if (bb["kind"] == "clay" || bb["kind"] == "stone"){
-        RunMine.call({"gameCode": gameCode, "location": bb["location"], "kind": bb["kind"], "groupName": bb["owner"], "building": bb});
+      bb = buildings[b];
+      if ("running" in bb) {
+        if (bb["running"] == true) {
+          if (bb["kind"] == "clay" || bb["kind"] == "stone"){
+            RunMine.call({"gameCode": gameCode, "location": bb["location"], "kind": bb["kind"], "groupName": bb["owner"], "building": bb});
+          }
+        }
       }
+      // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
+      // console.log(bb["kind"]);
     }
   }
 });
@@ -994,8 +999,11 @@ export const AddBuilding = new ValidatedMethod({
     //     );    
     //   }
     // });
-    buildObj = {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName, "kind": kind};
+    buildObj = {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName, "kind": kind, "running": false};
     Buildings.insert(buildObj);
+
+    //*** TODO: POSSIBLY FORCE building Id (and resource Id) to be epoch+gameCode+building+kind so that this find query doesn't return empty and leave buildingId undefined
+
     thisBuild = Buildings.findOne(buildObj);
     console.log(thisBuild);
     Maps.update(

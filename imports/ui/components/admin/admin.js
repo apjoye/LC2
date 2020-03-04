@@ -91,7 +91,7 @@ Template.gameMap.helpers({
     for (b in buildings) {
       buildDict[buildings[b]["_id"]] = buildings[b];
     }
-    
+    // console.log(resDict);
     for (m in map) {
       // if ("resource" in map[m]){
       loc = "x" + map[m].x + "y" + map[m].y;
@@ -99,17 +99,21 @@ Template.gameMap.helpers({
       if ("buildingId" in map[m]) {
         // console.log(loc);
         // console.log(map[m]);
-        resMapDict[loc]["building"] = buildDict[map[m]["buildingId"]];
+        if (map[m]["buildingId"] in buildDict){
+          resMapDict[loc]["building"] = buildDict[map[m]["buildingId"]];
+        }
       }
       if ("resId" in map[m]) {
-        resMapDict[loc]["resource"] = resDict[map[m]["resId"]];
+        if (map[m]["resId"] in resDict){
+          resMapDict[loc]["resource"] = resDict[map[m]["resId"]];
+        }
       }
       // }
     }
 
     
     Template.instance().data["map"] = resMapDict;
-
+    // console.log(resMapDict)
     // console.log(resMapDict);
 
     //add buildings, ownership, and resources stats to each cell
@@ -128,11 +132,12 @@ Template.gameMap.helpers({
           }
           rowCol["text"] = "";
           if ("resource" in resMapDict[loc]) {
+            // console.log(resMapDict[loc]);
             // console.log(resMapDict[loc]["resource"]);
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
-            console.log(resMapDict[loc]["building"]);
+            // console.log(resMapDict[loc]["building"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["kind"]);
             if ("bonusResource" in resMapDict[loc]["building"]) {
               rowCol["text"] += " bonus ore! ";
