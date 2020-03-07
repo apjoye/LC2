@@ -369,6 +369,59 @@ export const BuyProducer = new ValidatedMethod({
   }
 });
 
+export const ToggleBuilding = new ValidatedMethod({
+  name: 'toggle.build',
+  validate ({}) {},
+
+  run ({buildingId, currentStatus, gameCode, ownerId, runningBuilds = []}) {
+    
+    //*** TODO: at client end, try to pass the runners into runningBuilds ***//
+
+    thisGame = Games.findOne({$and: [{"playerId": ownerId}, {"gameCode": gameCode}, {"status": "running"}, {"role": "base"}]});
+    runners = [];
+    if (runningBuilds == []){
+      runners = Buildings.find({$and: [{"running": true}, {"gameCode": gameCode}, {"owned": true}, {"ownerId": ownerId}]}).fetch();
+    }
+    else {
+      runners = runningBuilds;
+    }
+    newStatus = currentStatus;
+    changed = false;
+    if (currentStatus == true) {
+      newStatus = false;
+      changed = true;
+    }
+    else{
+      if (runners.length < thisGame.population) {
+        newStatus = true;
+        changed = true;
+      }
+    }
+
+    overEmp = runners.length - thisGame.population;
+    if (overEmp > 0) {
+      for (var i = 0; i < overEmp; i++) {
+        Buildings.update({"_id": runners[i]["_id"]}, {$set: {"running": false}});
+      }
+    }
+
+    Buildings.update({"_id": buildingId}, {$set: {"running": newStatus}});
+    console.log("building set to " + newStatus);
+
+    Acts.insert({
+      "time": (new Date()).getTime(),
+      "key": "buildingToggle",
+      "buildingId": buildingId,
+      "pastStatus": currentStatus,
+      "newStatus": newStatus,
+      "gameCode": gameCode,
+      "baseId": ownerId,
+      "changed": changed
+    });
+    //***TODO: add game code, groupId, groupName
+  }
+});
+
 export const ToggleFactory = new ValidatedMethod({
   name: 'producers.toggle',
   validate ({}) {},
@@ -697,7 +750,7 @@ export const SpawnFactories = new ValidatedMethod({
 
     console.log(producerCount);
 
-    for (var i = 0; i < producerCount; i++) { 
+    for (let i = 0; i < producerCount; i++) { 
       //for each kind of resource 
         //if there are not 4 factories available with that bidkind, add a factory
       res = diffResources[(i % resources.length)];
@@ -928,7 +981,7 @@ export const RunBuildings = new ValidatedMethod({
       bb = buildings[b];
       if ("running" in bb) {
         if (bb["running"] == true) {
-          if (bb["kind"] == "clay" || bb["kind"] == "stone"){
+          if (bb["kind"] == "clay" || bb["kind"] == "copper"){
             RunMine.call({"gameCode": gameCode, "location": bb["location"], "kind": bb["kind"], "groupName": bb["owner"], "building": bb});
           }
         }
@@ -967,21 +1020,21 @@ export const AddBuilding = new ValidatedMethod({
     //owner = ""
     //type = ""
 
-    //mine kinds include metalmine, claymine, stonemine, etc
+    //mine kinds include metalmine, claymine, coppermine, etc
     //farm kinds include fishfarm, 
 
     gameObj = Games.findOne({$and: [{"gameCode": gameCode}, {"group": groupName}]});
     groupGame = gameObj['_id'];
     groupId = gameObj["playerId"];
     if (kind == "clay") {
-      prodCosts =  { "clay" : 0, "stone": 0, "food": 3, "lumber": 0};
+      prodCosts =  { "clay" : 0, "copper": 0, "food": 3, "lumber": 0};
       prodVals = { "pollution": 3, "clay": 6 };
       bonusProd = { "clay" : 3 };
     }
-    else if (kind == "stone") {
-      prodCosts =  { "clay" : 0, "stone": 0, "food": 1, "lumber": 2};
-      prodVals = { "pollution": 3, "stone": 6 };
-      bonusProd = { "stone" : 3 };
+    else if (kind == "copper") {
+      prodCosts =  { "clay" : 0, "copper": 0, "food": 1, "lumber": 2};
+      prodVals = { "pollution": 3, "copper": 6 };
+      bonusProd = { "copper" : 3 };
     }
 
     // Buildings.update(
@@ -1107,7 +1160,7 @@ export const MakeMap = new ValidatedMethod({
         "woods2": {"lumber": 100, "animals": 30},
         "lake": {"pollution": 0, "fish": 50},
         "mine1": {"clay": 30},
-        "mine2": {"stone": 30}
+        "mine2": {"copper": 30}
       }
 
       //*** TODO: Consider preprocessing and identifying neighbors of resources
@@ -1117,7 +1170,7 @@ export const MakeMap = new ValidatedMethod({
         "woods2": "lumber",
         "lake": "water",
         "mine1": "clay",
-        "mine2": "stone"
+        "mine2": "copper"
       }
 
       teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});

@@ -20,6 +20,7 @@ import { SpawnFactories } from '/imports/api/links/methods.js';
 
 import { MakeMap } from '/imports/api/links/methods.js';
 import { RunBuildings } from '/imports/api/links/methods.js';
+import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilds } from '/imports/api/links/methods.js';
 import { ResetResources } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
@@ -137,10 +138,20 @@ Template.gameMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
-            // console.log(resMapDict[loc]["building"]);
+            console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["kind"]);
+            
             if ("bonusResource" in resMapDict[loc]["building"]) {
               rowCol["text"] += " bonus ore! ";
+            }
+            
+            if (resMapDict[loc]["building"]["running"] == true) {
+              rowCol["text"] += " running ";
+              // console.log("building is running");
+            }
+            else {
+              rowCol["text"] += " idle ";
+              // console.log("building is idle");
             }
           }
           if ("owner" in resMapDict[loc]) {
@@ -170,6 +181,13 @@ Template.gameMap.events({
     event.preventDefault();
     // console.log(event.target.id);
     console.log(Template.instance().data.map[event.target.id]);
+    if (Template.instance().data.map[event.target.id] != undefined) {
+      if ("building" in Template.instance().data.map[event.target.id]) {
+        bb = Template.instance().data.map[event.target.id]["building"];
+        ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
+      }
+    }
+    
   }
 });
 
