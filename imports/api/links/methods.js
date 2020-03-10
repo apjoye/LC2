@@ -1015,27 +1015,37 @@ export const BuildingNeighbors = new ValidatedMethod({
 export const AddBuilding = new ValidatedMethod({
   name: 'add.build',
   validate ({}) {},
-  run({gameCode, locx, locy, kind, buildingName, groupName}) {
+  run({gameCode, locx, locy, bidKind, buildingName, groupName}) {
     //locs = []
     //owner = ""
     //type = ""
 
     //mine kinds include metalmine, claymine, coppermine, etc
     //farm kinds include fishfarm, 
+    
+    
+    // valAssign
+    //wood = m1, clay = m2, copper = m3
+    prodCosts = {
+      "claymine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
+      "coppermine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
+      "foodfarm": { "lumber": 1, "clay" : 1, "copper": 0, "food": 0 },
+      "foodfishing": { "lumber": 1, "clay" : 0, "copper": 1, "food": 0 },
+      "foodhunting": { "lumber": 0, "clay" : 0, "copper": 0, "food": 0 },
+      "lumbercamp": { "lumber": 0, "clay" : 1, "copper": 1, "food": 0 }
+    };
 
-    gameObj = Games.findOne({$and: [{"gameCode": gameCode}, {"group": groupName}]});
-    groupGame = gameObj['_id'];
-    groupId = gameObj["playerId"];
-    if (kind == "clay") {
-      prodCosts =  { "clay" : 0, "copper": 0, "food": 3, "lumber": 0};
-      prodVals = { "pollution": 3, "clay": 6 };
-      bonusProd = { "clay" : 3 };
-    }
-    else if (kind == "copper") {
-      prodCosts =  { "clay" : 0, "copper": 0, "food": 1, "lumber": 2};
-      prodVals = { "pollution": 3, "copper": 6 };
-      bonusProd = { "copper" : 3 };
-    }
+    prodVals = {
+      "claymine": { "clay": 5, "pollution": 2 },
+      "coppermine": {"copper": 5, "pollution": 2},
+      "foodfarm": {"food": 5},
+      "foodfishing": {"food": 5},
+      "foodhunting": {"food": 3},
+      "lumbercamp": {"lumber": 8}
+    };
+
+    prodCost = prodCosts["buildingName"];
+    prodVal = prodVals["buildingName"];
 
     // Buildings.update(
     //   {$and: [{"gameCode": gameCode, "location": [locx, locy]}]}, 
@@ -1052,24 +1062,45 @@ export const AddBuilding = new ValidatedMethod({
     //     );    
     //   }
     // });
-    buildObj = {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName, "kind": kind, "running": false};
-    Buildings.insert(buildObj);
+    mapPlaced = false;
+    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, "running": false, "prodCost": prodCost, "prodVal": prodVal, "auction": true, "placed": false};
+    if (groupName != "auctions") {
+      buildObj["auction"] = true;
+    }
+    else {
+      gameObj = Games.findOne({$and: [{"gameCode": gameCode}, {"group": groupName}]});
+      groupGame = gameObj['_id'];
+      groupId = gameObj["playerId"];
+      buildObj["owned"] = true;
+      buildObj["owner"] = groupName;
+      buildObj["ownerId"] = groupId;
+      buildObj["ownerGame"] = groupGame
+      if (locx != -1){
+        buildObj["location"] = [locx, locy];
+        mapPlaced = true;
+      }
+    }
+    // Buildings.insert(buildObj, function (err, res) {
+    //   if (err) {console.log("building insert failed!??!?!");}
+    //   else {
+
+    //   }
+    // });
 
     //*** TODO: POSSIBLY FORCE building Id (and resource Id) to be epoch+gameCode+building+kind so that this find query doesn't return empty and leave buildingId undefined
+    if (mapPlaced == true) {
+      thisBuild = Buildings.findOne(buildObj);
+      console.log(thisBuild);
+      Maps.update(
+        {$and: [{"x": locx}, {"y": locy}, {"gameCode": gameCode}]}, 
+        {$set: {"building": thisBuild, "buildingId": thisBuild["_id"] }},
+        {upsert: true}
+      ); 
 
-    thisBuild = Buildings.findOne(buildObj);
-    console.log(thisBuild);
-    Maps.update(
-      {$and: [{"x": locx}, {"y": locy}, {"gameCode": gameCode}]}, 
-      {$set: {"building": thisBuild, "buildingId": thisBuild["_id"] }},
-      {upsert: true}
-    ); 
-
-    BuildingNeighbors.call({"gameCode": gameCode, "building": thisBuild})
+      BuildingNeighbors.call({"gameCode": gameCode, "building": thisBuild})
+    }
     // });
     // build = Buildings.findOne()
-    
-
   }
 });
 

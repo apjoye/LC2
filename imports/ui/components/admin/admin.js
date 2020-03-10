@@ -226,7 +226,10 @@ Template.adminGame.helpers({
     else {
       return {"bids": "btn-primary", "builds": "btn-warning"};
     }
+  },
 
+  buildingNames() {
+    return ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
   }
 });
 
@@ -259,8 +262,16 @@ Template.adminGame.events({
 
   'submit .addBuilding' (event, instance) {
     event.preventDefault();
-    console.log(event.target.x.value + " " + event.target.y.value + event.target.kind.value + event.target.buildingName.value + event.target.groupName.value);
-    AddBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "locx": parseInt(event.target.x.value), "locy": parseInt(event.target.y.value), "kind": event.target.kind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});
+    if (event.target.x.value != "" && event.target.x.value != ""){
+      console.log(event.target.x.value + " " + event.target.y.value + event.target.bidKind.value + event.target.buildingName.value + event.target.groupName.value);
+      if (event.target.x.value >= -1 && event.target.y.value >= 0) {
+        AddBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "locx": parseInt(event.target.x.value), "locy": parseInt(event.target.y.value), "bidKind": event.target.bidKind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});    
+      }
+    }
+    else {
+      console.log(event.target.x.value + " " + event.target.y.value + "broken locs");
+    }
+    
   },
 
   'submit .addFacts' (event, instance) {
