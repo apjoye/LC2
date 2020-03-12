@@ -1064,7 +1064,7 @@ export const AddBuilding = new ValidatedMethod({
     // });
     mapPlaced = false;
     buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, "running": false, "prodCost": prodCost, "prodVal": prodVal, "auction": true, "placed": false};
-    if (groupName != "auctions") {
+    if (groupName == "auctions") {
       buildObj["auction"] = true;
     }
     else {
@@ -1080,6 +1080,7 @@ export const AddBuilding = new ValidatedMethod({
         mapPlaced = true;
       }
     }
+    Buildings.insert(buildObj);
     // Buildings.insert(buildObj, function (err, res) {
     //   if (err) {console.log("building insert failed!??!?!");}
     //   else {
@@ -1090,7 +1091,6 @@ export const AddBuilding = new ValidatedMethod({
     //*** TODO: POSSIBLY FORCE building Id (and resource Id) to be epoch+gameCode+building+kind so that this find query doesn't return empty and leave buildingId undefined
     if (mapPlaced == true) {
       thisBuild = Buildings.findOne(buildObj);
-      console.log(thisBuild);
       Maps.update(
         {$and: [{"x": locx}, {"y": locy}, {"gameCode": gameCode}]}, 
         {$set: {"building": thisBuild, "buildingId": thisBuild["_id"] }},
