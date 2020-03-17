@@ -13,6 +13,7 @@ import { ChangeTeam } from '/imports/api/links/methods.js';
 import { MakeBase } from '/imports/api/links/methods.js';
 import { AddNeighbor } from '/imports/api/links/methods.js';
 import { AddBuilding } from '/imports/api/links/methods.js';
+import { RemoveBuilding } from '/imports/api/links/methods.js';
 
 import { RunBids } from '/imports/api/links/methods.js';
 import { ConsumeResources } from '/imports/api/links/methods.js';
@@ -138,10 +139,10 @@ Template.gameMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
-            console.log(resMapDict[loc]["building"]["kind"]);
-            rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["kind"]);
+            // console.log(resMapDict[loc]["building"]["kind"]);
+            rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
-            if ("bonusResource" in resMapDict[loc]["building"]) {
+            if ("neighboringResource" in resMapDict[loc]["building"]) {
               rowCol["text"] += " bonus ore! ";
             }
             
@@ -227,6 +228,10 @@ Template.adminGame.helpers({
       return {"bids": "btn-primary", "builds": "btn-warning"};
     }
   },
+  
+  presentBuildings() {
+    return Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}]});
+  },
 
   buildingNames() {
     return ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
@@ -272,6 +277,18 @@ Template.adminGame.events({
       console.log(event.target.x.value + " " + event.target.y.value + "broken locs");
     }
     
+  },
+
+  'submit .removeBuilding'(event, instance) {
+    event.preventDefault();
+    RemoveBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "buildingId": event.target.presentBuilding.value}, (err, res) => {
+      if (err) { console.log(err); }
+      else {
+        console.log("removing one building!");
+      }
+    });
+    // console.log(event);
+    // console.log(event.target.presentBuilding);
   },
 
   'submit .addFacts' (event, instance) {

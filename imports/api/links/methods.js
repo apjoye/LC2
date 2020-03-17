@@ -933,20 +933,25 @@ export const RunMine = new ValidatedMethod ({
   run({gameCode, location, kind, groupName, building}) {
     // do we need a resource nearby? ideally not
     // bonuses = 
-    neighbors = CellNeighbor.call({"gameCode": gameCode, "location": location});
-    // there's a bonus if there's a resource nearby
-    // console.log(neighbors);
-    for (n in neighbors) {
-      if (neighbors[n] != undefined) {
-        if ("resId" in neighbors[n]) {
-          res = Resources.findOne({"_id": neighbors[n]["resId"]});
-          console.log(res["kind"]);
-          if (res["kind"] == kind) {
-            console.log("ore found!");
-          }
-        }
-      }
+    // neighbors = CellNeighbor.call({"gameCode": gameCode, "location": location});
+    // // there's a bonus if there's a resource nearby
+    // // console.log(neighbors);
+    // for (n in neighbors) {
+    //   if (neighbors[n] != undefined) {
+    //     if ("resId" in neighbors[n]) {
+    //       res = Resources.findOne({"_id": neighbors[n]["resId"]});
+    //       console.log(res["kind"]);
+    //       if (res["kind"] == kind) {
+    //         console.log("ore found!");
+    //       }
+    //       neighbors[n]["resource"] = res;
+    //     }
+        
+    //   }
 
+    // }
+    if ("neighboringResource" in building) {
+      console.log("neighboring ore found");
     }
 
     //check for use ore flag
@@ -977,11 +982,10 @@ export const RunBuildings = new ValidatedMethod({
     // buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
     buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
     for (b in buildings) {
-
       bb = buildings[b];
       if ("running" in bb) {
         if (bb["running"] == true) {
-          if (bb["kind"] == "clay" || bb["kind"] == "copper"){
+          if (bb["buildFeatures"]["buildKind"] == "mine") {
             RunMine.call({"gameCode": gameCode, "location": bb["location"], "kind": bb["kind"], "groupName": bb["owner"], "building": bb});
           }
         }
@@ -992,7 +996,7 @@ export const RunBuildings = new ValidatedMethod({
   }
 });
 
-export const BuildingNeighbors = new ValidatedMethod({
+export const BuildingNeighbors = new ValidatedMethod ({
   name: 'neighbors.build',
   validate ({}) {},
   run({gameCode, building}) { 
@@ -1002,15 +1006,30 @@ export const BuildingNeighbors = new ValidatedMethod({
         if ("resId" in neighbors[n]) {
           res = Resources.findOne({"_id": neighbors[n]["resId"]});
           console.log(res["kind"]);
-          if (res["kind"] == building["kind"]) {
+          if (res["kind"] == building["buildFeatures"]["resKind"]) {
             console.log("ore found!");
-            Buildings.update({"_id": building["_id"]}, {$set: {"bonusResource": res["_id"]}});
+            Buildings.update({"_id": building["_id"]}, {$set: {"neighboringResource": res["_id"]}});
           }
         }
+        // if ("buildingId" in neighbors[n]) {
+        //   build = Buildings.findOne({"_id": neighbors[n]["buildingId"]});
+        //   neighbors[n]["building"] = build;
+        // }
       }
     }
   }
 });
+
+// export const RemoveBuilding = new ValidatedMethod({
+//   name: 'remove.build',
+//   validate ({}) {},
+//   run({buildId}) { 
+//     Buildings.remove({"_id": buildId});
+//     Maps.update({"buildingId": buildId}, {$unset: {"buildingId": ""}});
+//   }
+// });
+
+
 
 export const AddBuilding = new ValidatedMethod({
   name: 'add.build',
@@ -1026,7 +1045,16 @@ export const AddBuilding = new ValidatedMethod({
     
     // valAssign
     //wood = m1, clay = m2, copper = m3
-    prodCosts = {
+    var buildFeatures = {
+      "claymine": { "resKind": "clay", "buildKind": "mine" },
+      "coppermine": { "resKind": "copper", "buildKind": "mine" },
+      "foodfarm": { "resKind": "food", "buildKind": "farm" },
+      "foodfishing": { "resKind": "food", "buildKind": "fishing" },
+      "foodhunting": { "resKind": "food", "buildKind": "hunting" },
+      "lumbercamp": { "resKind": "lumber", "buildKind": "camp" }
+    };
+
+    var prodCosts = {
       "claymine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
       "coppermine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
       "foodfarm": { "lumber": 1, "clay" : 1, "copper": 0, "food": 0 },
@@ -1035,7 +1063,7 @@ export const AddBuilding = new ValidatedMethod({
       "lumbercamp": { "lumber": 0, "clay" : 1, "copper": 1, "food": 0 }
     };
 
-    prodVals = {
+    var prodVals = {
       "claymine": { "clay": 5, "pollution": 2 },
       "coppermine": {"copper": 5, "pollution": 2},
       "foodfarm": {"food": 5},
@@ -1044,8 +1072,10 @@ export const AddBuilding = new ValidatedMethod({
       "lumbercamp": {"lumber": 8}
     };
 
-    prodCost = prodCosts["buildingName"];
-    prodVal = prodVals["buildingName"];
+    prodCost = prodCosts[buildingName];
+    prodVal = prodVals[buildingName];
+
+    console.log(prodCosts[buildingName] + " " + buildingName);
 
     // Buildings.update(
     //   {$and: [{"gameCode": gameCode, "location": [locx, locy]}]}, 
@@ -1062,8 +1092,9 @@ export const AddBuilding = new ValidatedMethod({
     //     );    
     //   }
     // });
+
     mapPlaced = false;
-    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, "running": false, "prodCost": prodCost, "prodVal": prodVal, "auction": true, "placed": false};
+    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "running": false, "prodCost": prodCost, "prodVal": prodVal, "auction": true, "placed": false};
     if (groupName == "auctions") {
       buildObj["auction"] = true;
     }
@@ -1081,6 +1112,7 @@ export const AddBuilding = new ValidatedMethod({
       }
     }
     Buildings.insert(buildObj);
+    console.log(buildObj);
     // Buildings.insert(buildObj, function (err, res) {
     //   if (err) {console.log("building insert failed!??!?!");}
     //   else {
@@ -1115,7 +1147,8 @@ export const CellNeighbor = new ValidatedMethod({
       [(x - 1), y], [(x + 1), y], [x, (y - 1)], [x, (y + 1)]
     ];
     for (n in neighborCoords) {
-      neighbors.push(Maps.findOne({$and: [{"gameCode": gameCode}, {"x": neighborCoords[n][0]}, {"y": neighborCoords[n][1]}]}));
+      neigh = Maps.findOne({$and: [{"gameCode": gameCode}, {"x": neighborCoords[n][0]}, {"y": neighborCoords[n][1]}]});
+      neighbors.push(neigh);
     }
     return neighbors;
   }
@@ -1136,7 +1169,8 @@ export const RemoveBuilding = new ValidatedMethod({
   run({gameCode, buildingId}) {
     Buildings.remove({"_id": buildingId});
     Maps.update(
-      {$and: [{"gameCode": gameCode}, {"buildingId": buildingId}]}, 
+      // {$and: [{"gameCode": gameCode}, {"buildingId": buildingId}]}, 
+      {$and: [{"buildingId": buildingId}]}, 
       {$unset: {"building": "", "buildingId": ""}
     });
   }

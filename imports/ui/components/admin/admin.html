@@ -39,7 +39,7 @@
             <input class = "form-control" type="number" name="amount" placeholder="value" />
           </div>
           <div class="form-group">
-            <select class = "form-control" id="resource" name={{this}}>
+            <select class = "custom-select form-control" id="resource" name={{this}}>
               {{#each gameResource}}
                 <option value = {{this}}>{{this}}</option>
               {{/each}}
@@ -107,7 +107,7 @@
   <p>
   <form class="changeTeam form-inline">
     <div class="form-group">
-      <select class = "form-control" id="player" name="player">
+      <select class = "custom-select form-control" id="player" name="player">
         {{#each gamePlayers}}
           <option value = {{playerName}}>{{playerName}}</option>
         {{/each}}
@@ -115,7 +115,7 @@
     </div>
 
     <div class="form-group">
-      <select class = "form-control" id="team" name="team">
+      <select class = "custom-select form-control" id="team" name="team">
         {{#each gameTeams}}
           <option value = {{playerName}}>{{playerName}}</option>
         {{/each}}
@@ -166,14 +166,14 @@
       <input class = "form-control" type="number" name="y" placeholder="y-loc" />
     </div>
     <div class="form-group">
-      <select class = "form-control" id="buildingName" name="buildingName">
+      <select class = "custom-select form-control" id="buildingName" name="buildingName">
         {{#each buildingNames}}
           <option value = {{this}}>{{this}}</option>
         {{/each}}
       </select>
     </div>
     <div class="form-group">
-      <select class = "form-control" id="groupName" name="groupName">
+      <select class = "custom-select form-control" id="groupName" name="groupName">
         {{#each gameTeams}}
           <option value = {{playerName}}>{{playerName}}</option>
         {{/each}}
@@ -182,6 +182,22 @@
     </div>
     <div class="form-group">
       <input class="form-control" type="submit" value="Add Building"/>
+    </div>
+  </form>
+  </p>
+  <!-- remove specific buildings -->
+  <p>
+  <form class="removeBuilding form-inline">
+    <div class="form-group">
+      <select class = "custom-select form-control" id="presentBuilding" name="presentBuilding">
+        {{#each presentBuildings}}
+          <option value = {{this._id}}>{{this.location}} kind: {{this.name}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <input class="form-control" type="submit" value="Remove Building"/>
     </div>
   </form>
   </p>

@@ -111,8 +111,26 @@
         </div>
       {{/each}}
     </div>
+
+    <div class="row" style = "padding: 6pt;">
+      {{#each boughtBuildings}}
+        <div class="col-xs-6 col-sm-4 col-md-3">
+          <div style="border: solid black 1pt; padding: 2pt; margin:2pt;">
+            <!-- {{> boughtBuilding}} -->
+            {{name}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
+
   </div>
+
 </template>
+
+<template name="boughtBuilding">
+  {{name}}
+</template>
+
 
 <template name="cityFactory">
   <div class="row">

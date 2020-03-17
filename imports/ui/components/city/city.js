@@ -1,5 +1,6 @@
 import './city.html';
 import { Cities } from '/imports/api/links/links.js';
+import { Buildings } from '/imports/api/links/links.js';
 import { Producers } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
@@ -56,10 +57,17 @@ Template.city.onCreated(function helloOnCreated() {
   // Meteor.subscribe('producers.public');
   Meteor.subscribe('producers.owned');
   Meteor.subscribe('games.running');
+  Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
   
 });
 
 Template.city.helpers({
+  
+  boughtBuildings() {
+    console.log()
+    return Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]});
+  },
+
   cityFactories() {
     // console.log(Producers.find({}).fetch());
     // console.log(Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": true}, {"ownerId": Meteor.userId()}]}).fetch());
@@ -114,14 +122,14 @@ Template.city.helpers({
       }
       for (r in prod.prodValues) {
         prodOutput[r] += prod.prodValues[r];
-        console.log(prod)
+        // console.log(prod)
         // prodOutput[r] = prodOutput[r] - prod.prodCosts[r];
       }
 
       for (r in prod.prodCosts) {
-        console.log(prod.prodCosts);
-        console.log(r);
-        console.log(prod.prodCosts[r])
+        // console.log(prod.prodCosts);
+        // console.log(r);
+        // console.log(prod.prodCosts[r])
         prodOutput[r] = prodOutput[r] - prod.prodCosts[r];
       }
     });

@@ -50,6 +50,12 @@ Meteor.publish('buildings.thisGame', function (gameCode) {
   return Buildings.find({$and: [{"gameCode": gameCode }]});
 });
 
+Meteor.publish('buildings.city', function (gameCode) {
+  // console.log(this.users());
+  return Buildings.find({$and: [{"gameCode": gameCode }, {"ownerId": Meteor.userId()} ] } );
+});
+
+
 Meteor.publish('resources.thisGame', function (gameCode) {
   // console.log(this.users());
   return Resources.find({$and: [{"gameCode": gameCode }]});
