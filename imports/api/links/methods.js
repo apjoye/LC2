@@ -1228,6 +1228,10 @@ export const MakeMap = new ValidatedMethod({
         "mine2": {"copper": 30}
       }
 
+      visibleCells = {
+
+      };
+
       //*** TODO: Consider preprocessing and identifying neighbors of resources
 
       resKinds = {
@@ -1292,13 +1296,13 @@ export const MakeMap = new ValidatedMethod({
       
     }
 
-    async function makeTeamCells (cornerX, cornerY, width, height, gameCode, groupId, groupName, groupGame) {
+    async function makeTeamCells (corner, dims, visCorner, visDim, gameCode, groupId, groupName, groupGame) {
       //groupID is the userID of the group's user object; and groupGame is the _id of the group's game object. 
       //all instances of orange group across games are the same user but different games
-      var thisX = cornerX;
-      var thisY = cornerY;
-      for (thisX = cornerX; thisX < cornerX + width; thisX += 1){
-        for (thisY = cornerY; thisY < cornerY + height; thisY += 1) {
+      var thisX = corner[0];
+      var thisY = corner[1];
+      for (thisX; thisX < corner[0] + dims[0]; thisX += 1){
+        for (thisY; thisY < corner[1] + dims[1]; thisY += 1) {
           await Maps.update(
             {$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]}, 
             {$set: {"owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
@@ -1306,18 +1310,38 @@ export const MakeMap = new ValidatedMethod({
           );
         }
       }
+
+      // var visX = visCorner[0];
+      // var visY = visCorner[1];
+      // for (visX; visX < visX + visDim[0]; visX += 1){
+      //   for (visY; visY < visY + visDim[1]; visY += 1) {
+      //     await Maps.update(
+      //       {$and: [{"x": visX}, {"y": visY}, {"gameCode": gameCode}]}, 
+      //       {$set: {"owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
+      //       {upsert: true}
+      //     );
+      //   }
+      // }
     }
 
     async function mapSetup(gameCode) {
       corners = [[1, 1], [9, 0], [12, 6], [12, 12], [2, 12]];
       dims = [[4, 4], [4, 4], [4, 4], [4, 4], [4, 4]];
-      teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
-      teams = teams.fetch();
+
+      visCorners = [[0, 0], [8, 0], [11, 5], [11, 11], [1, 11]];
+      visDims = [[6, 6], [6, 5], [5, 6], [5, 5], [6, 5]];
+      teams = Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]}).fetch();
+      // teams = teams.fetch();
       for (t in teams) {
         if (t < corners.length){
-          await makeTeamCells(corners[t][0], corners[t][1], dims[t][0], dims[t][1], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
+          await makeTeamCells(corners[t], dims[t], visCorners[t], visDims[t], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
         }
+        await Games.update(
+          {"_id": teams[t]["_id"]}, 
+          {$set: {visibleCorner: visCorners[t], visibleDimensions: visDims[t]} }
+        );
       }
+
 
       await seedResources (gameCode);
     }

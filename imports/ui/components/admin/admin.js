@@ -119,7 +119,7 @@ Template.gameMap.helpers({
     // console.log(resMapDict);
 
     //add buildings, ownership, and resources stats to each cell
-    for (var i = 0; i < mapHeight; i++) {
+    for (var i = 0; i < mapWidth; i++) {
       thisRow = [];
       for (var j = 0; j < mapHeight; j++) {
         loc = "x" + j + "y" + i;

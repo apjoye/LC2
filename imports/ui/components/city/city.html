@@ -124,11 +124,26 @@
     </div>
 
   </div>
-
+  {{> cityMap}}
 </template>
 
 <template name="boughtBuilding">
   {{name}}
+</template>
+
+
+<template name="cityMap">
+  <table>
+    {{#each mapRows}}
+    <tr>
+        {{#each this}}
+        <td class="mapCell" id="{{this.loc}}">
+          {{this.text}}&emsp;
+        </td>
+        {{/each}}
+    </tr>
+    {{/each}}
+  </table>
 </template>
 
 

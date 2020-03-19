@@ -1,6 +1,10 @@
 import './city.html';
 import { Cities } from '/imports/api/links/links.js';
+
+import { Maps } from '/imports/api/links/links.js';
+import { Resources } from '/imports/api/links/links.js';
 import { Buildings } from '/imports/api/links/links.js';
+
 import { Producers } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
@@ -57,6 +61,8 @@ Template.city.onCreated(function helloOnCreated() {
   // Meteor.subscribe('producers.public');
   Meteor.subscribe('producers.owned');
   Meteor.subscribe('games.running');
+  // Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
+  // Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
   
 });
@@ -64,8 +70,10 @@ Template.city.onCreated(function helloOnCreated() {
 Template.city.helpers({
   
   boughtBuildings() {
-    console.log()
-    return Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]});
+    // console.log(Meteor.userId());
+    bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
+    // console.log(bb.fetch());
+    return bb;
   },
 
   cityFactories() {
@@ -170,6 +178,122 @@ Template.city.helpers({
     // console.log(thisgame);
     // console.log(prodOutput);
     return prodOutStr;
+  }
+
+});
+
+Template.cityMap.onCreated(function helloOnCreated() {
+  // counter starts at 0
+  // this.counter = new ReactiveVar(0);
+  // Meteor.subscribe('cities.all');
+  // Meteor.subscribe('producers.public');
+  // Meteor.subscribe('producers.owned');
+  Meteor.subscribe('games.running');
+  Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
+  
+});
+
+Template.cityMap.helpers({
+  mapRows() {
+    //store map dimensions somewhere
+    thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]});
+    // console.log(thisGame);
+    mapWidth = thisGame["visibleDimensions"][0];    //number of columns
+    mapHeight = thisGame["visibleDimensions"][1];   //number of rows
+    cornerX = thisGame["visibleCorner"][0];
+    cornerY = thisGame["visibleCorner"][1];
+    rows = [];
+    map = Maps.find({"gameCode": gameCode}).fetch();
+    resources = Resources.find({"gameCode": gameCode}).fetch();
+    buildings = Buildings.find({$and: [{"ownerId": Meteor.userId()}, {"gameCode": gameCode}]}).fetch();
+    // console.log(resources);
+    resMapDict = {};
+    resDict = {};
+    buildDict = {};
+
+    for (r in resources) {
+      resDict[resources[r]["_id"]] = resources[r];
+    }
+    for (b in buildings) {
+      buildDict[buildings[b]["_id"]] = buildings[b];
+    }
+    // console.log(resDict);
+    for (m in map) {
+      // if ("resource" in map[m]){
+      loc = "x" + map[m].x + "y" + map[m].y;
+      resMapDict[loc] = map[m];
+      if ("buildingId" in map[m]) {
+        // console.log(loc);
+        // console.log(map[m]);
+        if (map[m]["buildingId"] in buildDict){
+          resMapDict[loc]["building"] = buildDict[map[m]["buildingId"]];
+        }
+      }
+      if ("resId" in map[m]) {
+        if (map[m]["resId"] in resDict){
+          resMapDict[loc]["resource"] = resDict[map[m]["resId"]];
+        }
+      }
+      // }
+    }
+
+    Template.instance().data["map"] = resMapDict;
+    
+    // console.log(resMapDict);
+
+    //add buildings, ownership, and resources stats to each cell
+
+    for (var i = cornerX; i < (cornerX + mapHeight); i++) {
+      thisRow = [];
+      for (var j = cornerY; j < (cornerY + mapHeight); j++) {
+        loc = "x" + j + "y" + i;
+        if (loc in resMapDict) {
+          // console.log(loc + " found!");
+          // thisRow.push({"rowCol": resMapDict[loc]});  
+          rowCol = {};
+          rowCol["loc"] = loc;
+          rowCol["attributes"] = "";
+          if ("owner" in resMapDict[loc]) {
+            rowCol["attributes"] = "bgColor = \"red\"";
+          }
+          rowCol["text"] = "";
+          if ("resource" in resMapDict[loc]) {
+            // console.log(resMapDict[loc]);
+            // console.log(resMapDict[loc]["resource"]);
+            rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
+          }
+          if ("building" in resMapDict[loc]) {
+            // console.log(resMapDict[loc]["building"]["kind"]);
+            rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
+            
+            if ("neighboringResource" in resMapDict[loc]["building"]) {
+              rowCol["text"] += " bonus ore! ";
+            }
+            
+            if (resMapDict[loc]["building"]["running"] == true) {
+              rowCol["text"] += " running ";
+              // console.log("building is running");
+            }
+            else {
+              rowCol["text"] += " idle ";
+              // console.log("building is idle");
+            }
+          }
+          if ("owner" in resMapDict[loc]) {
+            rowCol["text"] += JSON.stringify(resMapDict[loc]["owner"]);
+          }
+          thisRow.push(rowCol);
+        }
+        else {
+          thisRow.push({"rowCol": ""});
+        }
+      }
+      rows.push(thisRow);
+    }
+    // console.log(rows);
+    return rows;
   }
 
 });
