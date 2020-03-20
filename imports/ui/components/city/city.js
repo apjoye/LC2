@@ -11,6 +11,8 @@ import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import '/imports/ui/stylesheets/style.css';
 
+import { PlaceBuilding } from '/imports/api/links/methods.js';
+import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
 import 'animate.css/animate.css';
 
@@ -69,12 +71,6 @@ Template.city.onCreated(function helloOnCreated() {
 
 Template.city.helpers({
   
-  boughtBuildings() {
-    // console.log(Meteor.userId());
-    bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
-    // console.log(bb.fetch());
-    return bb;
-  },
 
   cityFactories() {
     // console.log(Producers.find({}).fetch());
@@ -182,6 +178,7 @@ Template.city.helpers({
 
 });
 
+
 Template.cityMap.onCreated(function helloOnCreated() {
   // counter starts at 0
   // this.counter = new ReactiveVar(0);
@@ -192,6 +189,7 @@ Template.cityMap.onCreated(function helloOnCreated() {
   Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
+  Template.instance().data["selectedBuilding"] = "";
   
 });
 
@@ -294,9 +292,69 @@ Template.cityMap.helpers({
     }
     // console.log(rows);
     return rows;
+  },
+
+  boughtBuildings() {
+    // console.log(Meteor.userId());
+    bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
+    // console.log(bb.fetch());
+    return bb;
   }
 
 });
+
+Template.cityMap.events({
+  'click .mapCell' (event, instance) {
+    event.preventDefault();
+    // console.log(event.target.id);
+    mapLoc = Template.instance().data.map[event.target.id]
+    console.log(mapLoc);
+    if (mapLoc != undefined) {
+      if ("building" in mapLoc) {
+        bb = mapLoc["building"];
+        ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
+      }
+      else {
+        if ("ownerId" in mapLoc){
+          if (mapLoc["ownerId"] == Meteor.userId()) {
+            console.log("empty owned spot!");
+            selectedBuilding = Template.instance().data["selectedBuilding"];
+            console.log(selectedBuilding);
+            if (selectedBuilding != "" && selectedBuilding != undefined) {
+              loc = [mapLoc["x"], mapLoc["y"]];
+              console.log(loc);
+              PlaceBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "buildingId": selectedBuilding, "location": loc, "userId": Meteor.userId()});
+              // buildingId, location, userId
+            }
+          }
+          else {
+            console.log("spot owned by someone else?");
+          }
+        }
+        else {
+          console.log("unowned spot!")
+        }
+      }
+    }
+    
+    // console.log(selectedBuilding);
+    
+    
+  },
+
+  'click .boughtBuilding': function (event, instance) {
+    event.preventDefault();
+    if (event.target.id == Template.instance().data["selectedBuilding"]) {
+      Template.instance().data["selectedBuilding"] = "";  
+    }
+    else {
+      Template.instance().data["selectedBuilding"] = event.target.id;
+    }
+    console.log(Template.instance().data["selectedBuilding"]);
+  }
+
+});
+
 
 Template.cityFactory.onCreated(function helloOnCreated() {
   // counter starts at 0

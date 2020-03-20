@@ -111,28 +111,22 @@
         </div>
       {{/each}}
     </div>
-
-    <div class="row" style = "padding: 6pt;">
-      {{#each boughtBuildings}}
-        <div class="col-xs-6 col-sm-4 col-md-3">
-          <div style="border: solid black 1pt; padding: 2pt; margin:2pt;">
-            <!-- {{> boughtBuilding}} -->
-            {{name}}
-          </div>
-        </div>
-      {{/each}}
-    </div>
-
   </div>
-  {{> cityMap}}
-</template>
 
-<template name="boughtBuilding">
-  {{name}}
+    
+  {{> cityMap}}
 </template>
 
 
 <template name="cityMap">
+  <div class="row" style = "padding: 6pt;">
+    {{#each boughtBuildings}}
+      <div class="col-xs-6 col-sm-4 col-md-3 boughtBuilding" id="{{this._id}}" style="border: solid black 1pt; padding: 2pt; margin:2pt;">
+      {{this.name}}
+    </div>
+    {{/each}}
+  </div>
+
   <table>
     {{#each mapRows}}
     <tr>

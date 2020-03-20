@@ -1136,6 +1136,38 @@ export const AddBuilding = new ValidatedMethod({
   }
 });
 
+export const PlaceBuilding = new ValidatedMethod({
+  name: 'place.build',
+  validate ({}) {},
+  run ({gameCode, buildingId, location, userId}) {
+    //if map location belongs to city
+    //and location doesn't have a building
+    console.log(location);
+    //place it
+    mapLoc = Maps.findOne({$and: [{"gameCode": gameCode}, {"x": location[0]}, {"y": location[0]}]});
+    building = Buildings.findOne({"_id": buildingId});
+
+    if (mapLoc["ownerId"] == userId) {
+      if (building["ownerId"] == userId) {
+        if ("buildingId" in mapLoc) {
+          return "there's a building in this spot!";
+        }
+        else {
+          Buildings.update({"_id": buildingId}, {$set: {"location": location}});
+          Maps.update({"_id": mapLoc._id}, {$set: {"buildingId": building._id, "building": building}});
+        }
+      }
+      else {
+        return "you don't own this building!";
+      } 
+    }
+    else {
+      return "you don't own this spot!!!";
+    }
+    
+  }
+});
+
 export const CellNeighbor = new ValidatedMethod({
   name: 'map.neighbor',
   validate ({}) {},
