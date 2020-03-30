@@ -1153,6 +1153,7 @@ export const PlaceBuilding = new ValidatedMethod({
           return "there's a building in this spot!";
         }
         else {
+          building["location"] = location;
           Buildings.update({"_id": buildingId}, {$set: {"location": location}});
           Maps.update({"_id": mapLoc._id}, {$set: {"buildingId": building._id, "building": building}});
         }
@@ -1164,6 +1165,7 @@ export const PlaceBuilding = new ValidatedMethod({
     else {
       return "you don't own this spot!!!";
     }
+    BuildingNeighbors.call({"gameCode": gameCode, "building": building});
     
   }
 });

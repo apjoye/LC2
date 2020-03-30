@@ -30,3 +30,4 @@ accounts-password@1.5.2
 useraccounts:bootstrap
 useraccounts:flow-routing
 jquery
+reactive-dict

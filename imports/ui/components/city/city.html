@@ -138,6 +138,15 @@
     </tr>
     {{/each}}
   </table>
+
+  <div class="container">
+  {{currentBuilding.text}}
+  {{#if currentBuilding.buildingButtons}}
+    <button class="btn btn-default toggleBuilding" id="{{currentBuilding.building._id}}"> Toggle - {{currentBuilding.status}} </button>
+    <button class="btn btn-danger removeBuilding"> Remove Building </button>
+  {{/if}}
+  </div>
+
 </template>
 
 
