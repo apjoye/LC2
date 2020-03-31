@@ -120,9 +120,13 @@
 
 <template name="cityMap">
   <div class="row" style = "padding: 6pt;">
-    {{#each boughtBuildings}}
-      <div class="col-xs-6 col-sm-4 col-md-3 boughtBuilding" id="{{this._id}}" style="border: solid black 1pt; padding: 2pt; margin:2pt;">
-      {{this.name}}
+    {{#each build in boughtBuildings}}
+      <div class="container boughtBuilding" style="border: solid black 1pt; padding: 2pt; margin:2pt;">
+        {{build.name}}
+        {{#if buildingPlacable build}}
+          <button class="btn btn-primary placeBuilding" id="{{build._id}}"> Place Building </button>
+        {{/if}}
+        <!-- {{buildingPlacable build}} -->
     </div>
     {{/each}}
   </div>
@@ -139,12 +143,14 @@
     {{/each}}
   </table>
 
-  <div class="container">
+  <div class="container" style="border: solid black 1pt; padding: 2pt; margin:2pt;">
+
   {{currentBuilding.text}}
   {{#if currentBuilding.buildingButtons}}
     <button class="btn btn-default toggleBuilding" id="{{currentBuilding.building._id}}"> Toggle - {{currentBuilding.status}} </button>
     <button class="btn btn-danger removeBuilding"> Remove Building </button>
   {{/if}}
+  <!-- {{#else}} -->
   </div>
 
 </template>

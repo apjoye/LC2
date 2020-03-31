@@ -406,7 +406,7 @@ export const ToggleBuilding = new ValidatedMethod({
     }
 
     Buildings.update({"_id": buildingId}, {$set: {"running": newStatus}});
-    console.log("building set to " + newStatus);
+    // console.log("building set to " + newStatus);
 
     Acts.insert({
       "time": (new Date()).getTime(),
@@ -1144,15 +1144,20 @@ export const PlaceBuilding = new ValidatedMethod({
     //and location doesn't have a building
     console.log(location);
     //place it
-    mapLoc = Maps.findOne({$and: [{"gameCode": gameCode}, {"x": location[0]}, {"y": location[0]}]});
+    mapLoc = Maps.findOne({$and: [{"gameCode": gameCode}, {"x": location[0]}, {"y": location[1]}]});
     building = Buildings.findOne({"_id": buildingId});
 
     if (mapLoc["ownerId"] == userId) {
+      console.log("spot is owned");
       if (building["ownerId"] == userId) {
+        console.log("building is owned");
         if ("buildingId" in mapLoc) {
+          console.log("building in spot")
+          console.log(mapLoc);
           return "there's a building in this spot!";
         }
         else {
+          console.log("trying to place building")
           building["location"] = location;
           Buildings.update({"_id": buildingId}, {$set: {"location": location}});
           Maps.update({"_id": mapLoc._id}, {$set: {"buildingId": building._id, "building": building}});

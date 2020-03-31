@@ -307,6 +307,32 @@ Template.cityMap.helpers({
     return bb;
   },
 
+  buildingPlacable(building) {
+    buyingBuilds = ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
+    map = Template.instance().fullmap.get();
+    mapSelect = map[Template.instance().selectedLoc.get()];
+    placeMode = false;
+    // console.log(mapSelect)
+    if (mapSelect != "") {
+      if (!("building" in mapSelect)) {
+        if (mapSelect["ownerId"] == Meteor.userId()) {
+          console.log("placable true");
+          placeMode = true;
+        }
+      }
+    }
+    // console.log(building.name);
+    // console.log(building.name in buyingBuilds);
+    // console.log(placeMode);
+    // console.log(building.name in buyingBuilds && placeMode); 
+    if (buyingBuilds.indexOf(building.name) >= 0 && placeMode) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  },
+
   currentBuilding() {
     text = "";
     boxContent = {};
@@ -344,61 +370,24 @@ Template.cityMap.helpers({
 Template.cityMap.events({
   'click .mapCell' (event, instance) {
     event.preventDefault();
-    // console.log(event.target.id);
-    // mapLoc = Template.instance().data.map[event.target.id];
-    mapLoc = Template.instance().fullmap.get()[event.target.id];
-    // console.log(mapLoc);
-    // Template.instance().data["selectedMapCell"] = mapLoc;
-    instance.selectedBuilding.set(mapLoc);
     instance.selectedLoc.set(event.target.id);
-    // Template.instance().selectedBuilding.set(mapLoc);
-    if (mapLoc != undefined) {
-      if ("building" in mapLoc) {
-        bb = mapLoc["building"];
-        // ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
-      }
-      else {
-        if ("ownerId" in mapLoc){
-          if (mapLoc["ownerId"] == Meteor.userId()) {
-            console.log("empty owned spot!");
-
-            // if (selectedBuilding != "" && selectedBuilding != undefined) {
-            //   loc = [mapLoc["x"], mapLoc["y"]];
-            //   console.log(loc);
-            //   PlaceBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "buildingId": selectedBuilding, "location": loc, "userId": Meteor.userId()});
-            //   // buildingId, location, userId
-            // }
-          }
-          else {
-            console.log("spot owned by someone else?");
-          }
-        }
-        else {
-          console.log("unowned spot!")
-        }
-      }
-    }    
-    // console.log(selectedBuilding);
   },
 
-  'click .boughtBuilding': function (event, instance) {
+  'click .placeBuilding': function (event, instance) {
     event.preventDefault();
-    if (event.target.id == Template.instance().data["selectedBuilding"]) {
-      Template.instance().data["selectedBuilding"] = "";  
-    }
-    else {
-      Template.instance().data["selectedBuilding"] = event.target.id;
-    }
-    console.log(Template.instance().data["selectedBuilding"]);
+    loc = instance.selectedLoc.get();
+    x = loc.indexOf("x") + 1;
+    y = loc.indexOf("y") - 1;
+    buildLoc = [parseInt(loc.substr(x, y)), parseInt(loc.substr(y + 2))];
+    // console.log(x + " " + y + " " + loc + " " + buildLoc);
+    console.log(buildLoc);
+    // console.log(event.target.id + " " + buildLoc);
+    PlaceBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "buildingId": event.target.id, "location": buildLoc, "userId": Meteor.userId()});
   },
 
   'click .toggleBuilding': function (event, instance) {
     event.preventDefault();
-    // mapLoc = Template.instance().selectedBuilding.get();
-    // console.log(mapLoc["building"]["_id"]);
-    // bb = mapLoc["building"];
     bb = Template.instance().data.map[Template.instance().selectedLoc.get()]["building"];
-    // console.log(bb);
     ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
   },
 
