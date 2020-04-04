@@ -1,11 +1,16 @@
 import './card.html';
+import { ReactiveVar } from 'meteor/reactive-var';
+
 import { Producers } from '/imports/api/links/links.js';
 import { Bids } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
 // import { Assets } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
 
-import { NewRound } from '/imports/api/links/methods.js';
+import { Buildings } from '/imports/api/links/links.js';
+
+import { MakeBid2 } from '/imports/api/links/methods.js';
+
 import { BuyProducer } from '/imports/api/links/methods.js';
 import { MakeBid } from '/imports/api/links/methods.js';
 import { UpdateBid } from '/imports/api/links/methods.js';
@@ -17,7 +22,10 @@ Template.factoryList.onCreated(function helloOnCreated() {
 
   Meteor.subscribe('producers.public');
   Meteor.subscribe('games.minerunning');
-
+  Meteor.subscribe('buildings.auction', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('bids.local');
+  this.buildingBids = new ReactiveVar([]);
+  this.resBids = new ReactiveVar([]);
 });
 
 Template.factoryList.helpers({
@@ -26,6 +34,7 @@ Template.factoryList.helpers({
   // },
   bidKinds() {
     return ["f1", "f2", "m1", "m2"];
+    // return ["wood", "lumber", "clay", "copper"];
   },
 
   PublicFactories(bidKind) {
@@ -35,8 +44,63 @@ Template.factoryList.helpers({
     // while (prods.length < 4) {
     //   prods.push({});
     // }
-    return prods;
+    // console.log(prods);
+    return prods; 
     // return Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": false}, {"visible": true}, {"bidKind": bidKind}]});
+  },
+
+  PublicBuildings () {
+    builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": false}, {"visible": true}, {"state": "auction"}] });
+    // console.log(builds.fetch());
+    // console.log(Buildings.find().fetch());
+    // console.log(FlowRouter.getParam("gameCode"));
+    return builds;
+  },
+
+  CityBids() {
+    bids = Bids.find(
+      {$and: [
+        {"gameCode": FlowRouter.getParam("gameCode")}, 
+        {"baseId": Meteor.userId()}, 
+        // {"groupGame"}
+      ]}
+    ).fetch();
+    bbs = {};     //bids grouped by building 
+    rbs = {};    //bids grouped by resource kind
+    // console.log(bids);
+    for (b in bids) {
+      bbs[bids[b]["buildingId"]] = bids[b]["value"];
+      if (!(bids[b]["bidKind"] in rbs)) {
+        rbs[bids[b]["bidKind"]] = 0;
+      }
+      rbs[bids[b]["kind"]] += bids[b]["value"];
+    }
+    // console.log(bbs);
+    // console.log(rbs);
+    Template.instance().buildingBids.set(bbs);
+    Template.instance().resBids.set(rbs);
+  },
+
+  bidValue(buildingId) {
+    bbs = Template.instance().buildingBids.get();
+    console.log(bbs);
+    if (buildingId in bbs) {
+      return bbs[buildingId];  
+    }
+    else {
+      return 0;
+    }
+    
+  },
+
+  buildingText(building){
+    console.log(building);
+    text = building.name;
+    text += " Features:" + JSON.stringify(building.buildFeatures);
+    text += " Uses:" + JSON.stringify(building.prodCost);
+    text += " Produces: " + JSON.stringify(building.prodVal);
+    text += " Bid Kind: " + JSON.stringify(building.bidKind);
+    return text;
   },
 
   ResourceIcon(res) {
@@ -101,15 +165,35 @@ Template.factoryList.helpers({
 });
 
 Template.factoryList.events({
-  'click .toggleCity' (event, instance) {
-    if (instance.city.get() == "city1") {
-      instance.city.set("city2");
+  'click .changeBid' (event, instance) {
+    // console.log(event.target.classList[3]);
+    //event.target.classList[3]   event.target.name
+    // console.log(event.target);
+    console.log(event.target.classList);
+    oldVal = parseInt(event.target.classList[5]);
+    change = parseInt(event.target.name);
+    if (isNaN(parseInt(oldVal))) {
+      oldVal = 0;
+    }
+    console.log(oldVal + " " + change);
+
+    if (oldVal == 0 && change == -1) {
+      console.log("no negative bids");
     }
     else {
-      instance.city.set("city1");
+      newVal = oldVal + change;
+      MakeBid2.call({
+        "baseId": Meteor.userId(), 
+        "building": event.target.classList[3], 
+        // "group": thisGroup.group, 
+        "gameCode": FlowRouter.getParam("gameCode"), 
+        "change": change, 
+        "oldVal": oldVal,
+        "newVal": newVal,
+        "bidKind": event.target.classList[4]});  
     }
+    
   }
-
 });
 
 Template.factoryList.onCreated(function helloOnCreated() {
@@ -139,8 +223,6 @@ Template.factory.helpers({
     // console.log(this);
     return factoryOutputType[this.kind];
   },
-
-  
 
   CostInfo(costList, startText) {
   // CostInfo() {

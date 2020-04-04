@@ -155,8 +155,15 @@
   <!-- Add Building -->
   <p>
   <form class="addBuilding form-inline">
-    <div class="form-group">
+    <!-- <div class="form-group">
       <input class = "form-control" type="text" name="bidKind" placeholder="Bid Kind" />
+    </div> -->
+    <div class="form-group">
+      <select class = "custom-select form-control" id="bidKind" name="bidKind">
+        {{#each bidKinds}}
+          <option value = {{this}}>{{this}}</option>
+        {{/each}}
+      </select>
     </div>
 
     <div class="form-group">

@@ -1094,7 +1094,7 @@ export const AddBuilding = new ValidatedMethod({
     // });
 
     mapPlaced = false;
-    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "running": false, "prodCost": prodCost, "prodVal": prodVal, "auction": true, "placed": false};
+    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "running": false, "prodCost": prodCost, "prodVal": prodVal, "state": "auction", "placed": false, "visible": true};
     if (groupName == "auctions") {
       buildObj["auction"] = true;
     }
@@ -1106,8 +1106,10 @@ export const AddBuilding = new ValidatedMethod({
       buildObj["owner"] = groupName;
       buildObj["ownerId"] = groupId;
       buildObj["ownerGame"] = groupGame
+      buildObj["state"] = "bought";
       if (locx != -1){
         buildObj["location"] = [locx, locy];
+        buildObj["state"] = "placed";
         mapPlaced = true;
       }
     }
@@ -1142,22 +1144,22 @@ export const PlaceBuilding = new ValidatedMethod({
   run ({gameCode, buildingId, location, userId}) {
     //if map location belongs to city
     //and location doesn't have a building
-    console.log(location);
+    // console.log(location);
     //place it
     mapLoc = Maps.findOne({$and: [{"gameCode": gameCode}, {"x": location[0]}, {"y": location[1]}]});
     building = Buildings.findOne({"_id": buildingId});
 
     if (mapLoc["ownerId"] == userId) {
-      console.log("spot is owned");
+      // console.log("spot is owned");
       if (building["ownerId"] == userId) {
-        console.log("building is owned");
+        // console.log("building is owned");
         if ("buildingId" in mapLoc) {
-          console.log("building in spot")
-          console.log(mapLoc);
+          // console.log("building in spot")
+          // console.log(mapLoc);
           return "there's a building in this spot!";
         }
         else {
-          console.log("trying to place building")
+          // console.log("trying to place building")
           building["location"] = location;
           Buildings.update({"_id": buildingId}, {$set: {"location": location}});
           Maps.update({"_id": mapLoc._id}, {$set: {"buildingId": building._id, "building": building}});
@@ -1205,7 +1207,8 @@ export const ResetResources = new ValidatedMethod({
 export const RemoveBuilding = new ValidatedMethod({
   name: 'remove.build',
   validate ({}) {},
-  run({gameCode, buildingId}) {
+  run({gameCode = "", buildingId}) {
+    console.log("removing building ");
     Buildings.remove({"_id": buildingId});
     Maps.update(
       // {$and: [{"gameCode": gameCode}, {"buildingId": buildingId}]}, 
@@ -1589,6 +1592,58 @@ export const JoinGame = new ValidatedMethod({
         throw new Error("game code doesn't exist");
       } 
       // if()
+    }
+  }
+});
+
+
+export const MakeBid2 = new ValidatedMethod({
+  name: 'bid2.make',
+  validate({}) {},
+  run({baseId, building, gameCode, oldVal, newVal, change, bidKind}) {
+    if (!this.isSimulation) {
+      Bids.update(
+        {$and: [{"baseId": baseId}, {"buildingId": building}]}, 
+        {$set: {"gameCode": gameCode, "value": newVal, "bidKind": bidKind}}, 
+        {upsert: true})
+      // var existBid = Bids.findOne({$and: [{"producer": producer}, {"group": group}]});
+      // if (existBid == undefined) {
+      //   if (change < 0) {
+      //     change = 0;
+      //   }
+      //   Bids.insert({
+      //     "producer": producer,
+      //     "group": group,
+      //     "gameCode": gameCode,
+      //     "baseId": baseId,
+      //     "bidVal": change,
+      //     "bidKind": bidKind
+      //   });
+      // }
+      // else {
+      //   // console.log(existBid.bidVal.toString());
+      //   change = existBid.bidVal + change;
+      //   if (change < 0) {
+      //     change = 0;
+      //   }
+      //   if (change.toString() == "NaN") {
+      //     // console.log("change is nan?");
+      //     change = 0;
+      //   }
+      //   Bids.update({"_id": existBid._id}, {$set: {"bidVal": change}});
+      // }
+      logObj = {
+        "baseId": baseId,
+        "buildingId": building,
+        "gameCode": gameCode,
+        "change": change,
+        "oldVal": oldVal,
+        "newVal": newVal,
+        "bidKind": bidKind
+      };
+      MakeLog.call({"key": "BidAct", "log": logObj}, function (err, res) {
+        if (err) {console.log(err);}
+      });
     }
   }
 });

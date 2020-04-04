@@ -233,6 +233,10 @@ Template.adminGame.helpers({
     return Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}]});
   },
 
+  bidKinds() {
+    return ["clay", "copper", "food", "lumber"];
+  },
+
   buildingNames() {
     return ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
   }

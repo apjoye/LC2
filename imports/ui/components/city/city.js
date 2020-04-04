@@ -15,6 +15,7 @@ import '/imports/ui/stylesheets/style.css';
 
 import { PlaceBuilding } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';
+import { RemoveBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
 import 'animate.css/animate.css';
 
@@ -303,7 +304,7 @@ Template.cityMap.helpers({
   boughtBuildings() {
     // console.log(Meteor.userId());
     bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
-    // console.log(bb.fetch());
+    // console.log(Buildings.find().fetch());
     return bb;
   },
 
@@ -337,15 +338,10 @@ Template.cityMap.helpers({
     text = "";
     boxContent = {};
     boxContent["text"] = "";
-    // mapSelect = Template.instance().selectedBuilding.get();
-    // console.log(Template.instance().selectedLoc.get());
-    // if ()
     map = Template.instance().fullmap.get();
     mapSelect = map[Template.instance().selectedLoc.get()];
     boxContent["mapCell"] = mapSelect;
     // console.log(mapSelect);
-    // console.log(Template.instance().data.selectedBuilding.get());
-    // console.log(Template.instance());
     if ("building" in mapSelect) {
       boxContent["text"] += JSON.stringify(mapSelect["building"]["buildFeatures"]["resKind"]);
       if ("neighboringResource" in mapSelect["building"]) {
@@ -358,10 +354,9 @@ Template.cityMap.helpers({
       else {
         boxContent["status"] = "Idle";
       }
-      //TODO: add status change button
-      //ADD delete building buttong
     }
     // console.log(mapSelect);
+    // console.log(boxContent);
     return boxContent;
   }
 
@@ -392,7 +387,10 @@ Template.cityMap.events({
   },
 
   'click .removeBuilding': function (event, instance) {
-    
+    event.preventDefault();
+    console.log(event.target.id);
+    console.log("removing building client " + (event.target.id).substr(7));
+    RemoveBuilding.call({"buildingId": (event.target.id).substr(7)});
   }
 
 });
