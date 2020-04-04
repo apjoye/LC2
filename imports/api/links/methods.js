@@ -1338,19 +1338,27 @@ export const MakeMap = new ValidatedMethod({
       
     }
 
-    async function makeTeamCells (corner, dims, visCorner, visDim, gameCode, groupId, groupName, groupGame) {
+    async function makeTeamCells (corner, dims, gameCode, groupId, groupName, groupGame) {
       //groupID is the userID of the group's user object; and groupGame is the _id of the group's game object. 
       //all instances of orange group across games are the same user but different games
       var thisX = corner[0];
       var thisY = corner[1];
-      for (thisX; thisX < corner[0] + dims[0]; thisX += 1){
-        for (thisY; thisY < corner[1] + dims[1]; thisY += 1) {
+      var width = dims[0];
+      var height = dims[1];
+      var endX = thisX + width;
+      var endY = thisY + height;
+      console.log(thisX + " " + thisY + " " + endX + " " + endY);
+
+      for (thisX; thisX < endX; thisX += 1){
+        for (thisY = corner[1]; thisY < endY; thisY += 1) {
+          console.log(thisX + " " + thisY);
           await Maps.update(
             {$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]}, 
             {$set: {"owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
             {upsert: true}
           );
         }
+        console.log(thisX);
       }
 
       // var visX = visCorner[0];
@@ -1376,7 +1384,7 @@ export const MakeMap = new ValidatedMethod({
       // teams = teams.fetch();
       for (t in teams) {
         if (t < corners.length){
-          await makeTeamCells(corners[t], dims[t], visCorners[t], visDims[t], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
+          await makeTeamCells(corners[t], dims[t], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
         }
         await Games.update(
           {"_id": teams[t]["_id"]}, 
