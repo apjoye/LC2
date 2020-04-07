@@ -213,13 +213,14 @@
 </template>
 
 <template name="gameMap">
-  <table>
+  <table id = "gameMapTable">
     {{#each mapRows}}
     <tr>
       <!-- <pre> -->
         {{#each this}}
         <td class="mapCell" id="{{this.loc}}">
-          {{this.text}}&emsp;
+          <img id = "mapTileimg" src = "../img/map/mapTile.png" style="width:60px; height:60px;">
+          <!--{{this.text}}&emsp;-->
         </td>
         {{/each}}
         <!-- {{this.rowCol}}&emsp;

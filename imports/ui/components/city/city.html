@@ -131,12 +131,13 @@
     {{/each}}
   </div>
 
-  <table>
+  <table id="smallMap">
     {{#each mapRows}}
     <tr>
         {{#each this}}
-        <td class="mapCell" id="{{this.loc}}">
-          {{this.text}}&emsp;
+        <td class="mapCell {{this.loc}}" id="{{this.loc}}">
+            <img class = "mapCell {{this.loc}}" id = "mapTileimg" src = "../img/map/mapTile.png" style="width:60px; height:60px;">
+            <!--{{this.text}}&emsp;-->
         </td>
         {{/each}}
     </tr>
