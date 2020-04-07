@@ -270,6 +270,20 @@ Template.cityMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
+            var smallMap = document.getElementById("smallMap");
+           if(resMapDict[loc]["building"]["name"] === "claymine"){
+            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory1.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "coppermine"){
+            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory2.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "foodfarm"){
+            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm1.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "foodfishing"){
+            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm2.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "foodhunting"){
+            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park1.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "lumbercamp"){
+            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park2.png' width = '60' height='60'>";
+           }
             // console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
@@ -313,9 +327,9 @@ Template.cityMap.helpers({
     map = Template.instance().fullmap.get();
     mapSelect = map[Template.instance().selectedLoc.get()];
     placeMode = false;
-    // console.log(mapSelect)
-    if (mapSelect != "") {
-      if (!("building" in mapSelect)) {
+     console.log(mapSelect);
+    if (mapSelect!="") {
+      if (!("building" in mapSelect)|| mapSelect != {}) {
         if (mapSelect["ownerId"] == Meteor.userId()) {
           console.log("placable true");
           placeMode = true;
@@ -365,7 +379,9 @@ Template.cityMap.helpers({
 Template.cityMap.events({
   'click .mapCell' (event, instance) {
     event.preventDefault();
-    instance.selectedLoc.set(event.target.id);
+    loc = event.target.classList[1];
+    // instance.selectedLoc.set(event.target.id);
+    instance.selectedLoc.set(loc);
   },
 
   'click .placeBuilding': function (event, instance) {

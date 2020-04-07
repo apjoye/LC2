@@ -139,6 +139,21 @@ Template.gameMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
+          
+           var gameMapTable = document.getElementById("gameMapTable");
+           if(resMapDict[loc]["building"]["name"] === "claymine"){
+             gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory1.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "coppermine"){
+            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory2.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "foodfarm"){
+            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm1.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "foodfishing"){
+            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm2.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "foodhunting"){
+            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park1.png' width = '60' height='60'>";
+           }else if(resMapDict[loc]["building"]["name"] === "lumbercamp"){
+            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park2.png' width = '60' height='60'>";
+           }
             // console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
