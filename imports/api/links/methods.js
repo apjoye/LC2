@@ -273,62 +273,6 @@ export const RunBids = new ValidatedMethod({
       }
       
       runThroughBids(gameCode);
-      
-      /*
-      Producers.find({$and: [{"gameCode": gameCode}, {"owned": false}]}).forEach(function (prod) {
-
-        allBids = Bids.find({$and: [{"gameCode": gameCode}, {"producer": prod._id}]}, {sort: {"bidVal": -1}}).fetch();
-        // maybe write another function to ensure removal of unaffordable bids?
-        purchased = "not yet";
-        affBids = []
-        for (i in allBids) {
-          bidder = Games.findOne({$and: [{"playerId": allBids[i].baseId}, {"gameCode": gameCode}]});
-          if (bidder.res[allBids[i].bidKind] >= allBids[i].bidVal && allBids[i].bidVal > 0) {
-            affBids.push(allBids[i]);
-          }
-        }
-        // console.log(affBids);
-
-        for (i in affBids) {
-          i = parseInt(i)
-          // console.log(i + " " + purchased); 
-          if(purchased == "not yet"){
-            if (i < (affBids.length - 1)){
-              // console.log(i+1);
-              // console.log(affBids[i]);
-              // console.log(affBids[(i + 1)]);
-              if (affBids[i].bidVal == affBids[i + 1].bidVal) {
-                //raise alerts that bid failed!
-                purchased = "bid clash";
-                AddTeamNote.call({"gameCode": gameCode, "baseId": affBids[i].baseId, "notes": ["Bid failed cause it clashed with someone else!"]})
-                AddTeamNote.call({"gameCode": gameCode, "baseId": affBids[i + 1].baseId, "notes": ["Bid failed cause it clashed with someone else!"]})
-                console.log("bid clash");
-              }
-              else {
-                // bidder = Games.findOne({"_id": allBids[i].baseId});
-                purchased = "bid success";
-                console.log("bid success cause top bid led");
-                BuyProducer.call({"producer": prod._id, "player": affBids[i].baseId, "gameCode": gameCode, "bid": affBids[i]}, function (err, res){
-                  if (err) {console.log(err);}
-                });
-                AddTeamNote.call({"gameCode": gameCode, "baseId": affBids[i].baseId, "notes": ["Your bid succeeded!"]})
-                purchased = true;
-              }
-            }
-            else {
-              console.log("bid success cause only 1 bid");
-              purchased = "bid success";
-              BuyProducer.call({"producer": prod._id, "player": affBids[i].baseId, "gameCode": gameCode, "bid": affBids[i]}, function (err, res){
-                if (err) {console.log(err);}
-              });
-              purchased = true;
-            }
-          }
-        }
-
-        ClearBids.call({"producer": prod._id});
-      });
-      */
     }
     return true;
   }

@@ -136,7 +136,7 @@
     <tr>
         {{#each this}}
         <td class="mapCell {{this.loc}}" id="{{this.loc}}">
-            <!-- <img class = "mapCell {{this.loc}}" id = "mapTileimg" src = "../img/map/mapTile.png" style="width:60px; height:60px;"> -->
+            <img class = "mapCell {{this.loc}}" id = "mapTileimg" src = "{{this.imageSource}}" style="width:60px; height:60px;">
             {{this.text}}&emsp;
         </td>
         {{/each}}
@@ -146,12 +146,12 @@
 
   <div class="container" style="border: solid black 1pt; padding: 2pt; margin:2pt;">
 
-  {{currentBuilding.text}}
-  {{#if currentBuilding.buildingButtons}}
-    <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
-    <button class="btn btn-danger removeBuilding"  id="remove-{{currentBuilding.mapCell.building._id}}"> Remove Building </button>
-  {{/if}}
-  <!-- {{#else}} -->
+    {{currentBuilding.text}}
+    {{#if currentBuilding.buildingButtons}}
+      <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
+      <button class="btn btn-danger removeBuilding"  id="remove-{{currentBuilding.mapCell.building._id}}"> Remove Building </button>
+    {{/if}}
+    <!-- {{#else}} -->
   </div>
 
 </template>

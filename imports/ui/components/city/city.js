@@ -248,8 +248,20 @@ Template.cityMap.helpers({
           resMapDict[loc]["resource"] = resDict[map[m]["resId"]];
         }
       }
+      neighbs = [[-1, 0], [0, -1], [1, 0], [0, 1]]
+      for (n in neighbs) {
+        nx = map[m].x + neighbs[n][0];
+        ny = map[m].y + neighbs[n][1]
+        if (nx >= 0 && ny >= 0) {
+          nloc = "x" + nx + "y" + ny;
+          if (!(nloc in resMapDict)) { resMapDict[nloc] = {};} 
+          else { if (!("neighbors" in resMap)) { resMapDict[nloc]["neighbors"] = []; } }
+          resMapDict[nloc]["neighbors"].push(resMapDict[loc]);
+        }
+       }
       // }
     }
+
     resMapDict[""] = {};
 
     Template.instance().data.map = resMapDict;
@@ -278,7 +290,7 @@ Template.cityMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
-            rowCol["image"] = mapTiles[resMapDict[loc]["building"]["name"]];
+            rowCol["imageSource"] = mapTiles[resMapDict[loc]["building"]["name"]];
             // console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
@@ -320,12 +332,13 @@ Template.cityMap.helpers({
   buildingPlacable(building) {
     buyingBuilds = ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
     map = Template.instance().fullmap.get();
-    mapSelect = map[Template.instance().selectedLoc.get()];
+    loc = Template.instance().selectedLoc.get();
+    mapSelect = map[loc];
     placeMode = false;
-     console.log(mapSelect);
-    if (mapSelect!="") {
-      if (!("building" in mapSelect)|| mapSelect != {}) {
-        if (mapSelect["ownerId"] == Meteor.userId()) {
+     // console.log(mapSelect);
+    if (mapSelect != "" || mapSelect != {} || mapSelect != undefined) {
+      if (!("building" in mapSelect) || mapSelect != {}) {
+        if ( mapSelect["ownerId"] == Meteor.userId() ) {
           console.log("placable true");
           placeMode = true;
         }
@@ -350,22 +363,23 @@ Template.cityMap.helpers({
     map = Template.instance().fullmap.get();
     mapSelect = map[Template.instance().selectedLoc.get()];
     boxContent["mapCell"] = mapSelect;
-    // console.log(mapSelect);
-    if ("building" in mapSelect) {
-      boxContent["text"] += JSON.stringify(mapSelect["building"]["buildFeatures"]["resKind"]);
-      if ("neighboringResource" in mapSelect["building"]) {
-        rowCol["text"] += " bonus ore! ";
-      }
-      boxContent["buildingButtons"] = true;
-      if (mapSelect["building"]["running"] == true) {
-        boxContent["status"] = "Running";
-      }
-      else {
-        boxContent["status"] = "Idle";
-      }
+    // console.log(mapSelect == undefined);
+    if (mapSelect == "" || mapSelect == {} || mapSelect == undefined) {
     }
     else {
-
+      if ("building" in mapSelect) {
+        boxContent["text"] += JSON.stringify(mapSelect["building"]["buildFeatures"]["resKind"]);
+        if ("neighboringResource" in mapSelect["building"]) {
+          rowCol["text"] += " bonus ore! ";
+        }
+        boxContent["buildingButtons"] = true;
+        if (mapSelect["building"]["running"] == true) {
+          boxContent["status"] = "Running";
+        }
+        else {
+          boxContent["status"] = "Idle";
+        }
+      }
     }
     // console.log(mapSelect);
     // console.log(boxContent);
