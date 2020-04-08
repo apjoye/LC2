@@ -16,7 +16,7 @@
             <div class="btn-group" role="group">
               <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}}" name="-1">   -1   </button>
               <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}}" name="+1">   +1   </button>
-              <button type="button" class="btn btn-default" name="buildValue">   {{bidValue build._id}}   </button>
+              <button type="button" class="btn btn-default" name="buildValue">   {{bidValue build._id}}  {{build.bidKind}} </button>
             </div>
           </div>
         {{/each}}

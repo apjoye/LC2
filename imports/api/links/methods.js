@@ -1075,7 +1075,7 @@ export const AddBuilding = new ValidatedMethod({
     prodCost = prodCosts[buildingName];
     prodVal = prodVals[buildingName];
 
-    console.log(prodCosts[buildingName] + " " + buildingName);
+    // console.log(prodCosts[buildingName] + " " + buildingName);
 
     // Buildings.update(
     //   {$and: [{"gameCode": gameCode, "location": [locx, locy]}]}, 
@@ -1114,7 +1114,7 @@ export const AddBuilding = new ValidatedMethod({
       }
     }
     Buildings.insert(buildObj);
-    console.log(buildObj);
+    // console.log(buildObj);
     // Buildings.insert(buildObj, function (err, res) {
     //   if (err) {console.log("building insert failed!??!?!");}
     //   else {

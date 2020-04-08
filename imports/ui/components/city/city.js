@@ -216,6 +216,14 @@ Template.cityMap.helpers({
     resMapDict = {};
     resDict = {};
     buildDict = {};
+    mapTiles = {
+      "claymine": "../img/buildings/claymine.png",
+      "coppermine": "../img/buildings/coppermine.png",
+      "foodfarm": "../img/buildings/foodfarm.png",
+      "foodfishing": "../img/buildings/foodfishing.png",
+      "foodhunting": "../img/buildings/foodhunting.png",
+      "lumbercamp": "../img/buildings/lumbercamp.png",
+    }
 
     for (r in resources) {
       resDict[resources[r]["_id"]] = resources[r];
@@ -270,20 +278,7 @@ Template.cityMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
-            var smallMap = document.getElementById("smallMap");
-           if(resMapDict[loc]["building"]["name"] === "claymine"){
-            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory1.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "coppermine"){
-            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory2.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "foodfarm"){
-            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm1.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "foodfishing"){
-            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm2.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "foodhunting"){
-            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park1.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "lumbercamp"){
-            smallMap.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park2.png' width = '60' height='60'>";
-           }
+            rowCol["image"] = mapTiles[resMapDict[loc]["building"]["name"]];
             // console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
@@ -369,6 +364,9 @@ Template.cityMap.helpers({
         boxContent["status"] = "Idle";
       }
     }
+    else {
+
+    }
     // console.log(mapSelect);
     // console.log(boxContent);
     return boxContent;
@@ -382,6 +380,7 @@ Template.cityMap.events({
     loc = event.target.classList[1];
     // instance.selectedLoc.set(event.target.id);
     instance.selectedLoc.set(loc);
+    console.log(loc);
   },
 
   'click .placeBuilding': function (event, instance) {
