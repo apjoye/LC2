@@ -197,13 +197,13 @@ export const RunBids2 = new ValidatedMethod({
           await Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
 
         // >> change producer owner
-          await Producers.update({"_id": bid.producer}, {$set: { "owned": true,  "ownerId": thisGame.playerId, "ownerGameId": thisGame._id, "ownerName": thisGame.group}});
+          await Buildings.update({"_id": bid.producer}, {$set: { "owned": true,  "ownerId": thisGame.playerId, "ownerGameId": thisGame._id, "ownerName": thisGame.group}});
 
         // >> add log about producer purchase
           evLog = bid;
           evLog["oldRes"] = oldRes;
           evLog["newRes"] = newRes
-          MakeLog.call({"key": "ProducerAcquire", "log": evLog});
+          MakeLog.call({"key": "BuildingAcquire", "log": evLog});
 
         // >> give note to success of bid?
 
@@ -249,7 +249,10 @@ export const RunBids2 = new ValidatedMethod({
           bidValue = bid.bidVal;
           teamRes = teamResources[producerBids[pb]["group"]][bid["bidKind"]]
           // console.log(bidValue +  " " + teamRes);
-          if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["group"]][bid["bidKind"]]) {
+          if (bidValue >= teamResources[producerBids[pb]["group"]][bid["bidKind"]]) {
+            //this "bid" object failed cause of unaffordability
+          }
+          else if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["group"]][bid["bidKind"]]) {
             if (bidValue == maxBid) {
               maxTie = true;
             }
