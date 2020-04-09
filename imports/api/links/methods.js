@@ -161,6 +161,134 @@ export const ClearBids = new ValidatedMethod({
   }
 });
 
+
+export const RunBids2 = new ValidatedMethod({
+  name: 'bids2.buy',
+  validate ({}) {},
+  // validate ({}) {
+
+  // },
+  run({gameCode}) {
+    // console.log(player + " " + producer);
+
+    if (!this.isSimulation) {
+      
+
+      async function clearBids (producer) {
+        // return await Bids.
+        // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
+      }
+
+      async function commitBid (bid, teams, resources) {
+        // >> check affordability
+        console.log(JSON.stringify(resources) + " " + JSON.stringify(bid));
+        newRes = resources[bid["group"]];
+        oldRes = newRes;
+        newRes[bid["bidKind"]] -=  bid["bidVal"];
+
+        if (newRes[bid["bidKind"]] < 0) {
+          console.log("somehow this bid won though it's unaffordable what the fck " + JSON.stringify(bid));
+          return true;
+        }
+        // >> change team resources
+        else {
+          console.log("committing the bid!!");
+          thisGame = Games.findOne({$and: [{"playerName": bid.group}, {"role": "base"}, {"gameCode": bid.gameCode}]});
+          await Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
+
+        // >> change producer owner
+          await Producers.update({"_id": bid.producer}, {$set: { "owned": true,  "ownerId": thisGame.playerId, "ownerGameId": thisGame._id, "ownerName": thisGame.group}});
+
+        // >> add log about producer purchase
+          evLog = bid;
+          evLog["oldRes"] = oldRes;
+          evLog["newRes"] = newRes
+          MakeLog.call({"key": "ProducerAcquire", "log": evLog});
+
+        // >> give note to success of bid?
+
+        // >> give notes to teams whose bids failed
+          // failBids = await Bids.find({$and: [{producer: bid.producer}, {}]})
+          // await Games.update()
+
+        // >> change game phase to post-bid
+          await Games.update({$and: [{"role": "admin"}, {"gameCode": bid.gameCode}]}, {$set: {"phase": "post-bid"}})
+          return true;
+          // return await resourceChange();
+        }
+      }
+
+      async function bidTieMessage (bidTeams) {
+        // return await updateTeamNotes();
+      }
+
+      async function resolveBids (producer, gameCode) {
+        prodBids = await Bids.find({"buildingId": producer._id}, {sort: {"bidVal": -1}}); 
+        producerBids = prodBids.fetch();
+        diffTeams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
+        diffTeams = diffTeams.fetch();
+        teamResources = diffTeams.reduce( function(map, obj) {map[obj.playerName] = obj.res; return map;}, {});
+
+        maxBid = 0;
+        maxBidObj = {};
+        maxTie = false;
+        bidResources = producer.bidKind;
+        bid = {};
+        // console.log(producerBids);
+        // do I want to make sure this is sorted?
+        function compareBids(a, b) {
+          if (a["bidVal"] > b["bidVal"]) return -1;
+          if (a["bidVal"] < b["bidVal"]) return 1;
+
+          return 0;
+        }
+        producerBids.sort(compareBids);
+
+        for (pb in producerBids) {
+          bid = producerBids[pb];
+          bidValue = bid.bidVal;
+          teamRes = teamResources[producerBids[pb]["group"]][bid["bidKind"]]
+          // console.log(bidValue +  " " + teamRes);
+          if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["group"]][bid["bidKind"]]) {
+            if (bidValue == maxBid) {
+              maxTie = true;
+            }
+            else if (bidValue > maxBid) {
+              maxBid = bidValue;
+              maxBidObj = bid;
+              maxTie = false;
+            }
+          }
+        }
+        // console.log(maxBid + " " + maxTie + " ");
+        if (maxBid == 0) {
+          // return await noBids();   // ugh can skip
+        }
+        else if (maxTie == false){
+          // console.log("false maxTie found!");
+          return await commitBid(maxBidObj, diffTeams, teamResources);
+        }
+        else {
+          // return await bidTieMessage(bidTeams);   // ugh can skip
+        }
+      }
+
+      async function runThroughBids(gameCode) {
+        allProds = await Buildings.find({$and: [{"gameCode": gameCode}, {"state": "auction"}]});
+        allProducers = allProds.fetch();
+        for (ap in allProducers) {
+          await resolveBids(allProducers[ap], gameCode);
+          await clearBids(allProducers[ap]);
+        }
+      }
+      
+      runThroughBids(gameCode);
+    }
+    return true;
+  }
+});
+
+//THIS IS THE OLD ONE
 export const RunBids = new ValidatedMethod({
   name: 'bids.buy',
   validate ({}) {},
@@ -1556,7 +1684,7 @@ export const MakeBid2 = new ValidatedMethod({
     if (!this.isSimulation) {
       Bids.update(
         {$and: [{"baseId": baseId}, {"buildingId": building}]}, 
-        {$set: {"gameCode": gameCode, "value": newVal, "bidKind": bidKind}}, 
+        {$set: {"gameCode": gameCode, "bidVal": newVal, "bidKind": bidKind}}, 
         {upsert: true})
       // var existBid = Bids.findOne({$and: [{"producer": producer}, {"group": group}]});
       // if (existBid == undefined) {

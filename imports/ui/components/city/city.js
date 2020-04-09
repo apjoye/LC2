@@ -254,8 +254,14 @@ Template.cityMap.helpers({
         ny = map[m].y + neighbs[n][1]
         if (nx >= 0 && ny >= 0) {
           nloc = "x" + nx + "y" + ny;
-          if (!(nloc in resMapDict)) { resMapDict[nloc] = {};} 
-          else { if (!("neighbors" in resMap)) { resMapDict[nloc]["neighbors"] = []; } }
+          if (!(nloc in resMapDict)) { 
+            resMapDict[nloc] = {};
+          } 
+          if (!("neighbors" in resMapDict[nloc])) { 
+            resMapDict[nloc]["neighbors"] = []; 
+            // console.log("given")
+          } 
+          // console.log()
           resMapDict[nloc]["neighbors"].push(resMapDict[loc]);
         }
        }
