@@ -277,7 +277,7 @@ Template.cityMap.helpers({
     for (var i = cornerX; i < (cornerX + mapHeight); i++) {
       thisRow = [];
       for (var j = cornerY; j < (cornerY + mapHeight); j++) {
-        loc = "x" + j + "y" + i;
+        loc = "x" + i + "y" + j;
         if (loc in resMapDict) {
           // console.log(loc + " found!");
           // thisRow.push({"rowCol": resMapDict[loc]});  
