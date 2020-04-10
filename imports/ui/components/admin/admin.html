@@ -219,8 +219,8 @@
   <form class="removeBuilding form-inline">
     <div class="form-group">
       <select class = "custom-select form-control" id="presentBuilding" name="presentBuilding">
-        {{#each presentBuildings}}
-          <option value = {{this._id}}>{{this.location}} {{this.owner}} {{this.name}}</option>
+        {{#each pb in presentBuildings}}
+          <option value = {{pb._id}}>{{pb.location}} {{pb.owner}} {{pb.name}}</option>
         {{/each}}
       </select>
     </div>

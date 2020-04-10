@@ -235,7 +235,10 @@ Template.cityMap.helpers({
         // console.log(loc);
         // console.log(map[m]);
         if (map[m]["buildingId"] in buildDict){
+
           resMapDict[loc]["building"] = buildDict[map[m]["buildingId"]];
+          console.log(loc);
+          console.log(resMapDict[loc]);
         }
       }
       if ("resId" in map[m]) {
@@ -297,6 +300,8 @@ Template.cityMap.helpers({
             
             if ("neighboringResource" in resMapDict[loc]["building"]) {
               rowCol["text"] += " bonus ore! ";
+              console.log(resMapDict[loc]);
+              console.log(loc);
             }
             
             if (resMapDict[loc]["building"]["running"] == true) {
@@ -319,7 +324,8 @@ Template.cityMap.helpers({
       }
       rows.push(thisRow);
     }
-    // console.log(rows);
+    console.log(rows);
+    console.log(resMapDict);
     return rows;
   },
 
@@ -336,8 +342,9 @@ Template.cityMap.helpers({
     loc = Template.instance().selectedLoc.get();
     mapSelect = map[loc];
     placeMode = false;
-     // console.log(mapSelect);
-    if (mapSelect != "" || mapSelect != {} || mapSelect != undefined) {
+    // console.log(mapSelect == undefined);
+    if (mapSelect == "" || mapSelect == {} || mapSelect == undefined) {}
+    else {
       if (!("building" in mapSelect) || mapSelect != {}) {
         if ( mapSelect["ownerId"] == Meteor.userId() ) {
           console.log("placable true");
@@ -360,7 +367,7 @@ Template.cityMap.helpers({
   currentBuilding() {
     text = "";
     boxContent = {};
-    boxContent["text"] = "";
+    boxContent["text"] = [];
     map = Template.instance().fullmap.get();
     mapSelect = map[Template.instance().selectedLoc.get()];
     boxContent["mapCell"] = mapSelect;
@@ -369,9 +376,18 @@ Template.cityMap.helpers({
     }
     else {
       if ("building" in mapSelect) {
-        boxContent["text"] += JSON.stringify(mapSelect["building"]["buildFeatures"]["resKind"]);
+        boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
+        pcs = mapSelect["building"]["prodCost"];
+        pcText = "";
+        for (pc in pcs) {
+          if (pcs[pc] != 0) {
+            pcText += pc + ": " + pcs[pc] + " ";
+          }
+        }
+        boxContent["text"].push("Uses: " + JSON.stringify(pcText));
+        boxContent["text"].push("Produces: " + JSON.stringify(mapSelect["building"]["prodVal"]));
         if ("neighboringResource" in mapSelect["building"]) {
-          rowCol["text"] += " bonus ore! ";
+          boxContent["text"].push(" bonus ore! ");
         }
         boxContent["buildingButtons"] = true;
         if (mapSelect["building"]["running"] == true) {

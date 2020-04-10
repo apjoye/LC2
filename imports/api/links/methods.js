@@ -182,7 +182,7 @@ export const RunBids2 = new ValidatedMethod({
       async function commitBid (bid, teams, resources) {
         // >> check affordability
         console.log(JSON.stringify(resources) + " " + JSON.stringify(bid));
-        newRes = resources[bid["group"]];
+        newRes = resources[bid["baseId"]];
         oldRes = newRes;
         newRes[bid["bidKind"]] -=  bid["bidVal"];
 
@@ -193,11 +193,11 @@ export const RunBids2 = new ValidatedMethod({
         // >> change team resources
         else {
           console.log("committing the bid!!");
-          thisGame = Games.findOne({$and: [{"playerName": bid.group}, {"role": "base"}, {"gameCode": bid.gameCode}]});
+          thisGame = Games.findOne({$and: [{"playerId": bid.baseId}, {"role": "base"}, {"gameCode": bid.gameCode}]});
           await Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
 
         // >> change producer owner
-          await Buildings.update({"_id": bid.producer}, {$set: { "owned": true,  "ownerId": thisGame.playerId, "ownerGameId": thisGame._id, "ownerName": thisGame.group}});
+          await Buildings.update({"_id": bid.buildingId}, {$set: { "owned": true, "state": "owned", "ownerId": thisGame.playerId, "ownerGame": thisGame._id, "owner": thisGame.group}});
 
         // >> add log about producer purchase
           evLog = bid;
@@ -227,7 +227,7 @@ export const RunBids2 = new ValidatedMethod({
         producerBids = prodBids.fetch();
         diffTeams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
         diffTeams = diffTeams.fetch();
-        teamResources = diffTeams.reduce( function(map, obj) {map[obj.playerName] = obj.res; return map;}, {});
+        teamResources = diffTeams.reduce( function(map, obj) {map[obj.playerId] = obj.res; return map;}, {});
 
         maxBid = 0;
         maxBidObj = {};
@@ -239,20 +239,22 @@ export const RunBids2 = new ValidatedMethod({
         function compareBids(a, b) {
           if (a["bidVal"] > b["bidVal"]) return -1;
           if (a["bidVal"] < b["bidVal"]) return 1;
-
           return 0;
         }
         producerBids.sort(compareBids);
+        console.log(producerBids);
+        console.log(teamResources);
 
         for (pb in producerBids) {
           bid = producerBids[pb];
           bidValue = bid.bidVal;
-          teamRes = teamResources[producerBids[pb]["group"]][bid["bidKind"]]
-          // console.log(bidValue +  " " + teamRes);
-          if (bidValue >= teamResources[producerBids[pb]["group"]][bid["bidKind"]]) {
+          teamRes = teamResources[producerBids[pb]["baseId"]][bid["bidKind"]]
+          
+          if (bidValue > teamResources[producerBids[pb]["baseId"]][bid["bidKind"]]) {
             //this "bid" object failed cause of unaffordability
+            console.log(bidValue +  " " + teamRes + " was unafordable ");
           }
-          else if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["group"]][bid["bidKind"]]) {
+          else if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["baseId"]][bid["bidKind"]]) {
             if (bidValue == maxBid) {
               maxTie = true;
             }
@@ -266,12 +268,14 @@ export const RunBids2 = new ValidatedMethod({
         // console.log(maxBid + " " + maxTie + " ");
         if (maxBid == 0) {
           // return await noBids();   // ugh can skip
+          console.log("max bid was 0");
         }
         else if (maxTie == false){
-          // console.log("false maxTie found!");
+          console.log("false maxTie found!");
           return await commitBid(maxBidObj, diffTeams, teamResources);
         }
         else {
+          console.log("non zero max tie");
           // return await bidTieMessage(bidTeams);   // ugh can skip
         }
       }
@@ -384,9 +388,10 @@ export const RunBids = new ValidatedMethod({
         // console.log(maxBid + " " + maxTie + " ");
         if (maxBid == 0) {
           // return await noBids();   // ugh can skip
+          console.log("max bid was ")
         }
         else if (maxTie == false){
-          // console.log("false maxTie found!");
+          console.log("false maxTie found!");
           return await commitBid(maxBidObj, diffTeams, teamResources);
         }
         else {

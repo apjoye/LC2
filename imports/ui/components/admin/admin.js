@@ -26,6 +26,8 @@ import { RemoveBuilds } from '/imports/api/links/methods.js';
 import { ResetResources } from '/imports/api/links/methods.js';
 import { ResetTeamResources } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
+
+import { RunBids2 } from '/imports/api/links/methods.js';
 // import {}
 import { Maps } from '/imports/api/links/links.js';
 import { Resources } from '/imports/api/links/links.js';
@@ -141,20 +143,20 @@ Template.gameMap.helpers({
           }
           if ("building" in resMapDict[loc]) {
           
-           var gameMapTable = document.getElementById("gameMapTable");
-           if(resMapDict[loc]["building"]["name"] === "claymine"){
-             gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory1.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "coppermine"){
-            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory2.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "foodfarm"){
-            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm1.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "foodfishing"){
-            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm2.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "foodhunting"){
-            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park1.png' width = '60' height='60'>";
-           }else if(resMapDict[loc]["building"]["name"] === "lumbercamp"){
-            gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park2.png' width = '60' height='60'>";
-           }
+           // var gameMapTable = document.getElementById("gameMapTable");
+           // if(resMapDict[loc]["building"]["name"] === "claymine"){
+           //   gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory1.png' width = '60' height='60'>";
+           // }else if(resMapDict[loc]["building"]["name"] === "coppermine"){
+           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory2.png' width = '60' height='60'>";
+           // }else if(resMapDict[loc]["building"]["name"] === "foodfarm"){
+           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm1.png' width = '60' height='60'>";
+           // }else if(resMapDict[loc]["building"]["name"] === "foodfishing"){
+           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm2.png' width = '60' height='60'>";
+           // }else if(resMapDict[loc]["building"]["name"] === "foodhunting"){
+           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park1.png' width = '60' height='60'>";
+           // }else if(resMapDict[loc]["building"]["name"] === "lumbercamp"){
+           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park2.png' width = '60' height='60'>";
+           // }
             // console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
@@ -220,7 +222,8 @@ Template.adminGame.helpers({
   },
 
   gameResource() {
-    return ["res.m1", "res.m2", "res.f1", "res.f2", "pollution", "population", "happiness"];
+    return ["res.clay", "res.copper", "res.lumber", "res.food", "pollution", "population", "happiness"];
+    // return ["res.m1", "res.m2", "res.f1", "res.f2", "pollution", "population", "happiness"];
   },
 
   status() {
@@ -246,7 +249,25 @@ Template.adminGame.helpers({
   },
   
   presentBuildings() {
-    return Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}]});
+    builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}]}).fetch();
+    bb = [];
+    for (b in builds) {
+      // console.log("location" in builds[b]);
+      if (!("location" in builds[b])) {
+        // console.log("adding location");
+        builds[b]["location"] = " ";
+      }
+      if (!("owner" in builds[b])) {
+        builds[b]["owner"] = " ";
+      }
+      console.log(builds[b]["_id"])
+      console.log(builds[b]["location"])
+      console.log(builds[b]["owner"])
+      console.log(builds[b]["name"])
+    }
+
+
+    return builds;
   },
 
   bidKinds() {
@@ -265,7 +286,7 @@ Template.adminGame.events({
     console.log(event.target.resource.name);
     console.log(event.target.resource.value);
 
-    ChangeStat.call({"gameCode": FlowRouter.getParam("gameCode"), "group": event.target.resource.name, "resource": event.target.resource.value, "amount": event.target.amount.value});
+    ChangeStat.call({"gameCode": FlowRouter.getParam("gameCode"), "group": event.target.resource.name, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
   },
 
   'submit .changeTeam' (event, instance) {
@@ -340,7 +361,7 @@ Template.adminGame.events({
   'click .runBids'(event, instance) {
     // increment the counter when button is clicked
     // instance.counter.set(instance.counter.get() + 1);
-    RunBids.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    RunBids2.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("bids run!");

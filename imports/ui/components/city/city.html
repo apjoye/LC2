@@ -156,8 +156,10 @@
   </table>
 
   <div class="container" style="border: solid black 1pt; padding: 2pt; margin:2pt;">
-
-    {{currentBuilding.text}}
+    
+    {{#each currentBuilding.text}}
+      {{this}} <br />
+    {{/each}}
     {{#if currentBuilding.buildingButtons}}
       <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
       <button class="btn btn-danger removeBuilding"  id="remove-{{currentBuilding.mapCell.building._id}}"> Remove Building </button>

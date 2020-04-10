@@ -96,7 +96,7 @@ Template.factoryList.helpers({
   buildingText(building){
     console.log(building);
     text = building.name;
-    text += " Features:" + JSON.stringify(building.buildFeatures);
+    // text += " Features:" + JSON.stringify(building.buildFeatures);
     text += " Uses:" + JSON.stringify(building.prodCost);
     text += " Produces: " + JSON.stringify(building.prodVal);
     text += " Bid Kind: " + JSON.stringify(building.bidKind);
