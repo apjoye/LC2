@@ -24,6 +24,7 @@ import { RunBuildings } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilds } from '/imports/api/links/methods.js';
 import { ResetResources } from '/imports/api/links/methods.js';
+import { ResetTeamResources } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
 // import {}
 import { Maps } from '/imports/api/links/links.js';
@@ -359,8 +360,6 @@ Template.adminGame.events({
   },
 
   'click .asyncTest'(event, instance) {
-    // increment the counter when button is clicked
-    // instance.counter.set(instance.counter.get() + 1);
     AsyncTest.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
       else {
@@ -370,9 +369,27 @@ Template.adminGame.events({
   },
 
   'click .resetRes'(event, instance) {
+    ResetResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) {console.log(err);}
+      else {
+        console.log("resources reset!");
+      }
+    })
+  },
+
+  'click .resetMap'(event, instance) {
+    // ResetResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    //   if (err) {console.log(err);}
+    //   else {
+    //     console.log("resources reset!");
+    //   }
+    // })
+  },
+
+  'click .resetTeamResources'(event, instance) {
     // increment the counter when button is clicked
     // instance.counter.set(instance.counter.get() + 1);
-    ResetResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    ResetTeamResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("resources reset!");

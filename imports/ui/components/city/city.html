@@ -35,7 +35,18 @@
         <div class="col-md-2">
           <h2> Resources </h2>
         </div>
-        <div class="col-sm-3 col-md-1 col-xs-4">
+        <!-- {{#each cityResources}}
+        {{this.image}}
+        {{/each}} -->
+        
+        {{#each cr in cityResources}}
+        <div class="col-sm-2 col-md-1 col-xs-4">
+          <h3><img class="cityIcon" src="{{cr.image}}"> {{cr.amount}} </h3> <h4>{{roundProduction.cr["res"]}}</h4>
+        </div>
+        {{/each}}
+
+
+        <!-- <div class="col-sm-3 col-md-1 col-xs-4">
           <h1><img class="cityIcon" src="../img/icons/gold_sml.png"> {{res.m1}} </h1> <h3>{{roundProduction.m1}}</h3>
         </div>
         <div class="col-sm-3 col-md-1 col-xs-4">
@@ -70,7 +81,7 @@
           <h1><img class="cityIcon" src="../img/icons/happiness_med.png"> {{happiness}}
           </h1>
           <h3>{{roundProduction.happiness}}</h3>
-        </div>
+        </div> -->
       </div>
     </div>
      <!-- <p> -->
@@ -136,7 +147,7 @@
     <tr>
         {{#each this}}
         <td class="mapCell {{this.loc}}" id="{{this.loc}}">
-            <img class = "mapCell {{this.loc}}" id = "mapTileimg" src = "{{this.imageSource}}" style="width:60px; height:60px;">
+            <!-- <img class = "mapCell {{this.loc}}" id = "mapTileimg" src = "{{this.imageSource}}" style="width:60px; height:60px;"> -->
             {{this.text}}&emsp;
         </td>
         {{/each}}

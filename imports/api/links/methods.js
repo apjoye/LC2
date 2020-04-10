@@ -1279,6 +1279,33 @@ export const ResetResources = new ValidatedMethod({
   }
 })
 
+export const ResetTeamResources = new ValidatedMethod({
+  name: 'teamresources.reset',
+  validate ({}) {},
+  run({gameCode}) {
+    newres = {"lumber": 2, "clay": 2, "copper": 2, "food": 2}
+    // deets["pollution"] = 2;
+    // deets["population"] = 5;
+    // deets["happiness"] = 5;
+    // deets["neighbors"] = neighbors;
+    Games.update(
+      {$and: [{"gameCode": gameCode}, {"role": "base"}]},
+      {$set: {"res": newres}},
+      {multi: true});
+    // Resources.remove({"gameCode": gameCode});
+    // Maps.remove({"gameCode": gameCode});
+  }
+})
+
+export const ResetMap = new ValidatedMethod({
+  name: 'map.reset',
+  validate ({}) {},
+  run({gameCode}) {
+    Resources.remove({"gameCode": gameCode});
+    Maps.remove({"gameCode": gameCode});
+  }
+})
+
 export const RemoveBuilding = new ValidatedMethod({
   name: 'remove.build',
   validate ({}) {},
@@ -1654,7 +1681,8 @@ export const JoinGame = new ValidatedMethod({
 
         }
         else if (role == "base") {
-          deets["res"] = {"m1": 2, "m2": 2, "f1": 2, "f2": 2};
+          // deets["res"] = {"m1": 2, "m2": 2, "f1": 2, "f2": 2};
+          deets["res"] = {"lumber": 2, "clay": 2, "copper": 2, "food": 2}
           deets["pollution"] = 2;
           deets["population"] = 5;
           deets["happiness"] = 5;

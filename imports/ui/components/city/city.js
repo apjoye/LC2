@@ -22,28 +22,20 @@ import 'animate.css/animate.css';
 // import { NewRound } from '/imports/api/links/methods.js';
 
 Template.cities.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  // this.counter = new ReactiveVar(0);
   Meteor.subscribe('cities.all');
   Meteor.subscribe('producers.public');
   Meteor.subscribe('producers.owned');
   Meteor.subscribe('games.running');
-  
 });
 
 Template.cities.helpers({
-  // counter() {
-  //   return Template.instance().counter.get();
-  // },
+
   allCities() {
-    // console.log((Producers.find({})).toArray());
-    // console.log(FlowRouter.current().params.city)
     return Cities.find();
   },
 
   notCityView() {
     cname = FlowRouter.current().params.city;
-    // console.log(Cities.find({"name": cname}).fetch());
     if (Cities.find({"name": cname}).fetch().length > 0) {
       return false;
     }
@@ -60,27 +52,51 @@ Template.cities.helpers({
 });
 
 Template.city.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  // this.counter = new ReactiveVar(0);
-  // Meteor.subscribe('cities.all');
-  // Meteor.subscribe('producers.public');
   Meteor.subscribe('producers.owned');
-  Meteor.subscribe('games.running');
-  // Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
-  // Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('games.minerunning');
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
-  
+  this.gameInfo = new ReactiveVar({});
 });
 
 Template.city.helpers({
-  
+  cityResources() {
+    resImages = {
+      "m1": "../img/icons/gold_sml.png",
+      "f1": "../img/icons/food_sml.png",
+      "m2": "../img/icons/steel_sml.png",
+      "f2": "../img/icons/cotton_sml.png",
+      "food": "../img/icons/food.png",
+      "clay": "../img/icons/clay.png",
+      "copper": "../img/icons/copper.png",
+      "lumber": "../img/icons/lumber.png",
+      "pollution": "../img/icons/pollution_sml.png",
+      "population": "../img/icons/population_sml.png",
+      "happiness": "../img/icons/happiness_sml.png"
+    };
+    // console.log(Games.find({"playerId": Meteor.userId()}).fetch());
+
+    thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode"), "playerId": Meteor.userId()}]})
+    Template.instance().gameInfo.set(thisGame);
+    resPrint = [];
+    // console.log(thisGame);
+    for (r in thisGame.res) {
+      thisRes = {};
+      thisRes["amount"] = thisGame.res[r];
+      thisRes["image"] = resImages[r];
+      resPrint.push(thisRes);
+    }
+    otherStats = ["pollution", "population", "happiness"];
+    for (r in otherStats) {
+      thisRes = {};
+      thisRes["amount"] = thisGame[otherStats[r]];
+      thisRes["image"] = resImages[otherStats[r]];
+      // console.log(thisRes + r);
+      resPrint.push(thisRes);
+    }
+    return resPrint;
+  },
 
   cityFactories() {
-    // console.log(Producers.find({}).fetch());
-    // console.log(Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": true}, {"ownerId": Meteor.userId()}]}).fetch());
-    // console.log(FlowRouter.getParam("gameCode") + " " + Meteor.userId());
-    // console.log(Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}]}).fetch());
-    
     return Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": true}, {"ownerId": Meteor.userId()}]});
   },
 
@@ -118,10 +134,18 @@ Template.city.helpers({
     // return this;
   },
 
+  // roundProd() {
+
+  // }
+
   roundProduction() {
-    prodOutput = {"m1": 0, "m2": 0, "f1": 0, "f2": 0, "pollution": 0};
-    prodOutStr = {"m1": "+0", "m2": "+0", "f1": "+0", "f2": "+0", "pollution": "+0"};
+    // prodOutput = {"m1": 0, "m2": 0, "f1": 0, "f2": 0, "pollution": 0};
+    // prodOutStr = {"m1": "+0", "m2": "+0", "f1": "+0", "f2": "+0", "pollution": "+0"};
+    prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0};
+    prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0"};
+    /*    
     runningProds = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
+    
     var parks = 0;
     runningProds.forEach(function (prod) {
       if (prod.kind == "p1" || prod.kind == "p2") {
@@ -129,14 +153,9 @@ Template.city.helpers({
       }
       for (r in prod.prodValues) {
         prodOutput[r] += prod.prodValues[r];
-        // console.log(prod)
-        // prodOutput[r] = prodOutput[r] - prod.prodCosts[r];
       }
 
       for (r in prod.prodCosts) {
-        // console.log(prod.prodCosts);
-        // console.log(r);
-        // console.log(prod.prodCosts[r])
         prodOutput[r] = prodOutput[r] - prod.prodCosts[r];
       }
     });
@@ -145,58 +164,34 @@ Template.city.helpers({
     var totalFood = thisgame.res.f1 + thisgame.res.f2 + prodOutput["f1"] + prodOutput["f2"];
     var foodToPoll = totalFood / (thisgame.pollution + prodOutput["pollution"]);
     var parksToPop = parks / thisgame.population;
-    // prodOutput["parksToPop"] = parksToPop;
-    // prodOutput["foodToPoll"] = foodToPoll;
     var happChange = 0;
     var popChange = 0;
-    if (parksToPop <= 0.25) {
-      happChange += -1;
-    }
-    else if (parksToPop >= 0.6) {
-      happChange += 1;
-    }
+    if (parksToPop <= 0.25) {      happChange += -1;    }
+    else if (parksToPop >= 0.6) {      happChange += 1;    }
 
-    if (foodToPoll < 0.7) {
-      popChange += 1;
-    }
-    else {
-      popChange += -1;
-    }
+    if (foodToPoll < 0.7) {      popChange += 1;    }
+    else {      popChange += -1;    }
     prodOutput["population"] = popChange;
     prodOutput["happiness"] = happChange;
 
     for (k in prodOutput) {
-      if (prodOutput[k] >= 0) {
-        prodOutStr[k] = "+" + prodOutput[k].toString();
-      }
-      else {
-       prodOutStr[k] = prodOutput[k].toString(); 
-      }
+      if (prodOutput[k] >= 0) {        prodOutStr[k] = "+" + prodOutput[k].toString();      }
+      else {       prodOutStr[k] = prodOutput[k].toString();       }
     }
-
-    // console.log(thisgame);
-    // console.log(prodOutput);
+    */
     return prodOutStr;
   }
-
 });
 
 
 Template.cityMap.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  // this.counter = new ReactiveVar(0);
-  // Meteor.subscribe('cities.all');
-  // Meteor.subscribe('producers.public');
-  // Meteor.subscribe('producers.owned');
-  Meteor.subscribe('games.running');
+  Meteor.subscribe('games.minerunning');
   Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
-  // Template.instance().data["selectedBuilding"] = "";
   this.selectedBuilding = new ReactiveVar({});
   this.selectedLoc = new ReactiveVar("");
   this.fullmap = new ReactiveVar({});
-  
 });
 
 Template.cityMap.helpers({
@@ -481,6 +476,10 @@ Template.cityFactory.helpers({
       "f1": "../img/icons/food_sml.png",
       "m2": "../img/icons/steel_sml.png",
       "f2": "../img/icons/cotton_sml.png",
+      "food": "../img/icons/cotton_sml.png",
+      "clay": "../img/icons/clay.png",
+      "copper": "../img/icons/copper.png",
+      "lumber": "../img/icons/lumber.png",
       "pollution": "../img/icons/pollution_sml.png"
     };
     for (r in costList) {
