@@ -237,8 +237,8 @@ Template.cityMap.helpers({
         if (map[m]["buildingId"] in buildDict){
 
           resMapDict[loc]["building"] = buildDict[map[m]["buildingId"]];
-          console.log(loc);
-          console.log(resMapDict[loc]);
+          // console.log(loc);
+          // console.log(resMapDict[loc]);
         }
       }
       if ("resId" in map[m]) {
@@ -300,8 +300,8 @@ Template.cityMap.helpers({
             
             if ("neighboringResource" in resMapDict[loc]["building"]) {
               rowCol["text"] += " bonus ore! ";
-              console.log(resMapDict[loc]);
-              console.log(loc);
+              // console.log(resMapDict[loc]);
+              // console.log(loc);
             }
             
             if (resMapDict[loc]["building"]["running"] == true) {
@@ -324,8 +324,8 @@ Template.cityMap.helpers({
       }
       rows.push(thisRow);
     }
-    console.log(rows);
-    console.log(resMapDict);
+    // console.log(rows);
+    // console.log(resMapDict);
     return rows;
   },
 
@@ -342,10 +342,11 @@ Template.cityMap.helpers({
     loc = Template.instance().selectedLoc.get();
     mapSelect = map[loc];
     placeMode = false;
-    // console.log(mapSelect == undefined);
+    console.log(mapSelect);
     if (mapSelect == "" || mapSelect == {} || mapSelect == undefined) {}
     else {
-      if (!("building" in mapSelect) || mapSelect != {}) {
+      // console.log(m)
+      if (!("building" in mapSelect)) {
         if ( mapSelect["ownerId"] == Meteor.userId() ) {
           console.log("placable true");
           placeMode = true;

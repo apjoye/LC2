@@ -20,6 +20,7 @@ import { ConsumeResources } from '/imports/api/links/methods.js';
 import { SpawnFactories } from '/imports/api/links/methods.js';
 
 import { MakeMap } from '/imports/api/links/methods.js';
+import { RunBids2 } from '/imports/api/links/methods.js';
 import { RunBuildings } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilds } from '/imports/api/links/methods.js';
@@ -27,7 +28,6 @@ import { ResetResources } from '/imports/api/links/methods.js';
 import { ResetTeamResources } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
 
-import { RunBids2 } from '/imports/api/links/methods.js';
 // import {}
 import { Maps } from '/imports/api/links/links.js';
 import { Resources } from '/imports/api/links/links.js';
@@ -370,14 +370,13 @@ Template.adminGame.events({
   },
 
   'click .runBuilds'(event, instance) {
-    // increment the counter when button is clicked
-    // instance.counter.set(instance.counter.get() + 1);
-    // ConsumeResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
-    //   if (err) {console.log(err);}
-    //   else {
-    //     console.log("bids run!");
-    //   }
-    // });
+    console.log("run buildings");
+    RunBuildings.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) { console.log(err); }
+      else {
+        console.log("buildings run!");
+      }
+    })
   },
 
   'click .asyncTest'(event, instance) {
@@ -408,8 +407,7 @@ Template.adminGame.events({
   },
 
   'click .resetTeamResources'(event, instance) {
-    // increment the counter when button is clicked
-    // instance.counter.set(instance.counter.get() + 1);
+    
     ResetTeamResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
       else {
@@ -419,8 +417,7 @@ Template.adminGame.events({
   },
 
   'click .makeMap'(event, instance) {
-    // increment the counter when button is clicked
-    // instance.counter.set(instance.counter.get() + 1);
+    
     MakeMap.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
       else {
@@ -429,16 +426,15 @@ Template.adminGame.events({
     })
   },
 
-  'click .runBuildings'(event, instance) {
-    // increment the counter when button is clicked
-    // instance.counter.set(instance.counter.get() + 1);
-    RunBuildings.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
-      if (err) { console.log(err); }
-      else {
-        console.log("buildings run!");
-      }
-    })
-  },
+  // 'click .runBuildings'(event, instance) {
+  //   console.log("run buildings");
+  //   RunBuildings.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+  //     if (err) { console.log(err); }
+  //     else {
+  //       console.log("buildings run!");
+  //     }
+  //   })
+  // },
 
   'click .removeBuildings'(event, instance) {
     // increment the counter when button is clicked
