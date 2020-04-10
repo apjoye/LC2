@@ -74,10 +74,31 @@ Template.gameMap.onCreated(function helloOnCreated() {
   Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
+  this.imageMode = new ReactiveVar(false);
 });
 
 Template.gameMap.helpers({
   mapRows() {
+    mapTiles = {
+      "claymine": "../img/buildings/claymine.png",
+      "coppermine": "../img/buildings/coppermine.png",
+      "foodfarm": "../img/buildings/foodfarm.png",
+      "foodfishing": "../img/buildings/foodfishing.png",
+      "foodhunting": "../img/buildings/foodhunting.png",
+      "lumbercamp": "../img/buildings/lumbercamp.png",
+      "background": "../img/resources/grass.png",
+      "water": "../img/resources/river.png",
+      "woods": "../img/resources/woods.png",
+      "lumber": "../img/resources/woods.png",
+      "copper": "../img/resources/copperore.png",
+      "clay": "../img/resources/clayore.png",
+      "red-city": "../img/bg/red-city.png",
+      "yellow-city": "../img/bg/yellow-city.png",
+      "blue-city": "../img/bg/blue-city.png",
+      "green-city": "../img/bg/green-city.png",
+      "pink-city": "../img/bg/pink-city.png",
+      
+    }
     //store map dimensions somewhere
     mapWidth = 16;    //number of columns
     mapHeight = 16;   //number of rows
@@ -126,38 +147,29 @@ Template.gameMap.helpers({
       thisRow = [];
       for (var j = 0; j < mapHeight; j++) {
         loc = "x" + j + "y" + i;
+        rowCol = {};
+        rowCol["image"] = mapTiles["background"];
+        rowCol["text"] = "";
         if (loc in resMapDict) {
           // console.log(loc + " found!");
           // thisRow.push({"rowCol": resMapDict[loc]});  
-          rowCol = {};
+          // rowCol = {};
           rowCol["loc"] = loc;
           rowCol["attributes"] = "";
+          
           if ("owner" in resMapDict[loc]) {
+            rowCol["image"] = "";
             rowCol["attributes"] = "bgColor = \"red\"";
           }
           rowCol["text"] = "";
           if ("resource" in resMapDict[loc]) {
             // console.log(resMapDict[loc]);
             // console.log(resMapDict[loc]["resource"]);
+            rowCol["image"] = mapTiles[resMapDict[loc]["resource"]["kind"]];
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
-          
-           // var gameMapTable = document.getElementById("gameMapTable");
-           // if(resMapDict[loc]["building"]["name"] === "claymine"){
-           //   gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory1.png' width = '60' height='60'>";
-           // }else if(resMapDict[loc]["building"]["name"] === "coppermine"){
-           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/factory2.png' width = '60' height='60'>";
-           // }else if(resMapDict[loc]["building"]["name"] === "foodfarm"){
-           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm1.png' width = '60' height='60'>";
-           // }else if(resMapDict[loc]["building"]["name"] === "foodfishing"){
-           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/farm2.png' width = '60' height='60'>";
-           // }else if(resMapDict[loc]["building"]["name"] === "foodhunting"){
-           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park1.png' width = '60' height='60'>";
-           // }else if(resMapDict[loc]["building"]["name"] === "lumbercamp"){
-           //  gameMapTable.rows[i].cells[j].innerHTML = "<img src = '../img/buildings/park2.png' width = '60' height='60'>";
-           // }
-            // console.log(resMapDict[loc]["building"]["kind"]);
+            rowCol["image"] = mapTiles[resMapDict[loc]["building"]["name"]];
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
             if ("neighboringResource" in resMapDict[loc]["building"]) {
@@ -184,7 +196,7 @@ Template.gameMap.helpers({
           //   });  
         }
         else {
-          thisRow.push({"rowCol": ""});
+          thisRow.push(rowCol);
         }
         
       }
@@ -192,6 +204,10 @@ Template.gameMap.helpers({
     }
     // console.log(rows);
     return rows;
+  },
+
+  imageMode() {
+    return Template.instance().imageMode.get();
   }
 });
 
@@ -199,14 +215,19 @@ Template.gameMap.events({
   'click .mapCell' (event, instance) {
     event.preventDefault();
     // console.log(event.target.id);
-    console.log(Template.instance().data.map[event.target.id]);
-    if (Template.instance().data.map[event.target.id] != undefined) {
-      if ("building" in Template.instance().data.map[event.target.id]) {
+    loc = event.target.classList[2];
+    console.log(Template.instance().data.map[loc]);
+    if (Template.instance().data.map[loc] != undefined) {
+      if ("building" in Template.instance().data.map[loc]) {
         bb = Template.instance().data.map[event.target.id]["building"];
         ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
       }
     }
-    
+  },
+
+  'click .toggleImages' (event, instance) {
+    console.log(Template.instance().imageMode.get());
+    Template.instance().imageMode.set(!Template.instance().imageMode.get());
   }
 });
 

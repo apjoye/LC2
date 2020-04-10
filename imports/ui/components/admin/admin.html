@@ -86,6 +86,7 @@
     <!-- <button type="button" class="asyncTest btn btn-default">Async Test</button>
     <button type="button" class="reset btn btn-default"> Reset everything </button> -->
     <button type="button" class="resetRes btn btn-default"> Reset Map Resources </button>
+
     <button type="button" class="resetMap btn btn-default"> Reset Map </button>
     <button type="button" class="resetTeamResources btn btn-default"> Reset Team Resources </button>
     <button type="button" class="makeMap btn btn-default"> Make Map </button>
@@ -235,14 +236,19 @@
 </template>
 
 <template name="gameMap">
+  <button type="button" class="toggleImages btn btn-default"> Toggle Images </button>
+  <p></p>
   <table id = "gameMapTable">
     {{#each mapRows}}
     <tr>
       <!-- <pre> -->
         {{#each this}}
-        <td class="mapCell" id="{{this.loc}}">
-          <!-- <img id = "mapTileimg" src = "../img/map/mapTile.png" style="width:60px; height:60px;"> -->
-          {{this.text}}&emsp;
+        <td class="mapCell {{this.loc}}" id="{{this.loc}}">
+          {{#if imageMode}}
+            <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px;">
+          {{else}}
+            {{this.text}}&emsp;
+          {{/if}}
         </td>
         {{/each}}
         <!-- {{this.rowCol}}&emsp;
