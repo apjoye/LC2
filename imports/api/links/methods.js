@@ -161,6 +161,141 @@ export const ClearBids = new ValidatedMethod({
   }
 });
 
+
+export const RunBids2 = new ValidatedMethod({
+  name: 'bids2.buy',
+  validate ({}) {},
+  // validate ({}) {
+
+  // },
+  run({gameCode}) {
+    // console.log(player + " " + producer);
+
+    if (!this.isSimulation) {
+      
+
+      async function clearBids (producer) {
+        // return await Bids.
+        // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
+      }
+
+      async function commitBid (bid, teams, resources) {
+        // >> check affordability
+        console.log(JSON.stringify(resources) + " " + JSON.stringify(bid));
+        newRes = resources[bid["baseId"]];
+        oldRes = newRes;
+        newRes[bid["bidKind"]] -=  bid["bidVal"];
+
+        if (newRes[bid["bidKind"]] < 0) {
+          console.log("somehow this bid won though it's unaffordable what the fck " + JSON.stringify(bid));
+          return true;
+        }
+        // >> change team resources
+        else {
+          console.log("committing the bid!!");
+          thisGame = Games.findOne({$and: [{"playerId": bid.baseId}, {"role": "base"}, {"gameCode": bid.gameCode}]});
+          await Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
+
+        // >> change producer owner
+          await Buildings.update({"_id": bid.buildingId}, {$set: { "owned": true, "state": "owned", "ownerId": thisGame.playerId, "ownerGame": thisGame._id, "owner": thisGame.group}});
+
+        // >> add log about producer purchase
+          evLog = bid;
+          evLog["oldRes"] = oldRes;
+          evLog["newRes"] = newRes
+          MakeLog.call({"key": "BuildingAcquire", "log": evLog});
+
+        // >> give note to success of bid?
+
+        // >> give notes to teams whose bids failed
+          // failBids = await Bids.find({$and: [{producer: bid.producer}, {}]})
+          // await Games.update()
+
+        // >> change game phase to post-bid
+          await Games.update({$and: [{"role": "admin"}, {"gameCode": bid.gameCode}]}, {$set: {"phase": "post-bid"}})
+          return true;
+          // return await resourceChange();
+        }
+      }
+
+      async function bidTieMessage (bidTeams) {
+        // return await updateTeamNotes();
+      }
+
+      async function resolveBids (producer, gameCode) {
+        prodBids = await Bids.find({"buildingId": producer._id}, {sort: {"bidVal": -1}}); 
+        producerBids = prodBids.fetch();
+        diffTeams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
+        diffTeams = diffTeams.fetch();
+        teamResources = diffTeams.reduce( function(map, obj) {map[obj.playerId] = obj.res; return map;}, {});
+
+        maxBid = 0;
+        maxBidObj = {};
+        maxTie = false;
+        bidResources = producer.bidKind;
+        bid = {};
+        // console.log(producerBids);
+        // do I want to make sure this is sorted?
+        function compareBids(a, b) {
+          if (a["bidVal"] > b["bidVal"]) return -1;
+          if (a["bidVal"] < b["bidVal"]) return 1;
+          return 0;
+        }
+        producerBids.sort(compareBids);
+        console.log(producerBids);
+        console.log(teamResources);
+
+        for (pb in producerBids) {
+          bid = producerBids[pb];
+          bidValue = bid.bidVal;
+          teamRes = teamResources[producerBids[pb]["baseId"]][bid["bidKind"]]
+          
+          if (bidValue > teamResources[producerBids[pb]["baseId"]][bid["bidKind"]]) {
+            //this "bid" object failed cause of unaffordability
+            console.log(bidValue +  " " + teamRes + " was unafordable ");
+          }
+          else if (bidValue > 0  && bidValue <= teamResources[producerBids[pb]["baseId"]][bid["bidKind"]]) {
+            if (bidValue == maxBid) {
+              maxTie = true;
+            }
+            else if (bidValue > maxBid) {
+              maxBid = bidValue;
+              maxBidObj = bid;
+              maxTie = false;
+            }
+          }
+        }
+        // console.log(maxBid + " " + maxTie + " ");
+        if (maxBid == 0) {
+          // return await noBids();   // ugh can skip
+          console.log("max bid was 0");
+        }
+        else if (maxTie == false){
+          console.log("false maxTie found!");
+          return await commitBid(maxBidObj, diffTeams, teamResources);
+        }
+        else {
+          console.log("non zero max tie");
+          // return await bidTieMessage(bidTeams);   // ugh can skip
+        }
+      }
+
+      async function runThroughBids(gameCode) {
+        allProds = await Buildings.find({$and: [{"gameCode": gameCode}, {"state": "auction"}]});
+        allProducers = allProds.fetch();
+        for (ap in allProducers) {
+          await resolveBids(allProducers[ap], gameCode);
+          await clearBids(allProducers[ap]);
+        }
+      }
+      
+      runThroughBids(gameCode);
+    }
+    return true;
+  }
+});
+
+//THIS IS THE OLD ONE
 export const RunBids = new ValidatedMethod({
   name: 'bids.buy',
   validate ({}) {},
@@ -253,9 +388,10 @@ export const RunBids = new ValidatedMethod({
         // console.log(maxBid + " " + maxTie + " ");
         if (maxBid == 0) {
           // return await noBids();   // ugh can skip
+          console.log("max bid was ")
         }
         else if (maxTie == false){
-          // console.log("false maxTie found!");
+          console.log("false maxTie found!");
           return await commitBid(maxBidObj, diffTeams, teamResources);
         }
         else {
@@ -273,62 +409,6 @@ export const RunBids = new ValidatedMethod({
       }
       
       runThroughBids(gameCode);
-      
-      /*
-      Producers.find({$and: [{"gameCode": gameCode}, {"owned": false}]}).forEach(function (prod) {
-
-        allBids = Bids.find({$and: [{"gameCode": gameCode}, {"producer": prod._id}]}, {sort: {"bidVal": -1}}).fetch();
-        // maybe write another function to ensure removal of unaffordable bids?
-        purchased = "not yet";
-        affBids = []
-        for (i in allBids) {
-          bidder = Games.findOne({$and: [{"playerId": allBids[i].baseId}, {"gameCode": gameCode}]});
-          if (bidder.res[allBids[i].bidKind] >= allBids[i].bidVal && allBids[i].bidVal > 0) {
-            affBids.push(allBids[i]);
-          }
-        }
-        // console.log(affBids);
-
-        for (i in affBids) {
-          i = parseInt(i)
-          // console.log(i + " " + purchased); 
-          if(purchased == "not yet"){
-            if (i < (affBids.length - 1)){
-              // console.log(i+1);
-              // console.log(affBids[i]);
-              // console.log(affBids[(i + 1)]);
-              if (affBids[i].bidVal == affBids[i + 1].bidVal) {
-                //raise alerts that bid failed!
-                purchased = "bid clash";
-                AddTeamNote.call({"gameCode": gameCode, "baseId": affBids[i].baseId, "notes": ["Bid failed cause it clashed with someone else!"]})
-                AddTeamNote.call({"gameCode": gameCode, "baseId": affBids[i + 1].baseId, "notes": ["Bid failed cause it clashed with someone else!"]})
-                console.log("bid clash");
-              }
-              else {
-                // bidder = Games.findOne({"_id": allBids[i].baseId});
-                purchased = "bid success";
-                console.log("bid success cause top bid led");
-                BuyProducer.call({"producer": prod._id, "player": affBids[i].baseId, "gameCode": gameCode, "bid": affBids[i]}, function (err, res){
-                  if (err) {console.log(err);}
-                });
-                AddTeamNote.call({"gameCode": gameCode, "baseId": affBids[i].baseId, "notes": ["Your bid succeeded!"]})
-                purchased = true;
-              }
-            }
-            else {
-              console.log("bid success cause only 1 bid");
-              purchased = "bid success";
-              BuyProducer.call({"producer": prod._id, "player": affBids[i].baseId, "gameCode": gameCode, "bid": affBids[i]}, function (err, res){
-                if (err) {console.log(err);}
-              });
-              purchased = true;
-            }
-          }
-        }
-
-        ClearBids.call({"producer": prod._id});
-      });
-      */
     }
     return true;
   }
@@ -452,7 +532,7 @@ export const ToggleFactory = new ValidatedMethod({
       "baseId": baseId,
       "changed": changed
     });
-    //***TODO: add game code, groupId, groupName
+
   }
 });
 
@@ -467,6 +547,7 @@ export const MakeLog = new ValidatedMethod({
   }
 });
 
+//OLD CONSUME
 export const ConsumeResources = new ValidatedMethod({
   name: 'producers.consume',
   validate ({}) {},
@@ -930,37 +1011,8 @@ export const ResetAll = new ValidatedMethod({
 export const RunMine = new ValidatedMethod ({
   name: 'run.mine',
   validate ({}) {},
-  run({gameCode, location, kind, groupName, building}) {
-    // do we need a resource nearby? ideally not
-    // bonuses = 
-    // neighbors = CellNeighbor.call({"gameCode": gameCode, "location": location});
-    // // there's a bonus if there's a resource nearby
-    // // console.log(neighbors);
-    // for (n in neighbors) {
-    //   if (neighbors[n] != undefined) {
-    //     if ("resId" in neighbors[n]) {
-    //       res = Resources.findOne({"_id": neighbors[n]["resId"]});
-    //       console.log(res["kind"]);
-    //       if (res["kind"] == kind) {
-    //         console.log("ore found!");
-    //       }
-    //       neighbors[n]["resource"] = res;
-    //     }
-        
-    //   }
+  run({gameCode, location, kind, groupName, groupGame, building}) {
 
-    // }
-    if ("neighboringResource" in building) {
-      console.log("neighboring ore found");
-    }
-
-    //check for use ore flag
-
-    //look for relevant ores in the neighborhood
-
-    //enter ore use mode if ore found
-
-    //produce with presence of ore (i.e. more pollution, and if possible, more metal)
 
     
   }
@@ -980,19 +1032,113 @@ export const RunBuildings = new ValidatedMethod({
   // run({gameCode, group}) {
   run({gameCode, group = ""}) {
     // buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
-    buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
-    for (b in buildings) {
-      bb = buildings[b];
-      if ("running" in bb) {
-        if (bb["running"] == true) {
-          if (bb["buildFeatures"]["buildKind"] == "mine") {
-            RunMine.call({"gameCode": gameCode, "location": bb["location"], "kind": bb["kind"], "groupName": bb["owner"], "building": bb});
+    
+    // console.log("runnning buildings");
+    async function EatAndMake(gameId, building) {
+        //enter ore use mode if ore found
+
+      //produce with presence of ore (i.e. more pollution, and if possible, more metal)
+      // console.log("entering eat and make");
+      affordable = true;
+      // thisGame = Games.findOne({"_id": groupGame});
+      // console.log(thisGame);
+      thisGame = Games.findOne({"_id": gameId});
+      newRes = thisGame["res"];
+      newPoll = thisGame["pollution"];
+      
+      if (!("notes" in thisGame)) {
+        thisGame["notes"] = [];
+      }
+
+      for (r in building["prodCost"]) {
+        if (building["prodCost"][r] > newRes[r]) {
+          affordable = false;
+        }
+        newRes[r] = newRes[r] - building["prodCost"][r];
+      }
+      if (affordable == false) {
+        newRes[r] = thisGame["res"];
+        // console.log(thisGame["res"]);
+        console.log("was unaffordable");
+        thisGame["notes"].push(building.name + " was unaffordable and did not run");
+        return true;
+      }
+      else {
+        
+        thisGame["res"] = newRes;
+        thisGame["pollution"] = newPoll;
+        thisGame["notes"].push(building.name + " ran successfully!")
+        usingResource = false;
+        console.log("consumed stuff, checking out neighboring resources");
+        if ("neighboringResource" in building && ["farm"].indexOf(building["buildFeatures"]["buildKind"]) == -1) {
+          console.log("mine and neighboring resource found");
+          mineres = building["buildFeatures"]["resUse"];
+          nres =  Resources.findOne({"_id": building["neighboringResource"]});
+
+          newval = nres["stats"][mineres];
+          if (newval > 0) { 
+            //***TODO: make the resource use different depending on resource and mine
+            newval = newval - 1; 
+            statField = nres["stats"];
+            statField[mineres] = newval;
+            usingResource = true;
+            await Resources.update({"_id": nres._id}, {$set: {stats: statField}});
+          }
+          console.log(nres + " " + statField + " " + newval);
+        }
+
+        if ((usingResource == false) && ["fishing", "hunting"].indexOf((building["buildFeatures"]["buildKind"])) > -1) {
+          console.log("neighboring resource was empty!");
+        } 
+        else {
+          console.log("making the worth");
+          for (r in building["prodVal"]) {
+            if (r != "pollution"){
+              newRes[r] = newRes[r] + building["prodVal"][r];
+            }
+            else {
+              newPoll = newPoll + building["prodVal"]["pollution"];
+            }
           }
         }
+        // return true;
       }
-      // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
-      // console.log(bb["kind"]);
+      // console.log("trying to update game");
+      await Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll}} );
+
     }
+
+    async function runThroughBuilds(buildings) {
+      // gameTeams = {};
+      for (b in buildings) {
+        bb = buildings[b];
+        // if (!(bb["ownerGame"] in gameTeams)) {
+        //   gameTeams[bb["ownerGame"]] = Games.findOne({"_id": bb["ownerGame"]});
+        // }
+        // thisGame = gameTeams[bb["ownerGame"]];
+        if ("running" in bb) {
+          if (bb["running"] == true) {
+            // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
+            try {
+              console.log("calling eat and make");
+              await EatAndMake(bb["ownerGame"], bb);
+            }
+            catch (err) {
+              console.log(err);
+            }
+            
+          }
+        }
+        // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
+        // console.log(bb["kind"]);
+      }
+      // for (gt in gameTeams) {
+      //   await Games.update({"_id": gt}, {$set: {"res": gameTeams[gt]["res"], "pollution": gameTeams[gt]["pollution"]}});
+      // }
+    }
+
+    buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
+    runThroughBuilds(buildings);
   }
 });
 
@@ -1005,11 +1151,19 @@ export const BuildingNeighbors = new ValidatedMethod ({
       if (neighbors[n] != undefined) {
         if ("resId" in neighbors[n]) {
           res = Resources.findOne({"_id": neighbors[n]["resId"]});
-          console.log(res["kind"]);
-          if (res["kind"] == building["buildFeatures"]["resKind"]) {
+          // console.log(building["buildFeatures"]["resUse"]);
+          // console.log(Object.keys(res["stats"]));
+          // console.log(building["buildFeatures"]["resUse"] in Object.keys(res["stats"]));
+          if (Object.keys(res["stats"]).indexOf(building["buildFeatures"]["resUse"]) > -1) {
             console.log("ore found!");
+            // add bonus resource output here;
             Buildings.update({"_id": building["_id"]}, {$set: {"neighboringResource": res["_id"]}});
           }
+          // else if (res["kind"] == building["buildFeatures"]["resKind"]) {
+          //   console.log("ore found!");
+          
+          //   Buildings.update({"_id": building["_id"]}, {$set: {"neighboringResource": res["_id"]}});
+          // }
         }
         // if ("buildingId" in neighbors[n]) {
         //   build = Buildings.findOne({"_id": neighbors[n]["buildingId"]});
@@ -1046,12 +1200,12 @@ export const AddBuilding = new ValidatedMethod({
     // valAssign
     //wood = m1, clay = m2, copper = m3
     var buildFeatures = {
-      "claymine": { "resKind": "clay", "buildKind": "mine" },
-      "coppermine": { "resKind": "copper", "buildKind": "mine" },
-      "foodfarm": { "resKind": "food", "buildKind": "farm" },
-      "foodfishing": { "resKind": "food", "buildKind": "fishing" },
-      "foodhunting": { "resKind": "food", "buildKind": "hunting" },
-      "lumbercamp": { "resKind": "lumber", "buildKind": "camp" }
+      "claymine": { "resKind": "clay", "buildKind": "mine", "resUse": "clay"},
+      "coppermine": { "resKind": "copper", "buildKind": "mine", "resUse": "copper"},
+      "foodfarm": { "resKind": "food", "buildKind": "farm", "resUse": "" },
+      "foodfishing": { "resKind": "food", "buildKind": "fishing", "resUse": "fish" },
+      "foodhunting": { "resKind": "food", "buildKind": "hunting", "resUse": "animals" },
+      "lumbercamp": { "resKind": "lumber", "buildKind": "camp", "resUse": "lumber" }
     };
 
     var prodCosts = {
@@ -1204,6 +1358,29 @@ export const ResetResources = new ValidatedMethod({
   }
 })
 
+export const ResetTeamResources = new ValidatedMethod({
+  name: 'teamresources.reset',
+  validate ({}) {},
+  run({gameCode}) {
+    newres = {"lumber": 2, "clay": 2, "copper": 2, "food": 2}
+
+    Games.update(
+      {$and: [{"gameCode": gameCode}, {"role": "base"}]},
+      {$set: {"res": newres}},
+      {multi: true});
+
+  }
+})
+
+export const ResetMap = new ValidatedMethod({
+  name: 'map.reset',
+  validate ({}) {},
+  run({gameCode}) {
+    Resources.remove({"gameCode": gameCode});
+    Maps.remove({"gameCode": gameCode});
+  }
+})
+
 export const RemoveBuilding = new ValidatedMethod({
   name: 'remove.build',
   validate ({}) {},
@@ -1274,7 +1451,7 @@ export const MakeMap = new ValidatedMethod({
 
       };
 
-      //*** TODO: Consider preprocessing and identifying neighbors of resources
+      
 
       resKinds = {
         "woods1": "lumber",
@@ -1287,40 +1464,7 @@ export const MakeMap = new ValidatedMethod({
       teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
       teams = teams.fetch();
 
-      // factoryLocs = [
-      //   [
-      //     {"name": "farmBonus", 
-      //     "kind": "f10", 
-      //     "prodCosts": {"m1": 1, "f1": 0, "m2": 0, "f2": 0 }, 
-      //     "prodValues": {"f1": 4, "pollution": 2 }, 
-      //     "location": [1, 4]   },
-          
-      //     {"name": "mineBonus", 
-      //     "kind": "m10", 
-      //     "prodCosts": {"m1": 0, "f1": 1, "m2": 0, "f2": 0 }, 
-      //     "prodValues": {"m1": 5, "pollution": 3 }, 
-      //     "location": [4, 4]},
-      //   ]
-      // ]
-
       for (res in resLocs) {
-        // await Resources.insert({"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]}, function (err, insertedRes) {
-        //   if (err) {console.log("resource insertion faiiled!!");}
-        //   else {
-        //     // console.log(resLocs[res]);
-        //     console.log(insertedRes);
-        //     for (l in resLocs[res]) {
-        //       Maps.update (
-        //         {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
-        //         {$set: {"resource": res, "resId": insertedRes}}, 
-        //         {upsert: true}
-        //       , function (err, result) {
-        //         if (err) {console.log(err);}
-        //         else {console.log(result);}
-        //       });
-        //     }
-        //   }  
-        // });
         resObj = {"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]};
         await Resources.insert(resObj);
         thisRes = Resources.findOne(resObj);
@@ -1331,9 +1475,7 @@ export const MakeMap = new ValidatedMethod({
             {$set: {"resource": thisRes, "resId": thisRes["_id"]}}, 
             {upsert: true});
         }
-        // console.log(res);
-        // await Resources.findOne()
-        
+
       }
       
     }
@@ -1579,7 +1721,8 @@ export const JoinGame = new ValidatedMethod({
 
         }
         else if (role == "base") {
-          deets["res"] = {"m1": 2, "m2": 2, "f1": 2, "f2": 2};
+          // deets["res"] = {"m1": 2, "m2": 2, "f1": 2, "f2": 2};
+          deets["res"] = {"lumber": 2, "clay": 2, "copper": 2, "food": 2}
           deets["pollution"] = 2;
           deets["population"] = 5;
           deets["happiness"] = 5;
@@ -1612,34 +1755,9 @@ export const MakeBid2 = new ValidatedMethod({
     if (!this.isSimulation) {
       Bids.update(
         {$and: [{"baseId": baseId}, {"buildingId": building}]}, 
-        {$set: {"gameCode": gameCode, "value": newVal, "bidKind": bidKind}}, 
+        {$set: {"gameCode": gameCode, "bidVal": newVal, "bidKind": bidKind}}, 
         {upsert: true})
-      // var existBid = Bids.findOne({$and: [{"producer": producer}, {"group": group}]});
-      // if (existBid == undefined) {
-      //   if (change < 0) {
-      //     change = 0;
-      //   }
-      //   Bids.insert({
-      //     "producer": producer,
-      //     "group": group,
-      //     "gameCode": gameCode,
-      //     "baseId": baseId,
-      //     "bidVal": change,
-      //     "bidKind": bidKind
-      //   });
-      // }
-      // else {
-      //   // console.log(existBid.bidVal.toString());
-      //   change = existBid.bidVal + change;
-      //   if (change < 0) {
-      //     change = 0;
-      //   }
-      //   if (change.toString() == "NaN") {
-      //     // console.log("change is nan?");
-      //     change = 0;
-      //   }
-      //   Bids.update({"_id": existBid._id}, {$set: {"bidVal": change}});
-      // }
+ 
       logObj = {
         "baseId": baseId,
         "buildingId": building,
@@ -1656,7 +1774,7 @@ export const MakeBid2 = new ValidatedMethod({
   }
 });
 
-//TODO: fix baseID to be game document ID and not just user document ID
+//THIS IS THE OLD ONE
 
 export const MakeBid = new ValidatedMethod({
   name: 'bid.make',

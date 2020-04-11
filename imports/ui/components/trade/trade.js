@@ -14,10 +14,15 @@ Template.trade.onCreated(function helloOnCreated() {
 Template.trade.helpers({
   resource() {
     return [
-      {"name": "m1", "displayName": "Gold"}, 
-      {"name": "m2", "displayName": "Steel"}, 
-      {"name": "f1", "displayName": "Food"}, 
-      {"name": "f2", "displayName": "Cotton"}];
+      // {"name": "m1", "displayName": "Gold"}, 
+      // {"name": "m2", "displayName": "Steel"}, 
+      // {"name": "f1", "displayName": "Food"}, 
+      // {"name": "f2", "displayName": "Cotton"}];
+      {"name": "copper", "displayName": "Copper"}, 
+      {"name": "lumber", "displayName": "Lumber"}, 
+      {"name": "food", "displayName": "Food"}, 
+      {"name": "clay", "displayName": "Clay"}];
+
   },
   otherPlayers() {
     gCode = FlowRouter.getParam("gameCode");

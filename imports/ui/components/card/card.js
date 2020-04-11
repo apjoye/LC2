@@ -69,11 +69,11 @@ Template.factoryList.helpers({
     rbs = {};    //bids grouped by resource kind
     // console.log(bids);
     for (b in bids) {
-      bbs[bids[b]["buildingId"]] = bids[b]["value"];
+      bbs[bids[b]["buildingId"]] = bids[b]["bidVal"];
       if (!(bids[b]["bidKind"] in rbs)) {
         rbs[bids[b]["bidKind"]] = 0;
       }
-      rbs[bids[b]["kind"]] += bids[b]["value"];
+      rbs[bids[b]["kind"]] += bids[b]["bidVal"];
     }
     // console.log(bbs);
     // console.log(rbs);
@@ -83,7 +83,7 @@ Template.factoryList.helpers({
 
   bidValue(buildingId) {
     bbs = Template.instance().buildingBids.get();
-    console.log(bbs);
+    // console.log(bbs);
     if (buildingId in bbs) {
       return bbs[buildingId];  
     }
@@ -96,7 +96,7 @@ Template.factoryList.helpers({
   buildingText(building){
     console.log(building);
     text = building.name;
-    text += " Features:" + JSON.stringify(building.buildFeatures);
+    // text += " Features:" + JSON.stringify(building.buildFeatures);
     text += " Uses:" + JSON.stringify(building.prodCost);
     text += " Produces: " + JSON.stringify(building.prodVal);
     text += " Bid Kind: " + JSON.stringify(building.bidKind);
