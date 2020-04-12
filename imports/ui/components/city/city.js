@@ -56,6 +56,7 @@ Template.city.onCreated(function helloOnCreated() {
   Meteor.subscribe('games.minerunning');
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
   this.gameInfo = new ReactiveVar({});
+  // this.roundProduction = new ReactiveVar({});
 });
 
 Template.city.helpers({
@@ -65,34 +66,59 @@ Template.city.helpers({
       "f1": "../img/icons/food_sml.png",
       "m2": "../img/icons/steel_sml.png",
       "f2": "../img/icons/cotton_sml.png",
-      "food": "../img/icons/food.png",
-      "clay": "../img/icons/clay.png",
-      "copper": "../img/icons/copper.png",
-      "lumber": "../img/icons/lumber.png",
+      "food": "../img/resources/food.png",
+      "clay": "../img/resources/clay.png",
+      "copper": "../img/resources/copper.png",
+      "lumber": "../img/resources/lumber.png",
       "pollution": "../img/icons/pollution_sml.png",
       "population": "../img/icons/population_sml.png",
       "happiness": "../img/icons/happiness_sml.png"
     };
+    prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0};
+    prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0"};
+
     // console.log(Games.find({"playerId": Meteor.userId()}).fetch());
 
     thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode"), "playerId": Meteor.userId()}]})
     Template.instance().gameInfo.set(thisGame);
+ 
+
+    // ROUND PRODUCTION INFORMATION SET UP HERE
+    runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
+
+    runningBuilds.forEach(function (build) {
+      for (r in build.prodVal) {        prodOutput[r] += build.prodVal[r];      }
+      for (r in build.prodCost) {        prodOutput[r] = prodOutput[r] - build.prodCost[r];      }
+    });
+
+    for (k in prodOutput) {
+      if (prodOutput[k] >= 0) {        prodOutStr[k] = "+" + prodOutput[k].toString();      }
+      else {       prodOutStr[k] = prodOutput[k].toString();       }
+    }
+
+
+    //GETTING OTHER CITY STATS INFO IN HERE
     resPrint = [];
     // console.log(thisGame);
     for (r in thisGame.res) {
-      thisRes = {};
+      thisRes = {"res": r};
       thisRes["amount"] = thisGame.res[r];
       thisRes["image"] = resImages[r];
+      thisRes["roundProduction"] = prodOutStr[r];
+      // console.log(prodOutStr[r]);
       resPrint.push(thisRes);
     }
+    resPrint.push({"amount": "Metrics"});
     otherStats = ["pollution", "population", "happiness"];
     for (r in otherStats) {
-      thisRes = {};
+      thisRes = {"res": otherStats[r]};
       thisRes["amount"] = thisGame[otherStats[r]];
       thisRes["image"] = resImages[otherStats[r]];
+      thisRes["roundProduction"] = prodOutStr[otherStats[r]];
       // console.log(thisRes + r);
       resPrint.push(thisRes);
     }
+
     return resPrint;
   },
 
@@ -138,13 +164,27 @@ Template.city.helpers({
 
   // }
 
-  roundProduction() {
+  roundProduction(res) {
     // prodOutput = {"m1": 0, "m2": 0, "f1": 0, "f2": 0, "pollution": 0};
     // prodOutStr = {"m1": "+0", "m2": "+0", "f1": "+0", "f2": "+0", "pollution": "+0"};
     prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0};
     prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0"};
+    runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
+    
+    
+    runningBuilds.forEach(function (build) {
+      for (r in build.prodVal) {
+        prodOutput[r] += build.prodVal[r];
+      }
+
+      for (r in build.prodCost) {
+        prodOutput[r] = prodOutput[r] - build.prodCost[r];
+      }
+    });
+
+
     /*    
-    runningProds = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
+    runningBuilds = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
     
     var parks = 0;
     runningProds.forEach(function (prod) {
@@ -179,7 +219,8 @@ Template.city.helpers({
       else {       prodOutStr[k] = prodOutput[k].toString();       }
     }
     */
-    return prodOutStr;
+    // console.log(res)
+    return prodOutStr[res];
   }
 });
 
@@ -203,6 +244,8 @@ Template.cityMap.helpers({
     mapHeight = thisGame["visibleDimensions"][1];   //number of rows
     cornerX = thisGame["visibleCorner"][0];
     cornerY = thisGame["visibleCorner"][1];
+    endCornerY = cornerY + mapHeight;
+    endCornerX = cornerX + mapWidth;
     rows = [];
     map = Maps.find({"gameCode": gameCode}).fetch();
     resources = Resources.find({"gameCode": gameCode}).fetch();
@@ -211,14 +254,8 @@ Template.cityMap.helpers({
     resMapDict = {};
     resDict = {};
     buildDict = {};
-    mapTiles = {
-      "claymine": "../img/buildings/claymine.png",
-      "coppermine": "../img/buildings/coppermine.png",
-      "foodfarm": "../img/buildings/foodfarm.png",
-      "foodfishing": "../img/buildings/foodfishing.png",
-      "foodhunting": "../img/buildings/foodhunting.png",
-      "lumbercamp": "../img/buildings/lumbercamp.png",
-    }
+    mapTiles = thisGame.mapTiles;
+    // console.log(mapTiles);
 
     for (r in resources) {
       resDict[resources[r]["_id"]] = resources[r];
@@ -227,6 +264,7 @@ Template.cityMap.helpers({
       buildDict[buildings[b]["_id"]] = buildings[b];
     }
     // console.log(resDict);
+
     for (m in map) {
       // if ("resource" in map[m]){
       loc = "x" + map[m].x + "y" + map[m].y;
@@ -250,7 +288,7 @@ Template.cityMap.helpers({
       for (n in neighbs) {
         nx = map[m].x + neighbs[n][0];
         ny = map[m].y + neighbs[n][1]
-        if (nx >= 0 && ny >= 0) {
+        if (nx >= 0 && ny >= 0 && nx < endCornerX && ny < endCornerY) {
           nloc = "x" + nx + "y" + ny;
           if (!(nloc in resMapDict)) { 
             resMapDict[nloc] = {};
@@ -274,13 +312,11 @@ Template.cityMap.helpers({
 
     //add buildings, ownership, and resources stats to each cell
 
-    for (var i = cornerX; i < (cornerX + mapHeight); i++) {
+    for (var i = cornerY; i < endCornerY; i++) {
       thisRow = [];
-      for (var j = cornerY; j < (cornerY + mapHeight); j++) {
-        loc = "x" + i + "y" + j;
+      for (var j = cornerX; j < endCornerX; j++) {
+        loc = "x" + j + "y" + i;
         if (loc in resMapDict) {
-          // console.log(loc + " found!");
-          // thisRow.push({"rowCol": resMapDict[loc]});  
           rowCol = {};
           rowCol["loc"] = loc;
           rowCol["attributes"] = "";
@@ -289,28 +325,21 @@ Template.cityMap.helpers({
           }
           rowCol["text"] = "";
           if ("resource" in resMapDict[loc]) {
-            // console.log(resMapDict[loc]);
-            // console.log(resMapDict[loc]["resource"]);
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
             rowCol["imageSource"] = mapTiles[resMapDict[loc]["building"]["name"]];
-            // console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
             
             if ("neighboringResource" in resMapDict[loc]["building"]) {
               rowCol["text"] += " bonus ore! ";
-              // console.log(resMapDict[loc]);
-              // console.log(loc);
             }
             
             if (resMapDict[loc]["building"]["running"] == true) {
               rowCol["text"] += " running ";
-              // console.log("building is running");
             }
             else {
               rowCol["text"] += " idle ";
-              // console.log("building is idle");
             }
           }
           if ("owner" in resMapDict[loc]) {
@@ -413,6 +442,8 @@ Template.cityMap.events({
     // instance.selectedLoc.set(event.target.id);
     instance.selectedLoc.set(loc);
     console.log(loc);
+    map = instance.fullmap.get();
+    console.log(map[loc]);
   },
 
   'click .placeBuilding': function (event, instance) {

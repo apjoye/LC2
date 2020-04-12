@@ -1404,6 +1404,34 @@ export const RemoveBuilds = new ValidatedMethod({
   }
 })
 
+export const SetTheme = new ValidatedMethod({
+  name: 'map.theme',
+  validate({}) {},
+  run({gameCode}) {
+    mapTiles = {
+      "claymine": "../img/buildings/claymine.png",
+      "coppermine": "../img/buildings/coppermine.png",
+      "foodfarm": "../img/buildings/foodfarm.png",
+      "foodfishing": "../img/buildings/foodfishing.png",
+      "foodhunting": "../img/buildings/foodhunting.png",
+      "lumbercamp": "../img/buildings/lumbercamp.png",
+      "background": "../img/resources/grass.png",
+      "water": "../img/resources/river.png",
+      "woods": "../img/resources/woods.png",
+      "lumber": "../img/resources/woods.png",
+      "copper": "../img/resources/copperore.png",
+      "clay": "../img/resources/clayore.png",
+      "red-city": "../img/bg/red-city.png",
+      "yellow-city": "../img/bg/yellow-city.png",
+      "blue-city": "../img/bg/blue-city.png",
+      "green-city": "../img/bg/green-city.png",
+      "pink-city": "../img/bg/pink-city.png",
+      
+    }
+    Games.update({"gameCode": gameCode}, {$set: {"mapTiles": mapTiles}}, {multi: true});
+  }
+});
+
 export const MakeMap = new ValidatedMethod({
   name: 'map.make',
   validate ({}) {},
@@ -1446,12 +1474,6 @@ export const MakeMap = new ValidatedMethod({
         "mine1": {"clay": 30},
         "mine2": {"copper": 30}
       }
-
-      visibleCells = {
-
-      };
-
-      
 
       resKinds = {
         "woods1": "lumber",
@@ -1503,23 +1525,12 @@ export const MakeMap = new ValidatedMethod({
         console.log(thisX);
       }
 
-      // var visX = visCorner[0];
-      // var visY = visCorner[1];
-      // for (visX; visX < visX + visDim[0]; visX += 1){
-      //   for (visY; visY < visY + visDim[1]; visY += 1) {
-      //     await Maps.update(
-      //       {$and: [{"x": visX}, {"y": visY}, {"gameCode": gameCode}]}, 
-      //       {$set: {"owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
-      //       {upsert: true}
-      //     );
-      //   }
-      // }
     }
 
     async function mapSetup(gameCode) {
       corners = [[1, 1], [9, 0], [12, 6], [12, 12], [2, 12]];
       dims = [[4, 4], [4, 4], [4, 4], [4, 4], [4, 4]];
-
+      mapDims = [16, 16];
       visCorners = [[0, 0], [8, 0], [11, 5], [11, 11], [1, 11]];
       visDims = [[6, 6], [6, 5], [5, 6], [5, 5], [6, 5]];
       teams = Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]}).fetch();
@@ -1534,12 +1545,17 @@ export const MakeMap = new ValidatedMethod({
         );
       }
 
+      Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, 
+        {$set: {"visibleCorner": mapDims[0], "visibleDimensions": mapDims[1]} 
+      });
+        
+
 
       await seedResources (gameCode);
     }
 
     mapSetup(gameCode);
-    
+    SetTheme.call({"gameCode": gameCode});
 
     //place an ore
     // Resources.insert({"gameCode": gameCode, "category": "ore", "kind": "m1", "name": "Gold Ore"});
