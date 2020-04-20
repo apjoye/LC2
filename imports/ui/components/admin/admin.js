@@ -98,7 +98,13 @@ Template.gameMap.helpers({
       "blue-city": "../img/bg/blue-city.png",
       "green-city": "../img/bg/green-city.png",
       "pink-city": "../img/bg/pink-city.png",
-      
+    }
+    bgColors = {
+      "red-city": "rgba(255,0,0,0.6)",
+      "yellow-city": "rgba(255,255,0,0.3)",
+      "blue-city": "rgba(0,0,255,0.3)",
+      "green-city": "rgba(0,255,0,0.3)",
+      "pink-city": "rgba(255, 51, 153, 0.3)",
     }
     //store map dimensions somewhere
     mapWidth = 16;    //number of columns
@@ -106,7 +112,8 @@ Template.gameMap.helpers({
     rows = [];
     map = Maps.find({"gameCode": gameCode}).fetch();
     resources = Resources.find({"gameCode": gameCode}).fetch();
-    buildings = Buildings.find({"gameCode": gameCode}).fetch();
+    buildings = Buildings.find({$and: [{"gameCode": gameCode}]}).fetch();
+    // buildings = Buildings.find({$and: [{"gameCode": gameCode}, {"owner": Meteor.userId()}]}).fetch();
     // console.log(resources);
     resMapDict = {};
     resDict = {};
@@ -151,16 +158,21 @@ Template.gameMap.helpers({
         rowCol = {};
         rowCol["image"] = mapTiles["background"];
         rowCol["text"] = "";
+        rowCol["bgColor"] = "";
+
         if (loc in resMapDict) {
           // console.log(loc + " found!");
           // thisRow.push({"rowCol": resMapDict[loc]});  
           // rowCol = {};
           rowCol["loc"] = loc;
-          rowCol["attributes"] = "";
           
           if ("owner" in resMapDict[loc]) {
-            rowCol["image"] = "";
-            rowCol["attributes"] = "bgColor = \"red\"";
+            rowCol["image"] = "../img/bg/empty.png";
+            // rowCol["attributes"] = "bgColor = \"red\"";
+            rowCol["bgColor"] = bgColors[resMapDict[loc]["owner"]];
+            console.log(resMapDict[loc]["owner"]);
+            // console.log(bgColors);
+            console.log(rowCol["bgColor"]);
           }
           rowCol["text"] = "";
           if ("resource" in resMapDict[loc]) {
@@ -170,21 +182,23 @@ Template.gameMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
-            rowCol["image"] = mapTiles[resMapDict[loc]["building"]["name"]];
-            rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
-            
-            if ("neighboringResource" in resMapDict[loc]["building"]) {
-              rowCol["text"] += " bonus ore! ";
+            if (resMapDict[loc]["building"]["ownerId"] == Meteor.userId()){
+              rowCol["image"] = mapTiles[resMapDict[loc]["building"]["name"]];
             }
-            
-            if (resMapDict[loc]["building"]["running"] == true) {
-              rowCol["text"] += " running ";
-              // console.log("building is running");
-            }
-            else {
-              rowCol["text"] += " idle ";
-              // console.log("building is idle");
-            }
+              rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
+              
+              if ("neighboringResource" in resMapDict[loc]["building"]) {
+                rowCol["text"] += " bonus ore! ";
+              }
+              
+              if (resMapDict[loc]["building"]["running"] == true) {
+                rowCol["text"] += " running ";
+                // console.log("building is running");
+              }
+              else {
+                rowCol["text"] += " idle ";
+                // console.log("building is idle");
+              }
           }
           if ("owner" in resMapDict[loc]) {
             rowCol["text"] += JSON.stringify(resMapDict[loc]["owner"]);
@@ -282,10 +296,10 @@ Template.adminGame.helpers({
       if (!("owner" in builds[b])) {
         builds[b]["owner"] = " ";
       }
-      console.log(builds[b]["_id"])
-      console.log(builds[b]["location"])
-      console.log(builds[b]["owner"])
-      console.log(builds[b]["name"])
+      // console.log(builds[b]["_id"])
+      // console.log(builds[b]["location"])
+      // console.log(builds[b]["owner"])
+      // console.log(builds[b]["name"])
     }
 
 

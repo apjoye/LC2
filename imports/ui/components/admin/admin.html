@@ -245,7 +245,7 @@
         {{#each this}}
         <td class="emptyClass mapCell {{this.loc}}" id="{{this.loc}}">
           {{#if imageMode}}
-            <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px;">
+            <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px; background-color:{{this.bgColor}}">
           {{else}}
             {{this.text}}&emsp;
           {{/if}}

@@ -479,11 +479,11 @@ export const ToggleBuilding = new ValidatedMethod({
     }
 
     overEmp = runners.length - thisGame.population;
-    if (overEmp > 0) {
-      for (var i = 0; i < overEmp; i++) {
-        Buildings.update({"_id": runners[i]["_id"]}, {$set: {"running": false}});
-      }
-    }
+    // if (overEmp > 0) {
+    //   for (var i = 0; i < overEmp; i++) {
+    //     Buildings.update({"_id": runners[i]["_id"]}, {$set: {"running": false}});
+    //   }
+    // }
 
     Buildings.update({"_id": buildingId}, {$set: {"running": newStatus}});
     // console.log("building set to " + newStatus);
@@ -1045,66 +1045,76 @@ export const RunBuildings = new ValidatedMethod({
       thisGame = Games.findOne({"_id": gameId});
       newRes = thisGame["res"];
       newPoll = thisGame["pollution"];
-      
+      roundEmployed = 0;
+      running = false
+      if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
+
       if (!("notes" in thisGame)) {
         thisGame["notes"] = [];
       }
 
-      for (r in building["prodCost"]) {
-        if (building["prodCost"][r] > newRes[r]) {
-          affordable = false;
+      if (roundEmployed < thisGame["population"]) {
+        for (r in building["prodCost"]) {
+          if (building["prodCost"][r] > newRes[r]) {
+            affordable = false;
+          }
+          newRes[r] = newRes[r] - building["prodCost"][r];
         }
-        newRes[r] = newRes[r] - building["prodCost"][r];
-      }
-      if (affordable == false) {
-        newRes[r] = thisGame["res"];
-        // console.log(thisGame["res"]);
-        console.log("was unaffordable");
-        thisGame["notes"].push(building.name + " was unaffordable and did not run");
-        return true;
+        if (affordable == false) {
+          newRes[r] = thisGame["res"];
+          // console.log(thisGame["res"]);
+          console.log("was unaffordable");
+          thisGame["notes"].push(building.name + " was unaffordable and did not run");
+          return true;
+        }
+        else {
+          roundEmployed += 1;
+          thisGame["res"] = newRes;
+          thisGame["pollution"] = newPoll;
+          thisGame["notes"].push(building.name + " ran successfully!")
+          usingResource = false;
+          console.log("consumed stuff, checking out neighboring resources");
+          if ("neighboringResource" in building && ["farm"].indexOf(building["buildFeatures"]["buildKind"]) == -1) {
+            console.log("mine and neighboring resource found");
+            mineres = building["buildFeatures"]["resUse"];
+            nres =  Resources.findOne({"_id": building["neighboringResource"]});
+
+            newval = nres["stats"][mineres];
+            if (newval > 0) { 
+              //***TODO: make the resource use different depending on resource and mine
+              newval = newval - 1; 
+              statField = nres["stats"];
+              statField[mineres] = newval;
+              usingResource = true;
+              await Resources.update({"_id": nres._id}, {$set: {stats: statField}});
+            }
+            console.log(nres + " " + statField + " " + newval);
+          }
+
+          if ((usingResource == false) && ["fishing", "hunting"].indexOf((building["buildFeatures"]["buildKind"])) > -1) {
+            console.log("neighboring resource was empty!");
+          } 
+          else {
+            console.log("making the worth");
+            for (r in building["prodVal"]) {
+              if (r != "pollution"){
+                newRes[r] = newRes[r] + building["prodVal"][r];
+              }
+              else {
+                newPoll = newPoll + building["prodVal"]["pollution"];
+              }
+            }
+          }
+          // return true;
+        }
       }
       else {
-        
-        thisGame["res"] = newRes;
-        thisGame["pollution"] = newPoll;
-        thisGame["notes"].push(building.name + " ran successfully!")
-        usingResource = false;
-        console.log("consumed stuff, checking out neighboring resources");
-        if ("neighboringResource" in building && ["farm"].indexOf(building["buildFeatures"]["buildKind"]) == -1) {
-          console.log("mine and neighboring resource found");
-          mineres = building["buildFeatures"]["resUse"];
-          nres =  Resources.findOne({"_id": building["neighboringResource"]});
+        // running = false;
+        thisGame["notes"].push(building.name + " did not run cause out of people");
 
-          newval = nres["stats"][mineres];
-          if (newval > 0) { 
-            //***TODO: make the resource use different depending on resource and mine
-            newval = newval - 1; 
-            statField = nres["stats"];
-            statField[mineres] = newval;
-            usingResource = true;
-            await Resources.update({"_id": nres._id}, {$set: {stats: statField}});
-          }
-          console.log(nres + " " + statField + " " + newval);
-        }
-
-        if ((usingResource == false) && ["fishing", "hunting"].indexOf((building["buildFeatures"]["buildKind"])) > -1) {
-          console.log("neighboring resource was empty!");
-        } 
-        else {
-          console.log("making the worth");
-          for (r in building["prodVal"]) {
-            if (r != "pollution"){
-              newRes[r] = newRes[r] + building["prodVal"][r];
-            }
-            else {
-              newPoll = newPoll + building["prodVal"]["pollution"];
-            }
-          }
-        }
-        // return true;
       }
       // console.log("trying to update game");
-      await Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll}} );
+      await Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
 
     }
 
@@ -1112,10 +1122,7 @@ export const RunBuildings = new ValidatedMethod({
       // gameTeams = {};
       for (b in buildings) {
         bb = buildings[b];
-        // if (!(bb["ownerGame"] in gameTeams)) {
-        //   gameTeams[bb["ownerGame"]] = Games.findOne({"_id": bb["ownerGame"]});
-        // }
-        // thisGame = gameTeams[bb["ownerGame"]];
+
         if ("running" in bb) {
           if (bb["running"] == true) {
             // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
@@ -1132,9 +1139,6 @@ export const RunBuildings = new ValidatedMethod({
         // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
         // console.log(bb["kind"]);
       }
-      // for (gt in gameTeams) {
-      //   await Games.update({"_id": gt}, {$set: {"res": gameTeams[gt]["res"], "pollution": gameTeams[gt]["pollution"]}});
-      // }
     }
 
     buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
