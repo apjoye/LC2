@@ -233,6 +233,8 @@ Template.cityMap.onCreated(function helloOnCreated() {
   this.selectedBuilding = new ReactiveVar({});
   this.selectedLoc = new ReactiveVar("");
   this.fullmap = new ReactiveVar({});
+  this.game = new ReactiveVar({});
+  this.buildings = new ReactiveVar({});
 });
 
 Template.cityMap.helpers({
@@ -240,6 +242,7 @@ Template.cityMap.helpers({
     //store map dimensions somewhere
     thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]});
     // console.log(thisGame);
+    Template.instance().game.set(thisGame);
     mapWidth = thisGame["visibleDimensions"][0];    //number of columns
     mapHeight = thisGame["visibleDimensions"][1];   //number of rows
     cornerX = thisGame["visibleCorner"][0];
@@ -250,6 +253,7 @@ Template.cityMap.helpers({
     map = Maps.find({"gameCode": gameCode}).fetch();
     resources = Resources.find({"gameCode": gameCode}).fetch();
     buildings = Buildings.find({$and: [{"ownerId": Meteor.userId()}, {"gameCode": gameCode}]}).fetch();
+    Template.instance().buildings.set(buildings);
     // console.log(resources);
     resMapDict = {};
     resDict = {};
@@ -372,7 +376,7 @@ Template.cityMap.helpers({
     loc = Template.instance().selectedLoc.get();
     mapSelect = map[loc];
     placeMode = false;
-    console.log(mapSelect);
+    // console.log(mapSelect);
     if (mapSelect == "" || mapSelect == {} || mapSelect == undefined) {}
     else {
       // console.log(m)
@@ -444,7 +448,7 @@ Template.cityMap.events({
     instance.selectedLoc.set(loc);
     console.log(loc);
     map = instance.fullmap.get();
-    console.log(map[loc]);
+    // console.log(map[loc]);
   },
 
   'click .placeBuilding': function (event, instance) {
@@ -462,7 +466,24 @@ Template.cityMap.events({
   'click .toggleBuilding': function (event, instance) {
     event.preventDefault();
     bb = Template.instance().data.map[Template.instance().selectedLoc.get()]["building"];
-    ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
+    bs = instance.buildings.get();
+    pop = instance.game.get().population;
+    // console.log(pop);
+    workingPop = 0;
+    for (b in bs) {
+      if (bs[b]["running"] == true) {
+        workingPop += 1;
+      }
+    }
+    currStat = bb["running"];
+
+    if (workingPop >= pop && currStat == false) {
+      currStat = true;
+      alert("all the people have buildings to work at!");
+    }
+    else {
+      ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
+    }
   },
 
   'click .removeBuilding': function (event, instance) {
