@@ -16,19 +16,6 @@
     <!-- <p class="cityName">{{name}} </p> -->
     <!-- <h3>Your City's Production</h3> -->
 
-   <!--  <div class="container pull-right">
-      <h4> Resources </h4>
-      <img class="cityIcon" src="../img/icons/gold_sml.png"> {{res.m1}} {{roundProduction.m1}}
-      <img class="cityIcon" src="../img/icons/steel_sml.png"> {{res.m2}} {{roundProduction.m2}}
-      <img class="cityIcon" src="../img/icons/food_sml.png"> {{res.f1}} {{roundProduction.f1}}
-      <img class="cityIcon" src="../img/icons/cotton_sml.png"> {{res.f2}} {{roundProduction.f1}}
-      <h4> Metrics </h4>
-      <img class="cityIcon" src="../img/icons/pollution_med.png"> {{pollution}} {{roundProduction.pollution}}
-      <img class="cityIcon" src="../img/icons/population_med.png"> {{population}} {{roundProduction.population}}
-      <img class="cityIcon" src="../img/icons/happiness_med.png"> {{happiness}} {{roundProduction.happiness}}
-    </div> -->
-
-
     <div class="container">
       <div class="row">
         
@@ -41,47 +28,10 @@
         
         {{#each cr in cityResources}}
         <div class="col-sm-2 col-md-1 col-xs-4">
-          <h3><img class="cityIcon" src="{{cr.image}}"> {{cr.amount}} </h3> <h4>{{roundProduction.cr["res"]}}</h4>
+          <h3><img class="cityIcon" src="{{cr.image}}"> {{cr.amount}} </h3> <h4>{{cr.roundProduction}}</h4>
         </div>
         {{/each}}
 
-
-        <!-- <div class="col-sm-3 col-md-1 col-xs-4">
-          <h1><img class="cityIcon" src="../img/icons/gold_sml.png"> {{res.m1}} </h1> <h3>{{roundProduction.m1}}</h3>
-        </div>
-        <div class="col-sm-3 col-md-1 col-xs-4">
-          <h1><img class="cityIcon" src="../img/icons/steel_sml.png"> {{res.m2}} 
-          </h1> 
-          <h3>{{roundProduction.m2}}</h3>
-        </div>
-        <div class="col-sm-3 col-md-1 col-xs-4">
-          <h1><img class="cityIcon" src="../img/icons/food_sml.png"> {{res.f1}}
-          </h1>
-          <h3>{{roundProduction.f1}}</h3>
-        </div>
-        <div class="col-sm-3 col-md-1 col-xs-4">
-          <h1><img class="cityIcon" src="../img/icons/cotton_sml.png"> {{res.f2}}
-          </h1>
-          <h3>{{roundProduction.f1}}</h3>
-        </div>
-        <div class="col-md-2">
-          <h2> Metrics </h2>
-        </div>
-        <div class="col-sm-4 col-md-1 col-xs-4">
-          <h1><img class="cityIcon" src="../img/icons/pollution_med.png"> {{pollution}}
-          </h1>
-          <h3>{{roundProduction.pollution}}</h3>
-        </div>
-        <div class="col-sm-4 col-md-1 col-xs-4">
-          <h1><img class="cityIcon" src="../img/icons/population_med.png"> {{population}}
-          </h1>
-          <h3>{{roundProduction.population}}</h3>
-        </div>
-        <div class="col-sm-4 col-md-1 col-xs-4">
-          <h1><img class="cityIcon" src="../img/icons/happiness_med.png"> {{happiness}}
-          </h1>
-          <h3>{{roundProduction.happiness}}</h3>
-        </div> -->
       </div>
     </div>
      <!-- <p> -->
@@ -99,29 +49,7 @@
 
       <!-- </p> -->
  
-<!--     <section id="factoryBox">
-      
-      <table cellpadding="10" class="productionBox">
-        <tr> --> 
-          <!-- {{#each cityFactories}} -->
-            <!-- <td style="{{producerColor}}" class="cityFactoryInfo"> -->
-              <!-- {{> cityFactory}} -->
-            <!-- </td> -->
-          <!-- {{/each}} -->
-        <!-- </tr> -->
-        <!-- <tr>Notes from last run: {{#each roundNotes}}  {{this}} <br />   {{/each}}</tr> -->
-      <!-- </table> -->
-    <!-- </section> -->
 
-    <!-- <div class="row" style = "padding: 6pt;">
-      {{#each cityFactories}}
-        <div class="col-xs-6 col-sm-4 col-md-3">
-          <div style="border: solid black 1pt; padding: 2pt; margin:2pt; {{producerColor}}">
-            {{> cityFactory}}
-          </div>
-        </div>
-      {{/each}}
-    </div> -->
   </div>
 
     

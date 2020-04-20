@@ -1,5 +1,6 @@
 import './admin.html';
 import '../gameList/gameList.js';
+// import '../map/map.js';
 import { Producers } from '/imports/api/links/links.js';
 // import { Assets } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
