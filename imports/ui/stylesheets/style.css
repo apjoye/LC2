@@ -219,3 +219,24 @@ body {
     display: flex;
     align-items: center;
 }
+
+.left-city{
+	border: solid black 1pt;
+	float: left;
+	width: 60%;
+	height: 500px;
+}
+.right-city{
+	border: solid black 1pt;
+	float: right;
+	width: 40%;
+}
+.slider-building{
+	display: flex;
+	overflow-x: auto;
+}
+.boughtBuilding{
+	flex-shrink: 0;
+}
+
+ 
