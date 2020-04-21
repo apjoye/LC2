@@ -73,11 +73,12 @@
     {{/each}}
   </table>
 </div>
-<div class="col-md-4">
-  <div class="top-sidebar" style="padding-top: 4%; padding-bottom: 4%;">
+<div class="col-md-4" style="padding-left: 4%;">
+  <div class="top-sidebar" style="padding-top: 2%; padding-bottom: 4%;">
+      <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Buildings</p>
   <div class="slider-building">
     {{#each build in boughtBuildings}}
-      <div class="col-md-8 boughtBuilding" style="border-style: outset; margin-left: 4%; margin-right: 4%;">
+      <div class="col-md-8 boughtBuilding" style="border-style: outset; margin-right: 4%;">
           <h3><img class="" src = "../img/buildings/claymine.png" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
         <!--{{build.name}}-->
         <p>Produce</p>
@@ -90,19 +91,24 @@
     {{/each}}
   </div>
 
-  <div>
-    {{#each currentBuilding.text}}
-      {{this}} <br />
-    {{/each}}
-    {{#if currentBuilding.buildingButtons}}
-      <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
-      <button class="btn btn-danger removeBuilding"  id="remove-{{currentBuilding.mapCell.building._id}}"> Remove Building </button>
-    {{/if}}
-    <!-- {{#else}} -->
-  </div>
+  
 </div>
 <div class = "bottom-sidebar">
-    <h3><img class="" src = "../img/buildings/claymine.png" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+    <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Infomation Panel</p>
+    <div style="border: 1px solid grey; padding: 2%; text-align: center;">
+        <h3><img class="" src = "../img/buildings/claymine.png" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+            {{#each currentBuilding.text}}
+              {{this}} <br />
+            {{/each}}
+            {{#if currentBuilding.buildingButtons}}
+            <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
+              <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
+              <button class="btn btn-danger removeBuilding"  id="remove-{{currentBuilding.mapCell.building._id}}"> Remove Building </button>
+            </div>
+            {{/if}}
+            <!-- {{#else}} -->
+    </div>
+    
 </div>
 </div>
 </template>
