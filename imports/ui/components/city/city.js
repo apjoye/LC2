@@ -81,7 +81,7 @@ Template.city.helpers({
 
     thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode"), "playerId": Meteor.userId()}]})
     Template.instance().gameInfo.set(thisGame);
- 
+
 
     // ROUND PRODUCTION INFORMATION SET UP HERE
     runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
@@ -170,8 +170,8 @@ Template.city.helpers({
     prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0};
     prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0"};
     runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
-    
-    
+
+
     runningBuilds.forEach(function (build) {
       for (r in build.prodVal) {
         prodOutput[r] += build.prodVal[r];
@@ -183,9 +183,9 @@ Template.city.helpers({
     });
 
 
-    /*    
+    /*
     runningBuilds = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
-    
+
     var parks = 0;
     runningProds.forEach(function (prod) {
       if (prod.kind == "p1" || prod.kind == "p2") {
@@ -294,13 +294,13 @@ Template.cityMap.helpers({
         ny = map[m].y + neighbs[n][1]
         if (nx >= 0 && ny >= 0 && nx < endCornerX && ny < endCornerY) {
           nloc = "x" + nx + "y" + ny;
-          if (!(nloc in resMapDict)) { 
+          if (!(nloc in resMapDict)) {
             resMapDict[nloc] = {};
-          } 
-          if (!("neighbors" in resMapDict[nloc])) { 
-            resMapDict[nloc]["neighbors"] = []; 
+          }
+          if (!("neighbors" in resMapDict[nloc])) {
+            resMapDict[nloc]["neighbors"] = [];
             // console.log("given")
-          } 
+          }
           // console.log()
           resMapDict[nloc]["neighbors"].push(resMapDict[loc]);
         }
@@ -332,13 +332,14 @@ Template.cityMap.helpers({
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
+            // console.log(resMapDict[loc]["building"]["kind"]);
             rowCol["imageSource"] = mapTiles[resMapDict[loc]["building"]["name"]];
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
-            
+
             if ("neighboringResource" in resMapDict[loc]["building"]) {
               rowCol["text"] += " bonus ore! ";
             }
-            
+
             if (resMapDict[loc]["building"]["running"] == true) {
               rowCol["text"] += " running ";
             }
@@ -389,7 +390,7 @@ Template.cityMap.helpers({
     // console.log(building.name);
     // console.log(building.name in buyingBuilds);
     // console.log(placeMode);
-    // console.log(building.name in buyingBuilds && placeMode); 
+    // console.log(building.name in buyingBuilds && placeMode);
     if (buyingBuilds.indexOf(building.name) >= 0 && placeMode) {
       return true;
     }
@@ -502,7 +503,7 @@ Template.cityFactory.onCreated(function helloOnCreated() {
   // Meteor.subscribe('producers.public');
   // Meteor.subscribe('producers.owned');
   // Meteor.subscribe('games.running');
-  
+
 });
 
 Template.cityFactory.helpers({
@@ -569,7 +570,7 @@ Template.cityFactory.helpers({
    }
    return costText;
   },
-  
+
   productionCosts() {
     costText = "";
     // console.log(this.prodCosts);
@@ -636,4 +637,3 @@ Template.cityFactory.events({
     // }
   }
 });
-
