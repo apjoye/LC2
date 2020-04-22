@@ -1230,29 +1230,49 @@ export const AddBuilding = new ValidatedMethod({
       "lumbercamp": {"lumber": 8}
     };
 
+    var neighborNeeds = {
+      "claymine": {"resources": [], "buildings": []},
+      "coppermine": {"resources": [], "buildings": []},
+      "foodfarm": {"resources": [], "buildings": []},
+      "foodfishing": {"resources": ["water"], "buildings": []},
+      "foodhunting": {"resources": ["lumber"], "buildings": []},
+      "lumbercamp": {"resources": ["lumber"], "buildings": []}
+    };
+
+    var bonusProds = {
+      "claymine":  {"clay": 8, "pollution": 3} ,
+      "coppermine": {"copper": 8, "pollution": 3}
+      // "foodfarm": {"production": {"food": 5} },
+      // "foodfishing": {"food": 3} ,
+      // "foodhunting": {"food": 8},
+      // "lumbercamp": {"lumber": 8}
+    }
+
+    var bonusCosts = {
+      "claymine":  {"clay": 8, "pollution": 3} ,
+      "coppermine": {"copper": 8, "pollution": 3}
+      // "foodfarm": {"production": {"food": 5} },
+      // "foodfishing": {"food": 3} ,
+      // "foodhunting": {"food": 8},
+      // "lumbercamp": {"lumber": 8}
+    }
+
     prodCost = prodCosts[buildingName];
     prodVal = prodVals[buildingName];
+    neighborNeed = {};
+    bonusCost = {};
+    bonusProd = {};
+    if (buildingName in neighborNeeds) {
+      neighborNeed = buildingName;
+    }
 
-    // console.log(prodCosts[buildingName] + " " + buildingName);
-
-    // Buildings.update(
-    //   {$and: [{"gameCode": gameCode, "location": [locx, locy]}]}, 
-    //   {$set: {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName},
-    //   {upsert: true} );
-    // Buildings.insert({"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName}, function (err, buildingId) {
-    //   if (err) {
-    //     console.log("Building addition failed!!!");
-    //   }
-    //   else {
-    //     Maps.update(
-    //       {$and: [{"x": locx}, {"y": locy}]}, 
-    //       {$set: {"building": , "object": "building", "kind": kind, "name": buildingName, "buildingId": buildingId}}
-    //     );    
-    //   }
-    // });
+    if (buildingName in bonusCosts) {
+      bonusCost = bonustCosts[buildingName];
+      bonusProd = bonustProds[buildingName];
+    }
 
     mapPlaced = false;
-    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "running": false, "prodCost": prodCost, "prodVal": prodVal, "state": "auction", "placed": false, "visible": true};
+    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "running": false, "prodCost": prodCost, "prodVal": prodVal, "state": "auction", "placed": false, "visible": true, "neighborNeed": neighborNeed, "bonusProd": bonusProd, "bonusCost": bonusCost};
     if (groupName == "auctions") {
       buildObj["auction"] = true;
     }
@@ -1353,12 +1373,24 @@ export const CellNeighbor = new ValidatedMethod({
   }
 });
 
+export const ResetMap = new ValidatedMethod({
+  name: 'map.reset',
+  validate ({}) {},
+  run({gameCode}) {
+    Resources.remove({"gameCode": gameCode});
+    Maps.remove({"gameCode": gameCode});
+    MakeMap.call({"gameCode": gameCode})
+  }
+})
+
 export const ResetResources = new ValidatedMethod({
   name: 'resources.reset',
   validate ({}) {},
   run({gameCode}) {
     Resources.remove({"gameCode": gameCode});
     Maps.update({"gameCode": gameCode}, {$unset: {"resource": "", "resId": ""}});
+    Maps.remove({"gameCode": gameCode});
+
   }
 })
 
@@ -1373,15 +1405,6 @@ export const ResetTeamResources = new ValidatedMethod({
       {$set: {"res": newres}},
       {multi: true});
 
-  }
-})
-
-export const ResetMap = new ValidatedMethod({
-  name: 'map.reset',
-  validate ({}) {},
-  run({gameCode}) {
-    Resources.remove({"gameCode": gameCode});
-    Maps.remove({"gameCode": gameCode});
   }
 })
 
@@ -1492,12 +1515,16 @@ export const MakeMap = new ValidatedMethod({
 
       for (res in resLocs) {
         resObj = {"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]};
-        await Resources.insert(resObj);
+        // await Resources.insert(resObj);
+        Resources.insert(resObj);
         thisRes = Resources.findOne(resObj);
+
         for (l in resLocs[res]) {
           // console.log(thisRes._id);
-          await Maps.update (
-            {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
+          mapid = "x" + resLocs[res][l][0] + "y" + resLocs[res][l][1] + "g" + gameCode
+          Maps.update (
+            // {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
+            {"_id": mapid}, 
             {$set: {"resource": thisRes, "resId": thisRes["_id"]}}, 
             {upsert: true});
         }
@@ -1517,19 +1544,36 @@ export const MakeMap = new ValidatedMethod({
       var endY = thisY + height;
       console.log(thisX + " " + thisY + " " + endX + " " + endY);
 
-      for (thisX; thisX < endX; thisX += 1){
+      for (thisX; thisX < endX; thisX += 1) {
         for (thisY = corner[1]; thisY < endY; thisY += 1) {
           console.log(thisX + " " + thisY);
-          await Maps.update(
-            {$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]}, 
-            {$set: {"owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
-            {upsert: true}
+          mapid = "emptyempty";
+          mapObj = Maps.findOne({$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]});
+          // await Maps.update(
+          //   {$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]}, 
+          //   {$set: {"owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
+          //   {upsert: true},
+          //   {multi: true}
+          // );
+          // console.log(mapObj);
+          // if (mapObj != undefined) {
+          //   console.log("map location found");
+          //   mapid = mapObj["_id"];
+
+          // }
+          mapid = "x" + thisX + "y" + thisY + "g" + gameCode;
+          Maps.update(
+            // {$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]}, 
+            {"_id": mapid},
+            {$set: {"_id": mapid, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame}}, 
+            {upsert: true},
+            {multi: true}
           );
         }
         console.log(thisX);
       }
-
-    }
+    return true;
+  }
 
     async function mapSetup(gameCode) {
       corners = [[1, 1], [9, 0], [12, 6], [12, 12], [2, 12]];
@@ -1543,19 +1587,18 @@ export const MakeMap = new ValidatedMethod({
         if (t < corners.length){
           await makeTeamCells(corners[t], dims[t], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
         }
-        await Games.update(
+        Games.update(
           {"_id": teams[t]["_id"]}, 
           {$set: {visibleCorner: visCorners[t], visibleDimensions: visDims[t]} }
         );
       }
-
-      Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, 
+      adminGame = Games.findOne({$and: [{"role": "admin"}, {"gameCode": gameCode}]});
+      Games.update({"_id": adminGame._id}, 
         {$set: {"visibleCorner": mapDims[0], "visibleDimensions": mapDims[1]} 
       });
-        
-
-
+       
       await seedResources (gameCode);
+      return true;
     }
 
     mapSetup(gameCode);

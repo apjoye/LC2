@@ -1,4 +1,5 @@
 import './admin.html';
+import '../map/map.js';
 import '../gameList/gameList.js';
 // import '../map/map.js';
 import { Producers } from '/imports/api/links/links.js';
@@ -25,6 +26,7 @@ import { RunBids2 } from '/imports/api/links/methods.js';
 import { RunBuildings } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilds } from '/imports/api/links/methods.js';
+import { ResetMap } from '/imports/api/links/methods.js';
 import { ResetResources } from '/imports/api/links/methods.js';
 import { ResetTeamResources } from '/imports/api/links/methods.js';
 import { AsyncTest } from '/imports/api/links/methods.js';
@@ -434,12 +436,12 @@ Template.adminGame.events({
   },
 
   'click .resetMap'(event, instance) {
-    // ResetResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
-    //   if (err) {console.log(err);}
-    //   else {
-    //     console.log("resources reset!");
-    //   }
-    // })
+    ResetMap.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) {console.log(err);}
+      else {
+        console.log("reset!");
+      }
+    })
   },
 
   'click .resetTeamResources'(event, instance) {

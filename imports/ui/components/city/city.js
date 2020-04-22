@@ -1,4 +1,5 @@
 import './city.html';
+import '../map/map.js';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { Cities } from '/imports/api/links/links.js';
