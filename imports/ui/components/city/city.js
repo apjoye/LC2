@@ -235,11 +235,43 @@ Template.cityMap.onCreated(function helloOnCreated() {
   this.fullmap = new ReactiveVar({});
   this.game = new ReactiveVar({});
   this.buildings = new ReactiveVar({});
+  this.imageMode = new ReactiveVar(true);
+
+  mapTiles = {
+      "claymine": "../img/buildings/claymine.png",
+      "coppermine": "../img/buildings/coppermine.png",
+      "foodfarm": "../img/buildings/foodfarm.png",
+      "foodfishing": "../img/buildings/foodfishing.png",
+      "foodhunting": "../img/buildings/foodhunting.png",
+      "lumbercamp": "../img/buildings/lumbercamp.png",
+      "background": "../img/resources/grass.png",
+      "water": "../img/resources/river.png",
+      "woods": "../img/resources/woods.png",
+      "lumber": "../img/resources/woods.png",
+      "copper": "../img/resources/copperore.png",
+      "clay": "../img/resources/clayore.png",
+      "red-city": "../img/bg/red-city.png",
+      "yellow-city": "../img/bg/yellow-city.png",
+      "blue-city": "../img/bg/blue-city.png",
+      "green-city": "../img/bg/green-city.png",
+      "pink-city": "../img/bg/pink-city.png",
+    }
+    bgColors = {
+      "red-city": "rgba(255,0,0,0.2)",
+      "yellow-city": "rgba(255,255,0,0.2)",
+      "blue-city": "rgba(0,0,255,0.2)",
+      "green-city": "rgba(0,255,0,0.2)",
+      "pink-city": "rgba(255, 51, 153, 0.2)",
+    }
+
+    this.mapTiles = mapTiles;
+    this.bgColors = bgColors;
 });
 
 Template.cityMap.helpers({
   mapRows() {
-    //store map dimensions somewhere
+    mapTiles = Template.instance().mapTiles;
+    bgColors = Template.instance().bgColors;
     thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]});
     // console.log(thisGame);
     Template.instance().game.set(thisGame);
@@ -268,6 +300,8 @@ Template.cityMap.helpers({
       buildDict[buildings[b]["_id"]] = buildings[b];
     }
     // console.log(resDict);
+    
+    // console.log(map);
 
     for (m in map) {
       // if ("resource" in map[m]){
@@ -288,24 +322,35 @@ Template.cityMap.helpers({
           resMapDict[loc]["resource"] = resDict[map[m]["resId"]];
         }
       }
-      neighbs = [[-1, 0], [0, -1], [1, 0], [0, 1]]
-      for (n in neighbs) {
-        nx = map[m].x + neighbs[n][0];
-        ny = map[m].y + neighbs[n][1]
-        if (nx >= 0 && ny >= 0 && nx < endCornerX && ny < endCornerY) {
-          nloc = "x" + nx + "y" + ny;
-          if (!(nloc in resMapDict)) {
-            resMapDict[nloc] = {};
-          }
-          if (!("neighbors" in resMapDict[nloc])) {
-            resMapDict[nloc]["neighbors"] = [];
-            // console.log("given")
-          }
-          // console.log()
-          resMapDict[nloc]["neighbors"].push(resMapDict[loc]);
+    }
+    // console.log("neighbor ing up");
+    for (var i = cornerY; i < endCornerY; i++) {
+      for (var j = cornerX; j < endCornerX; j++) {
+        loc = "x" + j + "y" + i;
+        // console.log(loc);
+        neighbs = [[-1, 0], [0, -1], [1, 0], [0, 1]];
+        if (!(loc in resMapDict)) {
+          resMapDict[loc] = {};
         }
-       }
-      // }
+        if (!("neighbors" in resMapDict[loc])) {
+          resMapDict[loc]["neighbors"] = [];
+        }
+      }
+    }
+    for (var i = cornerY; i < endCornerY; i++) {
+      for (var j = cornerX; j < endCornerX; j++) {
+        loc = "x" + j + "y" + i;
+        for (n in neighbs) {
+          nx = j + neighbs[n][0];
+          ny = i + neighbs[n][1];
+          // if (nx >= 0 && ny >= 0 && nx < endCornerX && ny < endCornerY) {
+          if (nx >= cornerX && ny >= cornerY && nx < endCornerX && ny < endCornerY) {
+            nloc = "x" + nx + "y" + ny;
+            // console.log("adding " + nloc);
+            resMapDict[loc]["neighbors"].push(resMapDict[nloc]);
+          }
+        }
+      }
     }
 
     resMapDict[""] = {};
@@ -320,20 +365,30 @@ Template.cityMap.helpers({
       thisRow = [];
       for (var j = cornerX; j < endCornerX; j++) {
         loc = "x" + j + "y" + i;
+        rowCol = {};
+        rowCol["image"] = mapTiles["background"];
+        rowCol["text"] = "";
+        rowCol["bgColor"] = "";
+
         if (loc in resMapDict) {
-          rowCol = {};
           rowCol["loc"] = loc;
-          rowCol["attributes"] = "";
+
           if ("owner" in resMapDict[loc]) {
-            rowCol["attributes"] = "bgColor = \"red\"";
+            rowCol["image"] = "../img/bg/empty.png";
+            rowCol["bgColor"] = bgColors[resMapDict[loc]["owner"]];
+            if (loc == Template.instance().selectedLoc.get()){
+              rowCol["bgColor"][rowCol["bgColor"].indexOf(".")]
+            }
+            rowCol["text"] += JSON.stringify(resMapDict[loc]["owner"]);
           }
           rowCol["text"] = "";
           if ("resource" in resMapDict[loc]) {
+            rowCol["image"] = mapTiles[resMapDict[loc]["resource"]["kind"]];
             rowCol["text"] = JSON.stringify(resMapDict[loc]["resource"]["stats"]);
           }
           if ("building" in resMapDict[loc]) {
             // console.log(resMapDict[loc]["building"]["kind"]);
-            rowCol["imageSource"] = mapTiles[resMapDict[loc]["building"]["name"]];
+            rowCol["image"] = mapTiles[resMapDict[loc]["building"]["name"]];
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
 
             if ("neighboringResource" in resMapDict[loc]["building"]) {
@@ -344,11 +399,9 @@ Template.cityMap.helpers({
               rowCol["text"] += " running ";
             }
             else {
+              rowCol["image"] = rowCol["image"].substr(0,rowCol["image"].indexOf(".png")) + "_g.png"
               rowCol["text"] += " idle ";
             }
-          }
-          if ("owner" in resMapDict[loc]) {
-            rowCol["text"] += JSON.stringify(resMapDict[loc]["owner"]);
           }
           thisRow.push(rowCol);
         }
@@ -367,6 +420,11 @@ Template.cityMap.helpers({
     // console.log(Meteor.userId());
     bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
     // console.log(Buildings.find().fetch());
+    bb = bb.fetch();
+
+    for (b in bb) {
+      bb[b]["image"] = this.mapTiles[bb[b]["name"]];
+    }
     return bb;
   },
 
@@ -376,6 +434,7 @@ Template.cityMap.helpers({
     loc = Template.instance().selectedLoc.get();
     mapSelect = map[loc];
     placeMode = false;
+    placable = false;
     // console.log(mapSelect);
     if (mapSelect == "" || mapSelect == {} || mapSelect == undefined) {}
     else {
@@ -391,12 +450,36 @@ Template.cityMap.helpers({
     // console.log(building.name in buyingBuilds);
     // console.log(placeMode);
     // console.log(building.name in buyingBuilds && placeMode);
-    if (buyingBuilds.indexOf(building.name) >= 0 && placeMode) {
-      return true;
+
+    console.log(mapSelect.neighbors);
+    // console.log(building);
+    nc = mapSelect["neighbors"]
+    if (placeMode) {
+      nn = building["neighborNeed"]["resources"];
+      if (nn.length > 0) {
+        placable = false;
+        for (n in nn) {
+          for (c in nc) {
+            if ("resource"in nc[c]) {
+              if (nc[c]["resource"]["kind"] == nn[n]) {
+                placable = true;
+              }
+            }
+          }
+        }
+      }
+      else {
+        placable = true;
+      }
+      
     }
-    else {
-      return false;
-    }
+    return placable;
+    // if (buyingBuilds.indexOf(building.name) >= 0 && placeMode) {
+    //   return true;
+    // }
+    // else {
+    //   return false;
+    // }
   },
 
   currentBuilding() {
@@ -436,14 +519,23 @@ Template.cityMap.helpers({
     // console.log(mapSelect);
     // console.log(boxContent);
     return boxContent;
+  },
+
+  imageMode() {
+    return Template.instance().imageMode.get();
   }
 
 });
 
 Template.cityMap.events({
+  'click .toggleImages' (event, instance) {
+    console.log(Template.instance().imageMode.get());
+    Template.instance().imageMode.set(!Template.instance().imageMode.get());
+  },
   'click .mapCell' (event, instance) {
     event.preventDefault();
-    loc = event.target.classList[1];
+    // loc = event.target.classList[1];
+    loc = event.target.classList[2];
     // instance.selectedLoc.set(event.target.id);
     instance.selectedLoc.set(loc);
     console.log(loc);

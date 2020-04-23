@@ -170,9 +170,9 @@ Template.gameMap.helpers({
             rowCol["image"] = "../img/bg/empty.png";
             // rowCol["attributes"] = "bgColor = \"red\"";
             rowCol["bgColor"] = bgColors[resMapDict[loc]["owner"]];
-            console.log(resMapDict[loc]["owner"]);
+            // console.log(resMapDict[loc]["owner"]);
             // console.log(bgColors);
-            console.log(rowCol["bgColor"]);
+            // console.log(rowCol["bgColor"]);
           }
           rowCol["text"] = "";
           if ("resource" in resMapDict[loc]) {
