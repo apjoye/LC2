@@ -238,6 +238,7 @@
 <template name="gameMap">
   <button type="button" class="toggleImages btn btn-default"> Toggle Images </button>
   <p></p>
+  <div gameMapchart-table>
   <table id = "gameMapTable">
     {{#each mapRows}}
     <tr>
@@ -258,6 +259,53 @@
     </tr>
     {{/each}}
   </table>
+  <div class="status-chart">
+  {{#if imageMode}}
+    <div class="red-city-status">
+      <p>Population:</p>
+      <p>Wealth:</p>
+      <p>Pollution:</p>
+      <p>Other Info:</p>
+    </div>
+    <div class="yellow-city-status">
+      <p>Population:</p>
+      <p>Wealth:</p>
+      <p>Pollution:</p>
+      <p>Other Info:</p>
+    </div>
+    <div class="blue-city-status">
+      <p>Population:</p>
+      <p>Wealth:</p>
+      <p>Pollution:</p>
+      <p>Other Info:</p>
+    </div>
+    <div class="green-city-status">
+      <p>Population:</p>
+      <p>Wealth:</p>
+      <p>Pollution:</p>
+      <p>Other Info:</p>
+    </div>
+    <div class="pink-city-status">
+      <p>Population:</p>
+      <p>Wealth:</p>
+      <p>Pollution:</p>
+      <p>Other Info:</p>
+    </div>
+    <div class="clay-left-status">
+      <p>Clay</p>
+      <p>Deposit:</p>
+    </div>
+    <div class="clay-right-status">
+      <p>Clay</p>
+      <p>Deposit:</p>
+    </div>
+    <div class="river-status">
+      <p>Fish:</p>
+      <p>Pollution:</p>
+    </div>
+    {{/if}}
+  </div>
+</div>
 </template>
 
 <!-- <template name="adminGames">

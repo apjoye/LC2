@@ -238,5 +238,53 @@ body {
 .boughtBuilding{
 	flex-shrink: 0;
 }
-
- 
+.gameMapchart-table{
+	position: relative;
+}
+.status-chart{
+	position: absolute;
+	top: 8px;
+}
+.red-city-status{
+	position: absolute;
+	top:800px;
+	left: 75px;
+}
+.yellow-city-status{
+	position: absolute;
+	top:1465px;
+	left: 135px;
+}
+.blue-city-status{
+	position: absolute;
+	top:1465px;
+	left: 740px;
+}
+.green-city-status{
+	position: absolute;
+	top:735px;
+	left: 565px;
+}
+.pink-city-status{
+	position: absolute;
+	top:1100px;
+	left: 740px;
+}
+.clay-left-status{
+	position: absolute;
+	top: 1025px;
+	left: 200px;
+	background-color:white;
+}
+.clay-right-status{
+	position: absolute;
+	top: 1330px;
+	left: 860px;
+	background-color:white;
+}
+.river-status{
+	position: absolute;
+	top: 1200px;
+	left: 325px;
+	background-color:white;
+}
