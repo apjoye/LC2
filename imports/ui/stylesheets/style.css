@@ -251,6 +251,11 @@ body {
 	width: 100px;
 }
 
+.resStatBox{
+	height: 50px;
+	min-width: 100px;
+}
+
 .red-city-status{
 	position: absolute;
 	top:800px;

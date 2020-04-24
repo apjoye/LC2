@@ -21,6 +21,7 @@ import { ConsumeResources } from '/imports/api/links/methods.js';
 import { SpawnFactories } from '/imports/api/links/methods.js';
 
 import { MakeMap } from '/imports/api/links/methods.js';
+import { BuildingToAuction } from '/imports/api/links/methods.js';
 import { RunBids2 } from '/imports/api/links/methods.js';
 import { RunBuildings } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';
@@ -423,6 +424,16 @@ Template.adminGame.events({
     ResetAll.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) {console.log(err);}
     });
+  },
+
+  'click .addAuction'(event, instance) {
+    console.log("adding building to auction");
+    BuildingToAuction.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+      if (err) { console.log(err); }
+      else {
+        console.log("buildings run!");
+      }
+    })
   },
 
   'click .runBids'(event, instance) {

@@ -423,10 +423,12 @@ Template.cityMap.helpers({
     // console.log(Meteor.userId());
     bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
     // console.log(Buildings.find().fetch());
+    mapTiles = Template.instance().mapTiles
     bb = bb.fetch();
 
     for (b in bb) {
-      bb[b]["image"] = this.mapTiles[bb[b]["name"]];
+      // console.log(bb[b]);
+      bb[b]["image"] = mapTiles[bb[b]["name"]];
     }
     return bb;
   },
@@ -504,8 +506,9 @@ Template.cityMap.helpers({
             pcText += pc + ": " + pcs[pc] + " ";
           }
         }
-        boxContent["text"].push("Uses: " + JSON.stringify(pcText));
-        boxContent["text"].push("Produces: " + JSON.stringify(mapSelect["building"]["prodVal"]));
+        // boxContent["text"].push("Uses: " + JSON.stringify(pcText));
+        // boxContent["text"].push("Produces: " + JSON.stringify(mapSelect["building"]["prodVal"]));
+        boxContent["text"].push(JSON.stringify(mapSelect["building"]["infoText"]));
         if ("neighboringResource" in mapSelect["building"] && "neighborBonus" in mapSelect["building"]) {
           boxContent["text"].push(" Resource nearby, bonus production possible! ");
         }

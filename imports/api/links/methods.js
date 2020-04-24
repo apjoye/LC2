@@ -1563,6 +1563,18 @@ export const JoinGame = new ValidatedMethod({
   }
 });
 
+export const BuildingToAuction = new ValidatedMethod({
+  name: 'bid.add',
+  validate ({}) {},
+  run({gameCode}) {
+    bidKinds = ["clay", "copper", "food", "lumber"];
+    randomBk = bidKinds[Math.floor(Math.random() * bidKinds.length)];
+    buildNames = ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
+    randomBuild = buildNames[Math.floor(Math.random() * buildNames.length)];
+    AddBuilding.call({"gameCode": gameCode, "locx": -1, "locy": 0, "bidKind": randomBk, "buildingName": randomBuild, "groupName": "auctions"});
+    // run({gameCode, locx, locy, bidKind, buildingName, groupName}) {
+  }
+});
 
 export const MakeBid2 = new ValidatedMethod({
   name: 'bid2.make',
