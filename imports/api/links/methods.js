@@ -736,6 +736,10 @@ export const RunBuildings = new ValidatedMethod({
               affordable = true;
               nresuse = true;
             }
+            else {
+              affordable = false;
+              console.log("neighboring needed resource is out of stock");
+            }
           }
           else {
             affordable = false;
@@ -773,11 +777,14 @@ export const RunBuildings = new ValidatedMethod({
                 neighbUse = true;
                 newnres[building["neighborUse"]["res"]] -= building["neighborUse"]["amount"];
               }
+              else {
+
+              }
             }
             if ("neighborAffect" in building) {
               //currently assuming neighbor affect is only pollution
               if ("pollution" in newnres){
-                newnres["pollution"] += [building["neighborAffect"]["pollution"]];
+                newnres["pollution"] += building["neighborAffect"]["pollution"];
               }
               else {
                 console.log("this neighboring affect was gonna receive some pollution but it doesn't have the pollution stat? ugh");
@@ -824,6 +831,8 @@ export const RunBuildings = new ValidatedMethod({
 
     async function runThroughBuilds(buildings) {
       // gameTeams = {};
+      await Games.update({$and: [{"gameCode": buildings[0].gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
+
       for (b in buildings) {
         bb = buildings[b];
 
@@ -832,6 +841,7 @@ export const RunBuildings = new ValidatedMethod({
             // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
             try {
               console.log("calling eat and make");
+              console.log(bb);
               await EatAndMake(bb["ownerGame"], bb);
             }
             catch (err) {
@@ -844,8 +854,7 @@ export const RunBuildings = new ValidatedMethod({
         // console.log(bb["kind"]);
       }
     }
-    Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multiple: true});
-    
+    Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
     buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
     runThroughBuilds(buildings);
   }
@@ -873,7 +882,8 @@ export const BuildingNeighbors = new ValidatedMethod ({
             res = Resources.findOne({"_id": neighbors[n]["resId"]});
             console.log(res["stats"]);
             console.log(nres);
-            if (Object.keys(res["stats"]).indexOf(nres) > -1) {
+            // if (Object.keys(res["stats"]).indexOf(nres) > -1 || res["kind"] == nres) {
+            if (res["kind"] == nres) { 
               console.log("ore found!");
               // add bonus resource output here;
               Buildings.update(
@@ -964,7 +974,7 @@ export const AddBuilding = new ValidatedMethod({
     };
 
     var neighborAffects = {
-      "foodfarm": {"pollution": 2},
+      "foodfarm": {"pollution": 2}
     }
 
     var bonusProds = {
@@ -1144,10 +1154,10 @@ export const ResetTeamResources = new ValidatedMethod({
   validate ({}) {},
   run({gameCode}) {
     newres = {"lumber": 8, "clay": 8, "copper": 8, "food": 8};
-    metrics = {"pollution": 2, "population": 5, "happiness": 5};
     Games.update(
       {$and: [{"gameCode": gameCode}, {"role": "base"}]},
-      {$set: {"res": newres, metrics}},
+      {$set: {"res": newres, 
+        "pollution": 2, "population": 5, "happiness": 5, "roundEmployed": 0}},
       {multi: true});
 
   }
@@ -1340,10 +1350,11 @@ export const MakeMap = new ValidatedMethod({
 
 
       await seedResources (gameCode);
+      // SetTheme.call({"gameCode": gameCode});
     }
 
     mapSetup(gameCode);
-    SetTheme.call({"gameCode": gameCode});
+    
 
     //place an ore
     // Resources.insert({"gameCode": gameCode, "category": "ore", "kind": "m1", "name": "Gold Ore"});
