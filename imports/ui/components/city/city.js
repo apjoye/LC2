@@ -290,7 +290,8 @@ Template.cityMap.helpers({
     resMapDict = {};
     resDict = {};
     buildDict = {};
-    mapTiles = thisGame.mapTiles;
+    // mapTiles = thisGame.mapTiles;
+    // mapTiles = this.mapTiles;
     // console.log(mapTiles);
 
     for (r in resources) {

@@ -73,9 +73,10 @@ Template.makeGame.helpers({
 
 Template.gameMap.onCreated(function helloOnCreated() {
   Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('games.users',  FlowRouter.getParam('gameCode'));
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
-  this.imageMode = new ReactiveVar(false);
+  this.imageMode = new ReactiveVar(true);
 });
 
 Template.gameMap.helpers({
@@ -219,6 +220,33 @@ Template.gameMap.helpers({
     }
     // console.log(rows);
     return rows;
+  },
+
+  cityStats() {
+    cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
+    stats = [];
+    for (c in cities) {
+      cities[c]["className"] = cities[c]["group"] + "-status";
+      stats.push(cities[c]);
+      // stats[cities[c]["group"]] = cities[c];
+      // stats[cities[c]["group"]]["className"] = cities[c]["group"] + "-status";
+    }
+    console.log(stats);
+    return stats;
+  },
+
+  resStats() {
+    res = Resources.find({"gameCode": FlowRouter.getParam('gameCode')}).fetch();
+    stats = [];
+    for (r in res) {
+      res[r]["className"] = res[r]["name"] + "-status";
+      res[r]["statList"] = [];
+      for (s in res[r]["stats"]) {
+        res[r]["statList"].push({"name": s, "amount": res[r]["stats"][s]});
+      }
+      stats.push(res[r]);
+    }
+    return stats;
   },
 
   imageMode() {

@@ -1354,6 +1354,7 @@ export const MakeMap = new ValidatedMethod({
     }
 
     mapSetup(gameCode);
+    SetTheme.call({"gameCode": gameCode});
     
 
     //place an ore

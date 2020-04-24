@@ -264,48 +264,39 @@
   </table>
   <div class="status-chart">
   {{#if imageMode}}
-    <div class="red-city-status">
-      <p>Population:</p>
-      <p>Wealth:</p>
-      <p>Pollution:</p>
-      <p>Other Info:</p>
-    </div>
-    <div class="yellow-city-status">
-      <p>Population:</p>
-      <p>Wealth:</p>
-      <p>Pollution:</p>
-      <p>Other Info:</p>
-    </div>
-    <div class="blue-city-status">
-      <p>Population:</p>
-      <p>Wealth:</p>
-      <p>Pollution:</p>
-      <p>Other Info:</p>
-    </div>
-    <div class="green-city-status">
-      <p>Population:</p>
-      <p>Wealth:</p>
-      <p>Pollution:</p>
-      <p>Other Info:</p>
-    </div>
-    <div class="pink-city-status">
-      <p>Population:</p>
-      <p>Wealth:</p>
-      <p>Pollution:</p>
-      <p>Other Info:</p>
-    </div>
-    <div class="clay-left-status">
-      <p>Clay</p>
-      <p>Deposit:</p>
+
+    {{#each cityStats}}
+      <div class="{{this.className}} cityStatBox">
+        <p>Pop:{{this.population}}</p>
+        <p>Happ: {{this.happiness}}</p>
+        <p>Poll: {{this.pollution}}</p>
+      </div>
+    {{/each}}
+
+    {{#each resStats}}
+      <div class="{{this.className}} resStatBox">
+        {{#each s in this.statList}}
+          <p>{{s.name}}: {{s.amount}}</p>
+        {{/each}}
+        <!-- <p>Happ: {{this.happiness}}</p>
+        <p>Poll: {{this.pollution}}</p> -->
+      </div>
+    {{/each}}
+    
+    <!-- <div class="clay-left-status">
+      <p>Clay: </p>
     </div>
     <div class="clay-right-status">
       <p>Clay</p>
-      <p>Deposit:</p>
     </div>
-    <div class="river-status">
-      <p>Fish:</p>
-      <p>Pollution:</p>
+    <div class="woods1-status">
+      <p>Woods:</p>
+      <p>Animals:</p>
     </div>
+    <div class="woods2-status">
+      <p>Woods:</p>
+      <p>Animals:</p>
+    </div> -->
     {{/if}}
   </div>
 </div>
