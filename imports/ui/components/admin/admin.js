@@ -247,7 +247,10 @@ Template.gameMap.events({
 });
 
 Template.adminGame.onCreated(function helloOnCreated() {
-  Meteor.subscribe('games.minerunning');
+  Meteor.subscribe('games.users', FlowRouter.getParam('gameCode'));
+  // Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
+  // Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
+  // Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
 });
 
 Template.adminGame.helpers({
@@ -405,7 +408,7 @@ Template.adminGame.events({
     })
   },
 
-  'click .runBuilds'(event, instance) {
+  'click .runBuildings'(event, instance) {
     console.log("run buildings");
     RunBuildings.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
       if (err) { console.log(err); }

@@ -345,43 +345,9 @@ export const ToggleBuilding = new ValidatedMethod({
       "baseId": ownerId,
       "changed": changed
     });
-    //***TODO: add game code, groupId, groupName
   }
 });
 
-export const ToggleFactory = new ValidatedMethod({
-  name: 'producers.toggle',
-  validate ({}) {},
-
-  run ({producerId, currentStatus, gameCode, baseId}) {
-    // Producers.find()
-    thisGame = Games.findOne({$and: [{"playerId": baseId}, {"gameCode": gameCode}, {"status": "running"}, {"role": "base"}]});
-    runners = Producers.find({$and: [{"running": true}, {"gameCode": gameCode}, {"owned": true}, {"ownerId": baseId}]}).fetch();
-    newStatus = currentStatus;
-    changed = false;
-    if (runners.length < thisGame.population && currentStatus == false) {
-      newStatus = true;
-      changed = true;
-    }
-    if (currentStatus == true) {
-      newStatus = false;
-      changed = true;
-    }
-
-    Producers.update({"_id": producerId}, {$set: {"running": newStatus}});
-    Acts.insert({
-      "time": (new Date()).getTime(),
-      "key": "factoryToggle",
-      "producerId": producerId,
-      "pastStatus": currentStatus,
-      "newStatus": newStatus,
-      "gameCode": gameCode,
-      "baseId": baseId,
-      "changed": changed
-    });
-
-  }
-});
 
 export const MakeLog = new ValidatedMethod({
   name: 'logs.add',
@@ -391,152 +357,6 @@ export const MakeLog = new ValidatedMethod({
     log["key"] = key;
     log["time"] = (new Date()).getTime();
     Acts.insert(log);
-  }
-});
-
-//OLD CONSUME
-export const ConsumeResources = new ValidatedMethod({
-  name: 'producers.consume',
-  validate ({}) {},
-
-  run ({gameCode}) {
-    // city = Cities.findOne({"name": prod["owner"]});
-    if (!this.isSimulation){
-      admin = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
-      
-      if ("year" in admin) { currYear = admin.year; }
-      else { currYear = 1; }
-
-      allBases = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch();
-      // ResetFactoryNotes.call({gameCode});
-
-      for (b in allBases){
-        base = allBases[b];
-        res = base.res;
-        newpoll = parseInt(base.pollution);
-        newpop = parseInt(base.population);
-        newhapp = parseInt(base.happiness);
-        workers = newpop;
-        freshFactCount = {"m1": 0, "m2": 0, "f1": 0, "f2": 0, "p1": 0, "p2": 0};
-        // factCount = city.factoryCount;
-        parks = 0;
-        roundNotes = base.roundNotes;
-        if (roundNotes == undefined) {
-          roundNotes = [];
-        }
-        // console.log("base " + base.playerId);
-        // console.log(Producers.find({"owned": true}).fetch());
-        allProds = Producers.find({$and: [{"gameCode": gameCode}, {"owned": true}, {"ownerId": base.playerId}, {"running": true}]}).fetch();
-        affordableProds = [];
-        // console.log(allProds);
-        for (p in allProds){
-          prod = allProds[p];
-          if (workers > 0){
-            
-            affordable = true;
-            for (r in prod.prodCosts) {
-              if ((res[r] -  prod.prodCosts[r]) < 0) {
-                affordable = false;
-              }
-            }
-
-            // console.log(affordable + " " + prod._id);
-            if (affordable == true) {
-              for (r in prod.prodCosts) {
-                res[r] -= prod.prodCosts[r];
-              }
-              for (r in prod.prodValues) {
-                if (r != "pollution"){
-                  res[r] += Math.round(prod.prodValues[r]);
-                }
-                else {
-                  newpoll = newpoll + prod.prodValues[r];
-                }
-              }
-              Producers.update({_id: prod._id}, {$set: {"roundNotes": ["Run successful!"], "roundRun": true}}, {multi: false});
-            }
-            else {
-              dur = prod.durability + 1;
-              Producers.update({_id: prod._id}, {$set: {"durability": dur, "roundNotes": ["Lack of resources to run!"], "roundRun": true}}, {multi: false});
-            }
-            freshFactCount[prod.kind] += 1;
-            if (prod.kind == "p1" || prod.kind == "p2") {
-              parks += 1;
-            }
-            workers = workers - 1;
-          }
-          else {
-            Producers.update({_id: prod._id}, {$set: {"running": false, "roundNotes": ["Lack of people to run!"], "roundRun": true}}, {multi: false});
-          }
-        }
-
-        var availFood = res.f1 + (res.f2*1.0);
-        var foodToPoll = availFood;
-        if (newpoll > 0) {
-          foodToPoll = foodToPoll / newpoll;
-        }
-
-        // roundNotes.push("food: " + availFood);
-
-        if (foodToPoll > 2) {
-          newpop = newpop + 1;
-          roundNotes.push("Your people are well fed, your city is growing!");
-        }
-
-        else if (foodToPoll < 0.7) {
-          newpop = newpop - 1;
-          roundNotes.push("Your people are starving, your city is shrinking!");
-        }
-
-        var parksToPop = (parks * 1.0);
-        if (newpop > 0){
-          parksToPop = parksToPop / newpop;
-          if (parksToPop  <= 0.2) {
-            newhapp -= 1;          
-            roundNotes.push("Your lack of parks is making people sad");
-          }
-          else if (parksToPop >= 0.4) {
-            newhapp += 1;
-            roundNotes.push("Your parks bring joy!");
-          }
-        }
-        else {
-          newhapp = 1;
-          roundNotes.push("No people! Defaulting to 1 happiness");
-        }
-
-        // roundNotes.push("parks to population ratio:  " + parksToPop);
-
-        if (newhapp < 0) {
-          newpop = newpop - 1;
-          roundNotes.push("Your city is too depressing, people don't want to live there!");
-        }
-        if (newhapp < 0) { newhapp = 0; }
-        if (newpoll < 0) { newpoll = 0; }
-        if (newpop < 0) { newpop = 0; }
-
-        newStats = {
-          "res": res,
-          "pollution": newpoll,
-          "happiness": newhapp,
-          "population": newpop,
-          "roundNotes": roundNotes,
-          "year": (currYear + 1)
-        }
-        Games.update({"_id": base._id}, {$set: newStats});
-        newStats["baseID"] = base._id;
-        MakeLog.call({"key": "cityUpdate", "log": newStats})
-        
-      }
-      console.log(currYear);
-      Games.update({$and: [ {"gameCode": admin.gameCode}]}, {$set: {"year": (currYear + 1)}});
-      Games.update({"_id": admin._id}, {$set: {"phase": "pre-bid"}})
-      console.log("finishing round end");
-
-      // change game phase
-
-      return true;
-    }
   }
 });
 
@@ -882,7 +702,7 @@ export const RunBuildings = new ValidatedMethod({
     
     // console.log("runnning buildings");
     async function EatAndMake(gameId, building) {
-        //enter ore use mode if ore found
+      //enter ore use mode if ore found
 
       //produce with presence of ore (i.e. more pollution, and if possible, more metal)
       // console.log("entering eat and make");
@@ -895,17 +715,32 @@ export const RunBuildings = new ValidatedMethod({
       roundEmployed = 0;
       running = false
       if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
-
+      console.log("employed " + roundEmployed);
       if (!("notes" in thisGame)) {
         thisGame["notes"] = [];
       }
 
       if (roundEmployed < thisGame["population"]) {
+        // console.log("we have employees!");
         for (r in building["prodCost"]) {
           if (building["prodCost"][r] > newRes[r]) {
             affordable = false;
           }
           newRes[r] = newRes[r] - building["prodCost"][r];
+        }
+        //neighborNeeds specifies requirement which restricts  placement
+        if ("neighborNeed" in building) {
+          if ("neighboringResource" in building) {
+            nres =  Resources.findOne({"_id": building["neighboringResource"]});
+            if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
+              affordable = true;
+              nresuse = true;
+            }
+          }
+          else {
+            affordable = false;
+            console.log("this building needed a neighbor to run and also be placed but doesn't have it?!?!? please fix")
+          }
         }
         if (affordable == false) {
           newRes[r] = thisGame["res"];
@@ -921,47 +756,69 @@ export const RunBuildings = new ValidatedMethod({
           thisGame["notes"].push(building.name + " ran successfully!")
           usingResource = false;
           console.log("consumed stuff, checking out neighboring resources");
-          if ("neighboringResource" in building && ["farm"].indexOf(building["buildFeatures"]["buildKind"]) == -1) {
-            console.log("mine and neighboring resource found");
-            mineres = building["buildFeatures"]["resUse"];
+
+          //neighborUses gets used, if neighboring resource is present. Either by neighborneed or bonus mode
+            //bonusProds is the extra production that happens is neighborUse succeeds
+          //neighborAffect affects the neigboring resource
+
+          if ("neighboringResource" in building) {
             nres =  Resources.findOne({"_id": building["neighboringResource"]});
-
-            newval = nres["stats"][mineres];
-            if (newval > 0) { 
-              //***TODO: make the resource use different depending on resource and mine
-              newval = newval - 1; 
-              statField = nres["stats"];
-              statField[mineres] = newval;
-              usingResource = true;
-              await Resources.update({"_id": nres._id}, {$set: {stats: statField}});
+            newnres = nres["stats"];
+            neighbUse = false;
+            console.log("found a neighboring resource");
+            if ("neighborUse" in building) {
+              console.log("gonna use a neighboring resource " + JSON.stringify(nres) + " " + JSON.stringify(building["neighborUse"]));
+              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
+                console.log("neighboring resource available")
+                neighbUse = true;
+                newnres[building["neighborUse"]["res"]] -= building["neighborUse"]["amount"];
+              }
             }
-            console.log(nres + " " + statField + " " + newval);
-          }
-
-          if ((usingResource == false) && ["fishing", "hunting"].indexOf((building["buildFeatures"]["buildKind"])) > -1) {
-            console.log("neighboring resource was empty!");
-          } 
-          else {
-            console.log("making the worth");
-            for (r in building["prodVal"]) {
-              if (r != "pollution"){
-                newRes[r] = newRes[r] + building["prodVal"][r];
+            if ("neighborAffect" in building) {
+              //currently assuming neighbor affect is only pollution
+              if ("pollution" in newnres){
+                newnres["pollution"] += [building["neighborAffect"]["pollution"]];
               }
               else {
-                newPoll = newPoll + building["prodVal"]["pollution"];
+                console.log("this neighboring affect was gonna receive some pollution but it doesn't have the pollution stat? ugh");
               }
             }
+
+            if ("neighborBonus" in building) {
+              console.log("bonus mode attempt");
+              if ("pollution" in building["bonusProd"]){
+                newPoll += building["bonusProd"]["pollution"];
+              }
+              if (neighbUse == true) {
+                console.log("bonus mode resource use was affordable!")
+                newRes[building["bonusProd"]["res"]] += building["bonusProd"]["amount"];
+              } 
+            }
+            console.log(building["neighboringResource"]);
+            console.log(newnres);
+            await Resources.update({"_id": building["neighboringResource"]}, {$set: {stats: newnres}});
           }
+          console.log("making the worth");
+          for (r in building["prodVal"]) {
+            if (r != "pollution"){
+              newRes[r] = newRes[r] + building["prodVal"][r];
+            }
+            else {
+              newPoll = newPoll + building["prodVal"]["pollution"];
+            }
+          }
+          // }
           // return true;
         }
       }
       else {
         // running = false;
+        console.log(building.name + " did not run cause out of people");
         thisGame["notes"].push(building.name + " did not run cause out of people");
 
       }
-      // console.log("trying to update game");
-      await Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
+      console.log("trying to update game");
+      Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
 
     }
 
@@ -987,7 +844,8 @@ export const RunBuildings = new ValidatedMethod({
         // console.log(bb["kind"]);
       }
     }
-
+    Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multiple: true});
+    
     buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
     runThroughBuilds(buildings);
   }
@@ -998,28 +856,36 @@ export const BuildingNeighbors = new ValidatedMethod ({
   validate ({}) {},
   run({gameCode, building}) { 
     neighbors = CellNeighbor.call({"gameCode": gameCode, "location": building["location"]});
-    for (n in neighbors) {
-      if (neighbors[n] != undefined) {
-        if ("resId" in neighbors[n]) {
-          res = Resources.findOne({"_id": neighbors[n]["resId"]});
-          // console.log(building["buildFeatures"]["resUse"]);
-          // console.log(Object.keys(res["stats"]));
-          // console.log(building["buildFeatures"]["resUse"] in Object.keys(res["stats"]));
-          if (Object.keys(res["stats"]).indexOf(building["buildFeatures"]["resUse"]) > -1) {
-            console.log("ore found!");
-            // add bonus resource output here;
-            Buildings.update({"_id": building["_id"]}, {$set: {"neighboringResource": res["_id"]}});
+    console.log(building);
+    console.log("trying to add building neighbors");
+    // neighborBonus
+    if ("neighborBonus" in building || "neighborNeed" in building) {
+      console.log("looking to add neighbors info");
+      if ("neighborBonus" in building){
+        nres = building["neighborBonus"]["resources"];
+      }
+      else if ("neighborNeed" in  building) {
+        nres = building["neighborNeed"]["resources"];
+      }
+      for (n in neighbors) {
+        if (neighbors[n] != undefined) {
+          if ("resId" in neighbors[n]) {
+            res = Resources.findOne({"_id": neighbors[n]["resId"]});
+            console.log(res["stats"]);
+            console.log(nres);
+            if (Object.keys(res["stats"]).indexOf(nres) > -1) {
+              console.log("ore found!");
+              // add bonus resource output here;
+              Buildings.update(
+                {"_id": building["_id"]}, 
+                {$set: {
+                  "neighboringResource": res["_id"],
+                  "status": ["bonus mode"]
+                }
+              });
+            }
           }
-          // else if (res["kind"] == building["buildFeatures"]["resKind"]) {
-          //   console.log("ore found!");
-          
-          //   Buildings.update({"_id": building["_id"]}, {$set: {"neighboringResource": res["_id"]}});
-          // }
         }
-        // if ("buildingId" in neighbors[n]) {
-        //   build = Buildings.findOne({"_id": neighbors[n]["buildingId"]});
-        //   neighbors[n]["building"] = build;
-        // }
       }
     }
   }
@@ -1063,9 +929,9 @@ export const AddBuilding = new ValidatedMethod({
       "claymine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
       "coppermine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
       "foodfarm": { "lumber": 1, "clay" : 1, "copper": 0, "food": 0 },
-      "foodfishing": { "lumber": 1, "clay" : 0, "copper": 1, "food": 0 },
+      "foodfishing": { "lumber": 0, "clay" : 0, "copper": 1, "food": 0 },
       "foodhunting": { "lumber": 0, "clay" : 0, "copper": 0, "food": 0 },
-      "lumbercamp": { "lumber": 0, "clay" : 1, "copper": 1, "food": 0 }
+      "lumbercamp": { "lumber": 0, "clay" : 1, "copper": 0, "food": 0 }
     };
 
     var prodVals = {
@@ -1077,44 +943,71 @@ export const AddBuilding = new ValidatedMethod({
       "lumbercamp": {"lumber": 8}
     };
 
+    var neighborBonuses = {
+     "claymine": {"resources": "clay", "buildings": []},
+      "coppermine": {"resources": "copper", "buildings": []},
+      "foodfarm": {"resources": "water", "buildings": []},
+    }
     var neighborNeeds = {
-      "claymine": {"resources": [], "buildings": []},
-      "coppermine": {"resources": [], "buildings": []},
-      "foodfarm": {"resources": [], "buildings": []},
-      "foodfishing": {"resources": ["water"], "buildings": []},
-      "foodhunting": {"resources": ["lumber"], "buildings": []},
-      "lumbercamp": {"resources": ["lumber"], "buildings": []}
+      "foodfishing": {"resources": "water", "buildings": []},
+      "foodhunting": {"resources": "lumber", "buildings": []},
+      "lumbercamp": {"resources": "lumber", "buildings": []}
     };
 
-    var bonusProds = {
-      "claymine":  {"clay": 8, "pollution": 3} ,
-      "coppermine": {"copper": 8, "pollution": 3}
-      // "foodfarm": {"production": {"food": 5} },
-      // "foodfishing": {"food": 3} ,
-      // "foodhunting": {"food": 8},
-      // "lumbercamp": {"lumber": 8}
+
+    var neighborUses = {
+      "claymine":  {"res": "clay", "amount": 2},
+      "coppermine": {"res": "copper", "amount": 2},
+      "foodfishing": {"res": "fish", "amount": 2},
+      "foodhunting": {"res": "animals", "amount": 2},
+      "lumbercamp": {"res": "lumber", "amount": 3}
+    };
+
+    var neighborAffects = {
+      "foodfarm": {"pollution": 2},
     }
 
-    var bonusCosts = {
-      "claymine":  {"clay": 8, "pollution": 3} ,
-      "coppermine": {"copper": 8, "pollution": 3}
-      // "foodfarm": {"production": {"food": 5} },
-      // "foodfishing": {"food": 3} ,
-      // "foodhunting": {"food": 8},
-      // "lumbercamp": {"lumber": 8}
+    var bonusProds = {
+      "claymine": {"res": "clay", "amount" : 3, "pollution": 1},
+      "coppermine": {"res": "copper", "amount": 3, "pollution": 1},
+      "foodfarm": {"res": "food", "amount": 3}
+    };
+
+    var infoTexts = {
+      "claymine":  "5 clay, 2 pollution for 2 food and 2 lumber. For neighboring clay ore (2), 8 clay and 3 pollution",
+      "coppermine": "5 copper, 2 pollution for 2 food and 2 lumber. For neighboring clay ore (2), 8 copper and 3 pollution",
+      "foodfarm": "5 food for 1 lumber, 1 clay. 8 food and 2 water pollution, if river nearby.",
+      "foodfishing": "5 food for 1 copper, 2 fish. Needs water nearby.",
+      "foodhunting": "3 food for 2 animals. Needs woods nearby.",
+      "lumbercamp": "8 wood for 1 clay, 3 lumber. Needs woods nearby."
     }
+
+    //neighborNeeds specifies requirement which restricts  placement
+    //neighborBonuses indicates bonusmode if neighboring resource is available
+    //neighborUses gets used, if neighboring resource is present. Either by neighborneed or bonus mdoe
+      //bonusProds is the extra production that happens is neighborUse succeeds
+    //neighborAffect affects the neigboring resource
 
     prodCost = prodCosts[buildingName];
     prodVal = prodVals[buildingName];
-    neighborNeed = {};
-    bonusCost = {};
-    bonusProd = {};
+    infoText = infoTexts[buildingName] ;
+
+    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "infoText": infoText, "running": false, "prodCost": prodCost, "prodVal": prodVal, "state": "auction", "placed": false, "visible": true};
+    
     if (buildingName in neighborNeeds) {
-      neighborNeed = neighborNeeds[buildingName];
+      buildObj["neighborNeed"] = neighborNeeds[buildingName];
     }
-    if (buildingName in bonusCosts) {
-      bonusCost = bonusCosts[buildingName];
-      bonusProd = bonusProds[buildingName];
+    if (buildingName in neighborBonuses) {
+      buildObj["neighborBonus"] = neighborBonuses[buildingName];
+    }
+    if (buildingName in neighborUses) {
+      buildObj["neighborUse"] = neighborUses[buildingName];
+    }
+    if (buildingName in neighborAffects) {
+      buildObj["neighborAffect"] = neighborAffects[buildingName];
+    }
+    if (buildingName in bonusProds) {
+      buildObj["bonusProd"] = bonusProds[buildingName];
     }
 
     // console.log(prodCosts[buildingName] + " " + buildingName);
@@ -1136,7 +1029,6 @@ export const AddBuilding = new ValidatedMethod({
     // });
 
     mapPlaced = false;
-    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "running": false, "prodCost": prodCost, "prodVal": prodVal, "state": "auction", "placed": false, "visible": true, "bonusCost": bonusCost, "bonusProd": bonusProd, "neighborNeed": neighborNeed};
     if (groupName == "auctions") {
       buildObj["auction"] = true;
     }
@@ -1214,6 +1106,7 @@ export const PlaceBuilding = new ValidatedMethod({
     else {
       return "you don't own this spot!!!";
     }
+    console.log("setting up building neighbors");
     BuildingNeighbors.call({"gameCode": gameCode, "building": building});
     
   }
@@ -1250,11 +1143,11 @@ export const ResetTeamResources = new ValidatedMethod({
   name: 'teamresources.reset',
   validate ({}) {},
   run({gameCode}) {
-    newres = {"lumber": 2, "clay": 2, "copper": 2, "food": 2}
-
+    newres = {"lumber": 8, "clay": 8, "copper": 8, "food": 8};
+    metrics = {"pollution": 2, "population": 5, "happiness": 5};
     Games.update(
       {$and: [{"gameCode": gameCode}, {"role": "base"}]},
-      {$set: {"res": newres}},
+      {$set: {"res": newres, metrics}},
       {multi: true});
 
   }

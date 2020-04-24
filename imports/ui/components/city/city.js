@@ -391,8 +391,8 @@ Template.cityMap.helpers({
             rowCol["image"] = mapTiles[resMapDict[loc]["building"]["name"]];
             rowCol["text"] += JSON.stringify(resMapDict[loc]["building"]["buildFeatures"]["resKind"]);
 
-            if ("neighboringResource" in resMapDict[loc]["building"]) {
-              rowCol["text"] += " bonus ore! ";
+            if ("neighboringResource" in resMapDict[loc]["building"] && "neighborBonus" in resMapDict[loc]["building"]) {
+              rowCol["text"] += "Resource nearby, bonus production possible!";
             }
 
             if (resMapDict[loc]["building"]["running"] == true) {
@@ -403,6 +403,7 @@ Template.cityMap.helpers({
               rowCol["text"] += " idle ";
             }
           }
+          resMapDict[loc]["rowCol"] = rowCol;
           thisRow.push(rowCol);
         }
         else {
@@ -411,6 +412,7 @@ Template.cityMap.helpers({
       }
       rows.push(thisRow);
     }
+    Template.instance().fullmap.set(resMapDict);
     // console.log(rows);
     // console.log(resMapDict);
     return rows;
@@ -441,45 +443,37 @@ Template.cityMap.helpers({
       // console.log(m)
       if (!("building" in mapSelect)) {
         if ( mapSelect["ownerId"] == Meteor.userId() ) {
-          console.log("placable true");
+          // console.log("placable true");
           placeMode = true;
         }
       }
     }
-    // console.log(building.name);
-    // console.log(building.name in buyingBuilds);
-    // console.log(placeMode);
-    // console.log(building.name in buyingBuilds && placeMode);
 
-    console.log(mapSelect.neighbors);
-    // console.log(building);
+    // console.log(mapSelect.neighbors);
     nc = mapSelect["neighbors"]
     if (placeMode) {
-      nn = building["neighborNeed"]["resources"];
-      if (nn.length > 0) {
+      if ("neighborNeed" in building){
+        // console.log(building["neighborNeed"]);
+        nn = building["neighborNeed"]["resources"];
         placable = false;
-        for (n in nn) {
-          for (c in nc) {
-            if ("resource"in nc[c]) {
-              if (nc[c]["resource"]["kind"] == nn[n]) {
-                placable = true;
-              }
+        // for (n in nn) {
+        for (c in nc) {
+          if ("resource"in nc[c]) {
+            if (nc[c]["resource"]["kind"] == nn) {
+              placable = true;
             }
           }
         }
+        // }
       }
       else {
         placable = true;
       }
-      
+    }
+    else {
+      placeable = false;
     }
     return placable;
-    // if (buyingBuilds.indexOf(building.name) >= 0 && placeMode) {
-    //   return true;
-    // }
-    // else {
-    //   return false;
-    // }
   },
 
   currentBuilding() {
@@ -493,7 +487,14 @@ Template.cityMap.helpers({
     if (mapSelect == "" || mapSelect == {} || mapSelect == undefined) {
     }
     else {
+      // console.log(mapSelect == {});
+      if ("rowCol" in mapSelect) {
+        boxContent["image"] = mapSelect["rowCol"]["image"];
+      }
+      // 
       if ("building" in mapSelect) {
+        boxContent["building"] = true;
+        boxContent["image"] = Template.instance().mapTiles[mapSelect["building"]["name"]];
         boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
         pcs = mapSelect["building"]["prodCost"];
         pcText = "";
@@ -504,8 +505,8 @@ Template.cityMap.helpers({
         }
         boxContent["text"].push("Uses: " + JSON.stringify(pcText));
         boxContent["text"].push("Produces: " + JSON.stringify(mapSelect["building"]["prodVal"]));
-        if ("neighboringResource" in mapSelect["building"]) {
-          boxContent["text"].push(" bonus ore! ");
+        if ("neighboringResource" in mapSelect["building"] && "neighborBonus" in mapSelect["building"]) {
+          boxContent["text"].push(" Resource nearby, bonus production possible! ");
         }
         boxContent["buildingButtons"] = true;
         if (mapSelect["building"]["running"] == true) {
@@ -540,7 +541,7 @@ Template.cityMap.events({
     instance.selectedLoc.set(loc);
     console.log(loc);
     map = instance.fullmap.get();
-    // console.log(map[loc]);
+    console.log(map[loc]["building"]);
   },
 
   'click .placeBuilding': function (event, instance) {
