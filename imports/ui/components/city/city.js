@@ -500,7 +500,7 @@ Template.cityMap.helpers({
         boxContent["image"] = Template.instance().mapTiles[mapSelect["building"]["name"]];
         boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
         pcs = mapSelect["building"]["prodCost"];
-        pcText = "";
+        pcText = [];
         for (pc in pcs) {
           if (pcs[pc] != 0) {
             pcText += pc + ": " + pcs[pc] + " ";
@@ -518,6 +518,29 @@ Template.cityMap.helpers({
         }
         else {
           boxContent["status"] = "Idle";
+        }
+      }
+      else {
+        if (mapSelect.ownerId == Meteor.userId()) {
+          // console.log("owned cell, looking into neighbors");
+          resTexts = {
+            "water": "Water nearby! You can fish here. Also, farms produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well",
+            "lumber": "Woods nearby! You can hunt and collect lumber here.",
+            "clay": "Clay ore nearby! Mines work extra here! They produce more pollution, and also collect bonus clay if there are deposits in the ores.",
+            "copper": "Copper ore nearby! Mines work extra here! They produce more pollution, and also collect bonus copper if there are deposits in the ores."
+          }
+          neighbs = mapSelect.neighbors;
+          found = [];
+          for (n in neighbs) {
+            if ("resource" in neighbs[n]) {
+              for (rt in resTexts) {
+                if (neighbs[n].resource.kind == rt && found.indexOf(rt) == -1) {
+                  boxContent.text.push(resTexts[rt]);
+                  found.push(rt);
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -544,17 +567,16 @@ Template.cityMap.events({
     // instance.selectedLoc.set(event.target.id);
     instance.selectedLoc.set(loc);
     console.log(loc);
-    console.log(document.getElementById("cell-" + loc));
+    console.log(document.getElementById("cell-" + loc).getBoundingClientRect());
     cellLoc = document.getElementById("cell-" + loc).getBoundingClientRect();
     d = document.getElementById("cell-highlighter");
       d.style.position = "absolute";
-      d.style.left = cellLoc.x+'px';
-      d.style.top = cellLoc.y+'px';
+      d.style.left = (cellLoc.x + window.scrollX) +'px';
+      d.style.top = (cellLoc.y + window.scrollY) +'px';
       d.style.width = cellLoc.width + "px";
       d.style.height = cellLoc.height + "px";
       // d.style
-    map = instance.fullmap.get();
-    console.log(map[loc]["building"]);
+    // map = instance.fullmap.get();
 
   },
 
