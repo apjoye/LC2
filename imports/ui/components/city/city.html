@@ -59,6 +59,9 @@
 
 
 <template name="cityMap">
+  <div id = "cell-highlighter" style="background-color: rgba(0, 60, 255, 0.2); z-index: 2">
+
+  </div>
   <div class="col-md-5" style="overflow-x:auto;">
     <p></p>
       <button type="button" class="toggleImages btn btn-default"> Toggle Images </button>
@@ -67,7 +70,7 @@
       {{#each mapRows}}
       <tr>
           {{#each this}}
-            <td class="emptyClass mapCell {{this.loc}}" id="{{this.loc}}">
+            <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
               {{#if imageMode}}
                 <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px; background-color:{{this.bgColor}}">
               {{else}}
@@ -100,7 +103,7 @@
 
   
 </div>
-<div class = "bottom-sidebar">
+  <div class = "bottom-sidebar">
     <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Information Panel</p>
     <div style="border: 1px solid grey; padding: 2%; text-align: center;">
         <h3><img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
@@ -114,10 +117,10 @@
             </div>
             {{/if}}
             <!-- {{#else}} -->
-    </div>
+      </div>
     
-</div>
-</div>
+    </div>
+  </div>
 </template>
 
 

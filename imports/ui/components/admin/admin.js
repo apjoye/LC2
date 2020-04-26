@@ -108,6 +108,13 @@ Template.gameMap.helpers({
       "green-city": "rgba(0,255,0,0.3)",
       "pink-city": "rgba(255, 51, 153, 0.3)",
     }
+    // highLightColors = {
+    //   "red-city": "rgba(255,0,0,0.6)",
+    //   "yellow-city": "rgba(255,255,0,0.3)",
+    //   "blue-city": "rgba(0,0,255,0.3)",
+    //   "green-city": "rgba(0,255,0,0.3)",
+    //   "pink-city": "rgba(255, 51, 153, 0.3)",
+    // }
     //store map dimensions somewhere
     mapWidth = 16;    //number of columns
     mapHeight = 16;   //number of rows

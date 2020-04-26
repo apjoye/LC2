@@ -544,8 +544,18 @@ Template.cityMap.events({
     // instance.selectedLoc.set(event.target.id);
     instance.selectedLoc.set(loc);
     console.log(loc);
+    console.log(document.getElementById("cell-" + loc));
+    cellLoc = document.getElementById("cell-" + loc).getBoundingClientRect();
+    d = document.getElementById("cell-highlighter");
+      d.style.position = "absolute";
+      d.style.left = cellLoc.x+'px';
+      d.style.top = cellLoc.y+'px';
+      d.style.width = cellLoc.width + "px";
+      d.style.height = cellLoc.height + "px";
+      // d.style
     map = instance.fullmap.get();
     console.log(map[loc]["building"]);
+
   },
 
   'click .placeBuilding': function (event, instance) {
