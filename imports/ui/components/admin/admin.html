@@ -82,19 +82,20 @@
 <!--   <p>    <button class="runBids btn btn-default">Run Bids</button>  </p>
   <p>    <button class="runBuilds btn btn-default">Run Builds & End Round</button>  </p>
   <p>    <button class="newRound btn btn-default">Next Round</button>  </p> -->
-  <div class="btn-group" role="group" aria-label="Basic example">
-    <!-- <button type="button" class="asyncTest btn btn-default">Async Test</button>
-    <button type="button" class="reset btn btn-default"> Reset everything </button> -->
-    <button type="button" class="resetRes btn btn-default"> Reset Map Resources </button>
 
+  <!-- <button type="button" class="asyncTest btn btn-default">Async Test</button>
+    <button type="button" class="reset btn btn-default"> Reset everything </button> -->
+
+  <div class="btn-group" role="group" aria-label="Basic example">
+    <button type="button" class="resetRes btn btn-default"> Reset Map Resources </button>
     <button type="button" class="resetMap btn btn-default"> Reset Map </button>
     <button type="button" class="resetTeamResources btn btn-default"> Reset Team Resources </button>
     <button type="button" class="makeMap btn btn-default"> Make Map </button>
   </div>
-  <!-- <p> </p> -->
+  <p> </p>
   <div class="btn-group" role="group" aria-label="Basic example">
     <button type="button" class="addAuction btn btn-default"> Add Auction Build </button>
-    <button type="button" class="runBuildings btn btn-default"> Run Builds </button>
+    <!-- <button type="button" class="runBuildings btn btn-default"> Run Builds </button> -->
     <button type="button" class="removeBuildings btn btn-default"> Remove Builds </button>
     <button type="button" class="btn btn-primary seeScore">See scoreboard</button> 
 
@@ -108,7 +109,7 @@
   
   <p> </p>
   
-  <form class="addFacts form-inline">
+  <!-- <form class="addFacts form-inline">
     <div class="form-group">
       <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
     </div>
@@ -125,7 +126,7 @@
       <input class="form-control" type="submit" value="Next Round"/>
     </div>
   </form>
-
+ -->
   <p>
     Status: {{status}}
     <button class="btn btn-default toggleGameState">Toggle</button>
@@ -155,7 +156,7 @@
   </form>
   </p>
   <!--  Make a new player a base -->
-  <p>
+<!--   <p>
   <form class="makeBase form-inline">
     <div class="form-group">
       <input class = "form-control" type="text" name="playerName" placeholder="player" />
@@ -164,9 +165,9 @@
       <input class="form-control" type="submit" value="Make Base"/>
     </div>
   </form>
-  </p>
+  </p> -->
   <!--  Set neighbors for a base -->
-  <p>
+  <!-- <p>
   <form class="setNeighbors form-inline">
     <div class="form-group">
       <input class = "form-control" type="text" name="cityName" placeholder="city name" />
@@ -178,7 +179,7 @@
       <input class="form-control" type="submit" value="Add Neighbor"/>
     </div>
   </form>
-  </p>
+  </p> -->
   <!-- Add Building -->
   <p>
   <form class="addBuilding form-inline">
@@ -249,7 +250,7 @@
     <tr>
       <!-- <pre> -->
         {{#each this}}
-        <td class="emptyClass mapCell {{this.loc}}" id="{{this.loc}}">
+        <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
           {{#if imageMode}}
             <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px; background-color:{{this.bgColor}}">
           {{else}}
@@ -268,7 +269,8 @@
   {{#if imageMode}}
 
     {{#each cityStats}}
-      <div class="{{this.className}} cityStatBox">
+      <!-- <div id="cityStat-{{this.className}}" class="{{this.className}} cityStatBox" style="{{this.style}}"> -->
+      <div id="cityStat-{{this.className}}" class="cityStatBox" style="position: absolute; {{this.style}}">
         <p>Pop:{{this.population}}</p>
         <p>Happ: {{this.happiness}}</p>
         <p>Poll: {{this.pollution}}</p>

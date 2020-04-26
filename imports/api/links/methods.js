@@ -1339,7 +1339,7 @@ export const MakeMap = new ValidatedMethod({
         }
         await Games.update(
           {"_id": teams[t]["_id"]}, 
-          {$set: {visibleCorner: visCorners[t], visibleDimensions: visDims[t]} }
+          {$set: {"visibleCorner": visCorners[t], "visibleDimensions": visDims[t]} }
         );
       }
 

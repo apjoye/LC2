@@ -370,10 +370,8 @@ Template.cityMap.helpers({
         rowCol["image"] = mapTiles["background"];
         rowCol["text"] = "";
         rowCol["bgColor"] = "";
-
+        rowCol["loc"] = loc;
         if (loc in resMapDict) {
-          rowCol["loc"] = loc;
-
           if ("owner" in resMapDict[loc]) {
             rowCol["image"] = "../img/bg/empty.png";
             rowCol["bgColor"] = bgColors[resMapDict[loc]["owner"]];

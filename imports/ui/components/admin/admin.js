@@ -168,6 +168,7 @@ Template.gameMap.helpers({
         rowCol["image"] = mapTiles["background"];
         rowCol["text"] = "";
         rowCol["bgColor"] = "";
+        rowCol["loc"] = loc;
 
         if (loc in resMapDict) {
           // console.log(loc + " found!");
@@ -231,10 +232,21 @@ Template.gameMap.helpers({
   },
 
   cityStats() {
+    topMargin = 620;
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
     for (c in cities) {
+
+      loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
+      console.log(loc);
+      xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
+      yloc = topMargin + 80 + (60 * cities[c]["visibleCorner"][1]);
       cities[c]["className"] = cities[c]["group"] + "-status";
+      cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
+      // console.log(loc);
+      // console.log(document.getElementById(loc));
+      // console.log(document.getElementById("cell-x0y0"));
+      // cell = document.getElementById(loc).getBoundingClientRect();
       stats.push(cities[c]);
       // stats[cities[c]["group"]] = cities[c];
       // stats[cities[c]["group"]]["className"] = cities[c]["group"] + "-status";

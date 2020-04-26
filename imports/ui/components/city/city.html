@@ -121,12 +121,12 @@
             {{#if currentBuilding.buildingButtons}}
             <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
               <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
-              <button id="startRemoval" style="display: block" class="btn btn-danger startRemoval"  > Delete Building </button>
+              <button id="startRemoval" style="display: block" class="btn btn-danger startRemoval"> Delete Building </button>
               <div id="finalRemoval" style="display: none"> 
                 <button class="btn btn-danger removeBuilding" id="remove-{{currentBuilding.mapCell.building._id}}">
                   Yes - delete it
                 </button>
-                <button class="btn btn-default cancelRemoval" id="remove-{{currentBuilding.mapCell.building._id}}">
+                <button class="btn btn-default cancelRemoval">
                   Cancel deletion
                 </button>
                 This deletion is permanent. Are you sure?
