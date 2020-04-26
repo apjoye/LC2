@@ -1,4 +1,107 @@
 TODOS
+
+
+make bidding row look better - actually have images
+  give bidding feedback - either reset bids, and/or give an update
+
+tutorialize
+  the second row of numbers is upcoming info (Expected usage)
+    value of making it accurate, or mark it as expected run
+  disappear production info in bidding phase
+
+// Update if bidding is over stock
+
+// Update information panel and building placing panel with information
+
+//make remove and place building – confirmation based
+
+//highlight selected cell
+  //add a table border, and then show selected
+
+***Future:
+- possibly add cty details from center view
+
+
+UI:
+- history of trades
+- mapTiles are loaded from database
+
+// **- highlight selected cell
+// - parse placable buildings' info onto the thing
+// - add more useful information panel
+
+// - toggle images works on city view as well
+// - reintegrate employment check in running buildings
+
+Info
+
+- detailed view of buildings/map cells
+  - aggregate information of round production
+  - 
+- feedback on marketplace bids –> failed bids, succeeded bids
+- block placing of buildings on disfunctional cells
+- add the metrics text back in
+
+game design:
+- imbalance of resources we could roll with
+- 
+
+- make changes in population/pollution/happiness more salient
+
+
+
+Future UI:
+- neighbor calculation is pretty bad and slowing down client a lot
+
+
+
+
+
+
+
+-----------------------------------------**********************************-----------------------------------------
+
+
+
+// - DEBUG: city views for other cities
+
+
+// add a building to unspecified location but ownership
+
+// pending methods:
+  // buy building (from auction to ownershio)
+  // place building on map (from ownership to map)
+
+----------------------------------
+
+// TOP NEXT TODO: WHYYY does remove building form not work correctly
+
+----------------------------------
+
+task: 
+  make a meteor project, make a phaser map that changes 
+
+
+--- send out a city settlers meeting
+
+
+--- separate bidding + production rounds? production before bidding if doing this simultaneously
+
+
+
+
+
+
+
+
+
+
+ 
+-------------------------------------**********************************---------------------------------
+
+
+
+
  // - only display running games
  
  //- in admin view, show dropdown of all players, dropdown of all teams, dropdown of roles
@@ -9,9 +112,9 @@ TODOS
   //- every click on enable/disable, even if it fails
   - add log in updatebid method
 
-- fix data subs
-  - first for running
-  - next for gamecodes
+// - fix data subs
+  // - first for running
+  // - next for gamecodes
 
 
 - CLS workshop

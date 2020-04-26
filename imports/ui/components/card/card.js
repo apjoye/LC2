@@ -18,12 +18,12 @@ import { UpdateBid } from '/imports/api/links/methods.js';
 
 Template.factoryList.onCreated(function helloOnCreated() {
   // counter starts at 0
-  this.city = new ReactiveVar("city1");
-
   Meteor.subscribe('producers.public');
   Meteor.subscribe('games.minerunning');
   Meteor.subscribe('buildings.auction', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('bids.local');
+  this.city = new ReactiveVar("city1");
+  this.gameStats = new ReactiveVar({});
   this.buildingBids = new ReactiveVar([]);
   this.resBids = new ReactiveVar([]);
 });
@@ -69,7 +69,7 @@ Template.factoryList.helpers({
     rbs = {};    //bids grouped by resource kind
     // console.log(bids);
     for (b in bids) {
-      bbs[bids[b]["buildingId"]] = bids[b]["bidVal"];
+      bbs[bids[b]["buildingId"]] = {"bidVal": bids[b]["bidVal"], "bidKind": bids[b]["bidKind"]};
       if (!(bids[b]["bidKind"] in rbs)) {
         rbs[bids[b]["bidKind"]] = 0;
       }
@@ -77,20 +77,41 @@ Template.factoryList.helpers({
     }
     // console.log(bbs);
     // console.log(rbs);
+    thisGame = Games.findOne({ $and: [ {"gameCode":  FlowRouter.getParam('gameCode')}, {"role": "base"}, {"playerId": Meteor.userId()} ] } );
+    
     Template.instance().buildingBids.set(bbs);
     Template.instance().resBids.set(rbs);
+    Template.instance().gameStats.set(thisGame);
   },
 
   bidValue(buildingId) {
     bbs = Template.instance().buildingBids.get();
     // console.log(bbs);
     if (buildingId in bbs) {
-      return bbs[buildingId];  
+      return bbs[buildingId]["bidVal"];
     }
     else {
       return 0;
     }
-    
+  },
+
+  bidClass(buildingId){
+    bbs = Template.instance().buildingBids.get();
+    gs = Template.instance().gameStats.get();
+    // console.log(gs);
+    // console.log(bbs);
+    if (buildingId in bbs) {
+      if (bbs[buildingId]["bidVal"] > gs["res"][bbs[buildingId]["bidKind"]]) {
+        return "btn-danger";
+      }
+      else {
+        return "btn-default";  
+      }
+      // return bbs[buildingId];
+    }
+    else {
+      return "btn-default";
+    }
   },
 
   buildingText(building){
@@ -169,13 +190,13 @@ Template.factoryList.events({
     // console.log(event.target.classList[3]);
     //event.target.classList[3]   event.target.name
     // console.log(event.target);
-    console.log(event.target.classList);
+    // console.log(event.target.classList);
     oldVal = parseInt(event.target.classList[5]);
     change = parseInt(event.target.name);
     if (isNaN(parseInt(oldVal))) {
       oldVal = 0;
     }
-    console.log(oldVal + " " + change);
+    // console.log(oldVal + " " + change);
 
     if (oldVal == 0 && change == -1) {
       console.log("no negative bids");
@@ -281,7 +302,6 @@ Template.factory.helpers({
       outval["popoverText"] += "You've bid more than you have!";
       outval["class"] = "btn-danger";
       affordability = false;
-
     }
     else {
 
