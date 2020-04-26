@@ -96,9 +96,10 @@
         {{#if buildingPlacable build}}
         <!-- <div class="placementButtons" style="position:absolute"> -->
           <button id="startPlace" class="btn btn-primary startPlace" style=" display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Place Building </button>
-          <div id="confirmPlace" style="display: none"><p>This is permanent. Are you sure?</p>
+          <div id="confirmPlace" style="display: none">
             <button class="btn btn-success placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Confirm Placement </button>
             <button class="btn btn-default cancelPlace" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Cancel Placement </button>
+            <p>This is permanent. Are you sure?</p>
           </div>
         <!-- </div> -->
           
@@ -121,13 +122,15 @@
             <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
               <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
               <button id="startRemoval" style="display: block" class="btn btn-danger startRemoval"  > Delete Building </button>
-              <div id="finalRemoval" style="display: none"> This deletion is permanent. Are you sure?
+              <div id="finalRemoval" style="display: none"> 
                 <button class="btn btn-danger removeBuilding" id="remove-{{currentBuilding.mapCell.building._id}}">
                   Yes - delete it
                 </button>
                 <button class="btn btn-default cancelRemoval" id="remove-{{currentBuilding.mapCell.building._id}}">
                   Cancel deletion
                 </button>
+                This deletion is permanent. Are you sure?
+                
               </div>
             </div>
             {{/if}}
