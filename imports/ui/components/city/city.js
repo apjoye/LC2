@@ -591,6 +591,18 @@ Template.cityMap.events({
     // console.log(event.target.id + " " + buildLoc);
     PlaceBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "buildingId": event.target.id, "location": buildLoc, "userId": Meteor.userId()});
   },
+  
+  'click .startPlace': function (event, instance) {
+    event.preventDefault();
+    document.getElementById("confirmPlace").style.display = "block";
+    document.getElementById("startPlace").style.display = "none";
+  },
+
+  'click .cancelPlace': function (event, instance) {
+    event.preventDefault();
+    document.getElementById("confirmPlace").style.display = "none";
+    document.getElementById("startPlace").style.display = "block";
+  },
 
   'click .toggleBuilding': function (event, instance) {
     event.preventDefault();
@@ -615,12 +627,27 @@ Template.cityMap.events({
     }
   },
 
+  'click .startRemoval': function (event, instance) {
+    event.preventDefault();
+    // console.log(event.target.id);
+    // console.log("removing building client " + (event.target.id).substr(7));
+    // RemoveBuilding.call({"buildingId": (event.target.id).substr(7)});
+    document.getElementById("startRemoval").style.display = "none";
+    document.getElementById("finalRemoval").style.display = "block";
+  },
+
   'click .removeBuilding': function (event, instance) {
     event.preventDefault();
     console.log(event.target.id);
     console.log("removing building client " + (event.target.id).substr(7));
     RemoveBuilding.call({"buildingId": (event.target.id).substr(7)});
-  }
+  },
+
+  'click .cancelRemoval': function (event, instance) {
+    event.preventDefault();
+    document.getElementById("startRemoval").style.display = "block";
+    document.getElementById("finalRemoval").style.display = "none";
+  },
 
 });
 

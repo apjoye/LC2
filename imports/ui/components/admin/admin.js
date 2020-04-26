@@ -383,20 +383,19 @@ Template.adminGame.events({
 
   'submit .addBuilding' (event, instance) {
     event.preventDefault();
-    tx = event.target.x.value;
-    ty = event.target.y.value;
-    if (tx == "" && ty == "") {
+    tx = parseInt(event.target.x.value);
+    ty = parseInt(event.target.y.value);
+    if (isNaN(tx) || isNaN(ty) || tx >= 16 || ty >= 16 || tx < 0 || tx < 0) {
+      // console.log("setting defaults")
       tx = -1;      ty = 0;
     }
     
-    if (tx != "" && ty != ""){
+    if (tx >= -1 && ty >= 0) {
       console.log(tx + " " + ty + event.target.bidKind.value + event.target.buildingName.value + event.target.groupName.value);
-      if (event.target.x.value >= -1 && event.target.y.value >= 0) {
-        AddBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "locx": parseInt(event.target.x.value), "locy": parseInt(event.target.y.value), "bidKind": event.target.bidKind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});    
-      }
+      AddBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "locx": tx, "locy": ty, "bidKind": event.target.bidKind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});    
     }
     else {
-      console.log(event.target.x.value + " " + event.target.y.value + "broken locs");
+      console.log(tx + " " + ty + "broken locs");
     }
     
   },
