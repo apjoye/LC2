@@ -174,9 +174,10 @@ export const RunBids2 = new ValidatedMethod({
     if (!this.isSimulation) {
       
 
-      async function clearBids (producer) {
+      async function clearBids (producer, gameCode) {
         // return await Bids.
         // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
+        Bids.update({$and: [{"gameCode": gameCode}]}, {$set: {"bidVal": 0}}, {multi: true});
       }
 
       async function commitBid (bid, teams, resources) {
@@ -212,7 +213,7 @@ export const RunBids2 = new ValidatedMethod({
           // await Games.update()
 
         // >> change game phase to post-bid
-          await Games.update({$and: [{"role": "admin"}, {"gameCode": bid.gameCode}]}, {$set: {"phase": "post-bid"}})
+          console.log("changing game phase");
           return true;
           // return await resourceChange();
         }
@@ -285,8 +286,11 @@ export const RunBids2 = new ValidatedMethod({
         allProducers = allProds.fetch();
         for (ap in allProducers) {
           await resolveBids(allProducers[ap], gameCode);
-          await clearBids(allProducers[ap]);
+          await clearBids(allProducers[ap], gameCode);
+
         }
+        await Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}})
+
       }
       
       runThroughBids(gameCode);
@@ -698,6 +702,7 @@ export const RunBuildings = new ValidatedMethod({
   validate ({}) {},
   // run({gameCode, group}) {
   run({gameCode, group = ""}) {
+    if (!this.isSimulation) {
     // buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
     
     // console.log("runnning buildings");
@@ -857,6 +862,8 @@ export const RunBuildings = new ValidatedMethod({
     Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
     buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
     runThroughBuilds(buildings);
+    Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "pre-bid"}}, {$inc: {"year": 1}});
+  }
   }
 });
 
