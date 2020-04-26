@@ -50,7 +50,7 @@ Template.adminView.events({
     event.preventDefault();
     size = event.target.groups.value;
     if (size == ""){
-      size = 4;
+      size = 5;
     }
     // console.log(size);
     // cityCount, adminId, adminUsername
@@ -383,8 +383,14 @@ Template.adminGame.events({
 
   'submit .addBuilding' (event, instance) {
     event.preventDefault();
-    if (event.target.x.value != "" && event.target.x.value != ""){
-      console.log(event.target.x.value + " " + event.target.y.value + event.target.bidKind.value + event.target.buildingName.value + event.target.groupName.value);
+    tx = event.target.x.value;
+    ty = event.target.y.value;
+    if (tx == "" && ty == "") {
+      tx = -1;      ty = 0;
+    }
+    
+    if (tx != "" && ty != ""){
+      console.log(tx + " " + ty + event.target.bidKind.value + event.target.buildingName.value + event.target.groupName.value);
       if (event.target.x.value >= -1 && event.target.y.value >= 0) {
         AddBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "locx": parseInt(event.target.x.value), "locy": parseInt(event.target.y.value), "bidKind": event.target.bidKind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});    
       }

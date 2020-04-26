@@ -1227,7 +1227,7 @@ export const MakeMap = new ValidatedMethod({
   name: 'map.make',
   validate ({}) {},
   run({gameCode}) {
-
+  if (!this.isSimulation) {
     /*
     first assign ownership of cells for the first four teams - four corners of the grid - 0,0; 13,0; 0,13; 13,13
         edit - going by current map, it's five teams at 1,1; 9,0; 12,6; 12, 12; 2, 12
@@ -1362,6 +1362,7 @@ export const MakeMap = new ValidatedMethod({
 
     //
   }
+  }
 });
 
 export const StartGame = new ValidatedMethod({
@@ -1418,6 +1419,11 @@ export const StartGame = new ValidatedMethod({
           }
         });
       }
+      //call make map
+      MakeMap.call({"gameCode": newgc});
+      //call reset team resources
+      ResetTeamResources.call({"gameCode": newgc});
+      //
     }
   }
 });
