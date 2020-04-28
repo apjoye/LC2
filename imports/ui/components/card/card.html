@@ -10,7 +10,11 @@
         {{CityBids}}
         {{#each build in PublicBuildings}}
           <div class="col-md-4">
-            {{buildingText build}} <br />
+            <!-- {{buildingText build}} -->
+              <strong>{{build.name}}</strong>
+              <br />
+              {{build.infoText}}
+             <br />
             <!-- {{build.name}}  <br /> -->
             <br />
             <div class="btn-group" role="group">
