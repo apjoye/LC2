@@ -107,7 +107,8 @@
 </div>
   <div class = "bottom-sidebar">
     <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Information Panel</p>
-    <div style="border: 1px solid grey; padding: 2%; text-align: center;">
+    <div class = "info-panel" style="border: 1px solid grey; padding: 2%; text-align: center;">
+        <div>
         <h3><img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
             {{#each currentBuilding.text}}
               {{this}} <br />
@@ -115,21 +116,31 @@
             {{#if currentBuilding.buildingButtons}}
             <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
               <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
-              <button class="btn btn-danger removeBuilding" id="remove-{{currentBuilding.mapCell.building._id}}"> Remove Building </button>
-              <!-- Modal -->
-              <!--
-              <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                      <div class="modal-content">
-                          <button class="btn btn-danger removeBuilding"  id="remove-{{currentBuilding.mapCell.building._id}}" data-dismiss="modal"> Remove Building </button>
-                      </div>
-                    </div>
-                </div>
-                <!-->
+              <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
             </div>
             {{/if}}
             <!-- {{#else}} -->
-      </div>
+        </div>
+        <div id="myModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+     
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Warning</h4>
+              </div>
+              <div class="modal-body">
+                <p>It will disappear permanently, are you sure about that?</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default removeBuilding" data-dismiss="modal" id="remove-{{currentBuilding.mapCell.building._id}}">Destroy It!</button>
+              </div>
+            </div>
+     
+          </div>
+        </div>
+    </div>
     
     </div>
   </div>

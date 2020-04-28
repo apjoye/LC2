@@ -282,14 +282,23 @@ body {
 	left: 830px;
 	background-color:white;
 }
-
-.fixed{
-	position:fixed;
-	top:0;	
-	z-index: 30;
-	padding-left: 2px;
-	padding-right: 2px;
+@media (max-width:1200px){
+	.fixed{
+		position:fixed;
+		top:0;	
+		z-index: 30;
+		width:98.35%;
+	}
 }
+@media (min-width:1300px){
+	.fixed{
+		position:fixed;
+		top:0;	
+		z-index: 30;
+		width:98.6%;
+	}
+}
+
 .fixed + .after-sticky{
 	padding-top: 90.719px;
 }
@@ -300,3 +309,12 @@ body {
 		*width: 11.111111111111%;
 	}
 }
+
+.modal, .modal-backdrop {
+    position: absolute !important;
+}
+
+.info-panel{
+	position: relative;
+}
+
