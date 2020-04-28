@@ -286,7 +286,7 @@ export const RunBids2 = new ValidatedMethod({
         allProducers = allProds.fetch();
         for (ap in allProducers) {
           await resolveBids(allProducers[ap], gameCode);
-          await clearBids(allProducers[ap], gameCode);
+          // await clearBids(allProducers[ap], gameCode);
 
         }
         await Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}})
@@ -992,7 +992,7 @@ export const AddBuilding = new ValidatedMethod({
 
     var infoTexts = {
       "claymine":  "5 clay, 2 pollution for 2 food and 2 lumber. For neighboring clay ore (2), 8 clay and 3 pollution",
-      "coppermine": "5 copper, 2 pollution for 2 food and 2 lumber. For neighboring clay ore (2), 8 copper and 3 pollution",
+      "coppermine": "5 copper, 2 pollution for 2 food and 2 lumber. For neighboring copper ore (2), 8 copper and 3 pollution",
       "foodfarm": "5 food for 1 lumber, 1 clay. 8 food and 2 water pollution, if river nearby.",
       "foodfishing": "5 food for 1 copper, 2 fish. Needs water nearby.",
       "foodhunting": "3 food for 2 animals. Needs woods nearby.",
