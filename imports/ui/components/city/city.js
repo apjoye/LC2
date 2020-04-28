@@ -74,8 +74,8 @@ Template.city.helpers({
       "population": "../img/icons/population_sml.png",
       "happiness": "../img/icons/happiness_sml.png"
     };
-    prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0};
-    prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0"};
+    prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0, "population": 0, "happiness": 0};
+    prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": 0, "pollution": 0};
 
     // console.log(Games.find({"playerId": Meteor.userId()}).fetch());
 
@@ -108,7 +108,7 @@ Template.city.helpers({
       // console.log(prodOutStr[r]);
       resPrint.push(thisRes);
     }
-    resPrint.push({"amount": "Metrics"});
+    resPrint.push({"roundProduction": "Metrics"});
     otherStats = ["pollution", "population", "happiness"];
     for (r in otherStats) {
       thisRes = {"res": otherStats[r]};
@@ -167,8 +167,8 @@ Template.city.helpers({
   roundProduction(res) {
     // prodOutput = {"m1": 0, "m2": 0, "f1": 0, "f2": 0, "pollution": 0};
     // prodOutStr = {"m1": "+0", "m2": "+0", "f1": "+0", "f2": "+0", "pollution": "+0"};
-    prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0};
-    prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0"};
+    prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0, "population": "+0", "happiness": "+0"};
+    prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0", "population": "+0", "happiness": "+0"};
     runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
 
 
@@ -789,5 +789,14 @@ Template.cityFactory.events({
         }
       });
     // }
+  }
+});
+
+
+$(window).scroll(function(){
+  if($(this).scrollTop() >= 82){
+    $('.fixed-top-bar').addClass('fixed');
+  }else{
+    $('.fixed-top-bar').removeClass('fixed');
   }
 });
