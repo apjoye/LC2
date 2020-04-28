@@ -15,17 +15,12 @@
 }
 #cityBox {
 	border: solid black;
-	padding: .5em;
 	border-radius: 0pt;
-	margin-top: 15pt;
+	background: white;
 }
 
 #cityBox h3 {
 	margin-top: 10px;
-}
-
-.cityTable {
-	width: 100%;
 }
 
 .cityRow {
@@ -158,7 +153,7 @@ button {
 }
 
 body {
-	margin: 10px;
+	margin: 10px !important;
 }
 
 .marketType {
@@ -287,3 +282,39 @@ body {
 	left: 830px;
 	background-color:white;
 }
+@media (max-width:1200px){
+	.fixed{
+		position:fixed;
+		top:0;	
+		z-index: 30;
+		width:98.35%;
+	}
+}
+@media (min-width:1300px){
+	.fixed{
+		position:fixed;
+		top:0;	
+		z-index: 30;
+		width:98.6%;
+	}
+}
+
+.fixed + .after-sticky{
+	padding-top: 90.719px;
+}
+
+@media (min-width:1200px){
+	.nine-cols .col-md-1{
+		width: 11.111111111111%;
+		*width: 11.111111111111%;
+	}
+}
+
+.modal, .modal-backdrop {
+    position: absolute !important;
+}
+
+.info-panel{
+	position: relative;
+}
+

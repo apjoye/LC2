@@ -1,38 +1,39 @@
 <template name="cities">
-  <table cellpadding="10" class="cityTable">
-    <tr >
+  <div class="cityTable">
       {{#each citySet}}
         <!-- <td class="cityRow"> -->
           {{> city}}
         <!-- </td> -->
       {{/each}}
-    </tr>
-  </table>
+        </div>
 </template>
 
 <template name="city">
   <!-- {{}} -->
-  <div id="cityBox">
+  <div class = "fixed-top-bar" id="cityBox">
     <!-- <p class="cityName">{{name}} </p> -->
     <!-- <h3>Your City's Production</h3> -->
 
-    <div class="container">
-      <div class="row">
-        
-        <div class="col-md-2">
-          <h2> Resources </h2>
+    <div class ="container">
+        <div class="row nine-cols">
+        <div class="col-md-1" style="transform: translateY(40%);">
+          <h3> Resources </h3>
         </div>
         <!-- {{#each cityResources}}
         {{this.image}}
         {{/each}} -->
         
         {{#each cr in cityResources}}
-        <div class="col-sm-2 col-md-1 col-xs-4">
+        <div class="col-md-1">
+          <div class = "image-part" style="display: inline-block; width: 46%; text-align: center;">
+            <h4>{{cr.roundProduction}}</h4>
           <img class="cityIcon" src="{{cr.image}}">
-          <h3> {{cr.amount}} </h3> <h4>{{cr.roundProduction}}</h4>
+          </div>
+          <div class = "status-part" style="display: inline-block; width: 46%;">
+          <h2> {{cr.amount}} </h2> 
+        </div>
         </div>
         {{/each}}
-
       </div>
     </div>
      <!-- <p> -->
@@ -59,6 +60,7 @@
 
 
 <template name="cityMap">
+  <div class="after-sticky">
   <div id = "cell-highlighter" style="background-color: rgba(0, 60, 255, 0.2); z-index: 2">
 
   </div>
@@ -82,7 +84,7 @@
       {{/each}}
     </table>
 </div>
-<div class="col-md-7" style="padding-left: 4%;">
+<div class="col-md-7" style="padding-left: 15px;">
   <div class="top-sidebar" style="padding-top: 2%; padding-bottom: 4%;">
       <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Buildings</p>
   <div class="slider-building">
@@ -90,19 +92,11 @@
       <div class="col-md-4 boughtBuilding" style="border-style: outset; margin-right: 4%;">
           <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
         <!--{{build.name}}-->
-        <!-- <p>Produce</p>
-        <p>Consume</p> -->
+        <p>Produce</p>
+        <p>Consume</p>
         {{build.infoText}}
         {{#if buildingPlacable build}}
-        <!-- <div class="placementButtons" style="position:absolute"> -->
-          <button id="startPlace" class="btn btn-primary startPlace" style=" display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Place Building </button>
-          <div id="confirmPlace" style="display: none">
-            <button class="btn btn-success placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Confirm Placement </button>
-            <button class="btn btn-default cancelPlace" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Cancel Placement </button>
-            <p>This is permanent. Are you sure?</p>
-          </div>
-        <!-- </div> -->
-          
+          <button class="btn btn-primary placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Place Building </button>
         {{/if}}
         <!-- {{buildingPlacable build}} -->
     </div>
@@ -111,9 +105,10 @@
 
   
 </div>
-  <div class = "bottom-sidebar col-5">
+  <div class = "bottom-sidebar">
     <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Information Panel</p>
-    <div style="border: 1px solid grey; padding: 2%; text-align: center;">
+    <div class = "info-panel" style="border: 1px solid grey; padding: 2%; text-align: center;">
+        <div>
         <h3><img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
             {{#each currentBuilding.text}}
               {{this}} <br />
@@ -121,28 +116,40 @@
             {{#if currentBuilding.buildingButtons}}
             <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
               <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> Toggle - {{currentBuilding.status}} </button>
-              <button id="startRemoval" style="display: block" class="btn btn-danger startRemoval"> Delete Building </button>
-              <div id="finalRemoval" style="display: none"> 
-                <button class="btn btn-danger removeBuilding" id="remove-{{currentBuilding.mapCell.building._id}}">
-                  Yes - delete it
-                </button>
-                <button class="btn btn-default cancelRemoval">
-                  Cancel deletion
-                </button>
-                This deletion is permanent. Are you sure?
-                
-              </div>
+              <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
             </div>
             {{/if}}
             <!-- {{#else}} -->
-      </div>
+        </div>
+        <div id="myModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+     
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Warning</h4>
+              </div>
+              <div class="modal-body">
+                <p>It will disappear permanently, are you sure about that?</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default removeBuilding" data-dismiss="modal" id="remove-{{currentBuilding.mapCell.building._id}}">Destroy It!</button>
+              </div>
+            </div>
+     
+          </div>
+        </div>
+    </div>
     
     </div>
+  </div>
   </div>
 </template>
 
 
 <template name="cityFactory">
+  <div class="after-sticky">
   <div class="row">
     <div class="col-md-6 col-xs-6">
       <!-- <div class="cityFactoryInner"> -->
@@ -175,4 +182,5 @@
     <button type="button" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="top" data-html="true" title="Events over last round" data-content="<ul>{{#each roundNotes}} <li>{{this}} </li> {{/each}}">Factory Log</button>
   <!-- Factory log: {{#each roundNotes}}  {{this}} <br />   {{/each}} -->
   </div>
+</div>
 </template>
