@@ -516,6 +516,7 @@ Template.cityMap.helpers({
         }
         else {
           boxContent["status"] = "Idle";
+          boxContent["image"] = boxContent["image"].slice(0, -4) + "_g.png";
         }
       }
       else {
@@ -592,14 +593,14 @@ Template.cityMap.events({
   
   'click .startPlace': function (event, instance) {
     event.preventDefault();
-    document.getElementById("confirmPlace").style.display = "block";
-    document.getElementById("startPlace").style.display = "none";
+    document.getElementById("confirmPlace-" + event.target.id.slice(11)).style.display = "block";
+    document.getElementById(event.target.id).style.display = "none";
   },
 
   'click .cancelPlace': function (event, instance) {
     event.preventDefault();
-    document.getElementById("confirmPlace").style.display = "none";
-    document.getElementById("startPlace").style.display = "block";
+    document.getElementById("confirmPlace-" + event.target.id.slice(12)).style.display = "none";
+    document.getElementById("startPlace-" + event.target.id.slice(12)).style.display = "block";
   },
 
   'click .toggleBuilding': function (event, instance) {

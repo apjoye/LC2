@@ -286,11 +286,10 @@ export const RunBids2 = new ValidatedMethod({
         allProducers = allProds.fetch();
         for (ap in allProducers) {
           await resolveBids(allProducers[ap], gameCode);
-          // await clearBids(allProducers[ap], gameCode);
-
         }
-        await Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}})
-
+        // await Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}}, {$inc: {"year": 1}})
+        await Games.update({$and: [{"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}});
+        await clearBids(allProducers[ap], gameCode);
       }
       
       runThroughBids(gameCode);
@@ -703,167 +702,178 @@ export const RunBuildings = new ValidatedMethod({
   // run({gameCode, group}) {
   run({gameCode, group = ""}) {
     if (!this.isSimulation) {
-    // buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
-    
-    // console.log("runnning buildings");
-    async function EatAndMake(gameId, building) {
-      //enter ore use mode if ore found
+      // buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
+      
+      // console.log("runnning buildings");
+      async function EatAndMake(gameId, building) {
+        //enter ore use mode if ore found
 
-      //produce with presence of ore (i.e. more pollution, and if possible, more metal)
-      // console.log("entering eat and make");
-      affordable = true;
-      // thisGame = Games.findOne({"_id": groupGame});
-      // console.log(thisGame);
-      thisGame = Games.findOne({"_id": gameId});
-      newRes = thisGame["res"];
-      newPoll = thisGame["pollution"];
-      roundEmployed = 0;
-      running = false
-      if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
-      console.log("employed " + roundEmployed);
-      if (!("notes" in thisGame)) {
-        thisGame["notes"] = [];
-      }
-
-      if (roundEmployed < thisGame["population"]) {
-        // console.log("we have employees!");
-        for (r in building["prodCost"]) {
-          if (building["prodCost"][r] > newRes[r]) {
-            affordable = false;
-          }
-          newRes[r] = newRes[r] - building["prodCost"][r];
+        //produce with presence of ore (i.e. more pollution, and if possible, more metal)
+        // console.log("entering eat and make");
+        affordable = true;
+        // thisGame = Games.findOne({"_id": groupGame});
+        // console.log(thisGame);
+        thisGame = Games.findOne({"_id": gameId});
+        newRes = thisGame["res"];
+        newPoll = thisGame["pollution"];
+        roundEmployed = 0;
+        running = false
+        if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
+        console.log("employed " + roundEmployed);
+        if (!("notes" in thisGame)) {
+          thisGame["notes"] = [];
         }
-        //neighborNeeds specifies requirement which restricts  placement
-        if ("neighborNeed" in building) {
-          if ("neighboringResource" in building) {
-            nres =  Resources.findOne({"_id": building["neighboringResource"]});
-            if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
-              affordable = true;
-              nresuse = true;
+
+        if (roundEmployed < thisGame["population"]) {
+          // console.log("we have employees!");
+          for (r in building["prodCost"]) {
+            if (building["prodCost"][r] > newRes[r]) {
+              affordable = false;
+            }
+            newRes[r] = newRes[r] - building["prodCost"][r];
+          }
+          //neighborNeeds specifies requirement which restricts  placement
+          if ("neighborNeed" in building) {
+            if ("neighboringResource" in building) {
+              nres =  Resources.findOne({"_id": building["neighboringResource"]});
+              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
+                affordable = true;
+                nresuse = true;
+              }
+              else {
+                affordable = false;
+                console.log("neighboring needed resource is out of stock");
+              }
             }
             else {
               affordable = false;
-              console.log("neighboring needed resource is out of stock");
+              console.log("this building needed a neighbor to run and also be placed but doesn't have it?!?!? please fix")
             }
+          }
+          if (affordable == false) {
+            newRes[r] = thisGame["res"];
+            // console.log(thisGame["res"]);
+            console.log("was unaffordable");
+            thisGame["notes"].push(building.name + " was unaffordable and did not run");
+            return true;
           }
           else {
-            affordable = false;
-            console.log("this building needed a neighbor to run and also be placed but doesn't have it?!?!? please fix")
+            roundEmployed += 1;
+            thisGame["res"] = newRes;
+            thisGame["pollution"] = newPoll;
+            thisGame["notes"].push(building.name + " ran successfully!")
+            usingResource = false;
+            console.log("consumed stuff, checking out neighboring resources");
+
+            //neighborUses gets used, if neighboring resource is present. Either by neighborneed or bonus mode
+              //bonusProds is the extra production that happens is neighborUse succeeds
+            //neighborAffect affects the neigboring resource
+
+            if ("neighboringResource" in building) {
+              nres =  Resources.findOne({"_id": building["neighboringResource"]});
+              newnres = nres["stats"];
+              neighbUse = false;
+              console.log("found a neighboring resource");
+              if ("neighborUse" in building) {
+                console.log("gonna use a neighboring resource " + JSON.stringify(nres) + " " + JSON.stringify(building["neighborUse"]));
+                if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
+                  console.log("neighboring resource available")
+                  neighbUse = true;
+                  newnres[building["neighborUse"]["res"]] -= building["neighborUse"]["amount"];
+                }
+                else {
+
+                }
+              }
+              if ("neighborAffect" in building) {
+                //currently assuming neighbor affect is only pollution
+                if ("pollution" in newnres){
+                  newnres["pollution"] += building["neighborAffect"]["pollution"];
+                }
+                else {
+                  console.log("this neighboring affect was gonna receive some pollution but it doesn't have the pollution stat? ugh");
+                }
+              }
+
+              if ("neighborBonus" in building) {
+                console.log("bonus mode attempt");
+                if ("pollution" in building["bonusProd"]){
+                  newPoll += building["bonusProd"]["pollution"];
+                }
+                if (neighbUse == true) {
+                  console.log("bonus mode resource use was affordable!")
+                  newRes[building["bonusProd"]["res"]] += building["bonusProd"]["amount"];
+                } 
+              }
+              console.log(building["neighboringResource"]);
+              console.log(newnres);
+              await Resources.update({"_id": building["neighboringResource"]}, {$set: {stats: newnres}});
+            }
+            console.log("making the worth");
+            for (r in building["prodVal"]) {
+              if (r != "pollution"){
+                newRes[r] = newRes[r] + building["prodVal"][r];
+              }
+              else {
+                newPoll = newPoll + building["prodVal"]["pollution"];
+              }
+            }
+            // }
+            // return true;
           }
-        }
-        if (affordable == false) {
-          newRes[r] = thisGame["res"];
-          // console.log(thisGame["res"]);
-          console.log("was unaffordable");
-          thisGame["notes"].push(building.name + " was unaffordable and did not run");
-          return true;
         }
         else {
-          roundEmployed += 1;
-          thisGame["res"] = newRes;
-          thisGame["pollution"] = newPoll;
-          thisGame["notes"].push(building.name + " ran successfully!")
-          usingResource = false;
-          console.log("consumed stuff, checking out neighboring resources");
+          // running = false;
+          console.log(building.name + " did not run cause out of people");
+          thisGame["notes"].push(building.name + " did not run cause out of people");
 
-          //neighborUses gets used, if neighboring resource is present. Either by neighborneed or bonus mode
-            //bonusProds is the extra production that happens is neighborUse succeeds
-          //neighborAffect affects the neigboring resource
+        }
+        console.log("trying to update game");
+        Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
 
-          if ("neighboringResource" in building) {
-            nres =  Resources.findOne({"_id": building["neighboringResource"]});
-            newnres = nres["stats"];
-            neighbUse = false;
-            console.log("found a neighboring resource");
-            if ("neighborUse" in building) {
-              console.log("gonna use a neighboring resource " + JSON.stringify(nres) + " " + JSON.stringify(building["neighborUse"]));
-              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
-                console.log("neighboring resource available")
-                neighbUse = true;
-                newnres[building["neighborUse"]["res"]] -= building["neighborUse"]["amount"];
-              }
-              else {
+      }
 
-              }
-            }
-            if ("neighborAffect" in building) {
-              //currently assuming neighbor affect is only pollution
-              if ("pollution" in newnres){
-                newnres["pollution"] += building["neighborAffect"]["pollution"];
-              }
-              else {
-                console.log("this neighboring affect was gonna receive some pollution but it doesn't have the pollution stat? ugh");
-              }
-            }
+      async function runThroughBuilds(buildings) {
+        // gameTeams = {};
 
-            if ("neighborBonus" in building) {
-              console.log("bonus mode attempt");
-              if ("pollution" in building["bonusProd"]){
-                newPoll += building["bonusProd"]["pollution"];
+        await Games.update({$and: [{"gameCode": buildings[0].gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
+
+        for (b in buildings) {
+          bb = buildings[b];
+
+          if ("running" in bb) {
+            if (bb["running"] == true) {
+              // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
+              try {
+                console.log("calling eat and make");
+                console.log(bb);
+                await EatAndMake(bb["ownerGame"], bb);
               }
-              if (neighbUse == true) {
-                console.log("bonus mode resource use was affordable!")
-                newRes[building["bonusProd"]["res"]] += building["bonusProd"]["amount"];
-              } 
-            }
-            console.log(building["neighboringResource"]);
-            console.log(newnres);
-            await Resources.update({"_id": building["neighboringResource"]}, {$set: {stats: newnres}});
-          }
-          console.log("making the worth");
-          for (r in building["prodVal"]) {
-            if (r != "pollution"){
-              newRes[r] = newRes[r] + building["prodVal"][r];
-            }
-            else {
-              newPoll = newPoll + building["prodVal"]["pollution"];
+              catch (err) {
+                console.log(err);
+              }
+              
             }
           }
-          // }
-          // return true;
+          // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
+          // console.log(bb["kind"]);
         }
       }
-      else {
-        // running = false;
-        console.log(building.name + " did not run cause out of people");
-        thisGame["notes"].push(building.name + " did not run cause out of people");
-
+      Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
+      buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
+      if (buildings.length > 0){
+        runThroughBuilds(buildings);
       }
-      console.log("trying to update game");
-      Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
-
+      console.log("trying to update year");
+      thisyear = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
+      if ("year" in thisyear) {thisyear = thisyear.year + 1;}
+      else {thisyear = 1;}
+      Games.update(
+        {"gameCode": gameCode}, 
+        {$set: {"year": thisyear, "phase": "pre-bid"}}, 
+        {multi: true});
+      // console.log(Games.find({"gameCode": gameCode}).fetch());
     }
-
-    async function runThroughBuilds(buildings) {
-      // gameTeams = {};
-      await Games.update({$and: [{"gameCode": buildings[0].gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
-
-      for (b in buildings) {
-        bb = buildings[b];
-
-        if ("running" in bb) {
-          if (bb["running"] == true) {
-            // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
-            try {
-              console.log("calling eat and make");
-              console.log(bb);
-              await EatAndMake(bb["ownerGame"], bb);
-            }
-            catch (err) {
-              console.log(err);
-            }
-            
-          }
-        }
-        // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
-        // console.log(bb["kind"]);
-      }
-    }
-    Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
-    buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
-    runThroughBuilds(buildings);
-    Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "pre-bid"}}, {$inc: {"year": 1}});
-  }
   }
 });
 
@@ -991,12 +1001,12 @@ export const AddBuilding = new ValidatedMethod({
     };
 
     var infoTexts = {
-      "claymine":  "5 clay, 2 pollution for 2 food and 2 lumber. For neighboring clay ore (2), 8 clay and 3 pollution",
-      "coppermine": "5 copper, 2 pollution for 2 food and 2 lumber. For neighboring copper ore (2), 8 copper and 3 pollution",
-      "foodfarm": "5 food for 1 lumber, 1 clay. 8 food and 2 water pollution, if river nearby.",
-      "foodfishing": "5 food for 1 copper, 2 fish. Needs water nearby.",
-      "foodhunting": "3 food for 2 animals. Needs woods nearby.",
-      "lumbercamp": "8 wood for 1 clay, 3 lumber. Needs woods nearby."
+      "claymine":  "Produces: 5 clay, 2 pollution (or 8 clay and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
+      "coppermine": "Produces: 5 copper, 2 pollution (or 8 copper and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
+      "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 1 lumber, 1 clay. ",
+      "foodfishing": "Produces: 5 food, Uses: 1 copper, and 2 fish from nearby water. Can only be placed next to water.",
+      "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest). Needs forest nearby.",
+      "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest). Needs forest nearby."
     }
 
     //neighborNeeds specifies requirement which restricts  placement
@@ -1166,7 +1176,11 @@ export const ResetTeamResources = new ValidatedMethod({
       {$set: {"res": newres, 
         "pollution": 2, "population": 5, "happiness": 5, "roundEmployed": 0}},
       {multi: true});
-
+    Games.update(
+      {$and: [{"gameCode": gameCode}]},
+      {$set: {"year": 1, "phase": "pre-bid"}},
+      {multi: true}
+    );
   }
 })
 
@@ -1257,8 +1271,7 @@ export const MakeMap = new ValidatedMethod({
         [13, 0], [13, 1], [13, 2], [13, 3], [13, 4], [13, 5], 
         [14, 0], [14, 1], [14, 2], [14, 3], [14, 4], [14, 5], 
         [15, 0], [15, 1], [15, 2], [15, 3], [15, 4], [15, 5] ],
-        "lake": [ [7, 0], [8, 0], [7, 1], [8, 1], [6, 2], [7, 2], [6, 3], [7, 3], [6, 4], [7, 4],
-        [5, 5], [6, 5], [5, 6], [6, 6], [5, 7], [6, 7], [5, 8], [6, 8], [5, 9], [6, 9], [5, 10], [6, 10], [5, 11], [6, 11],
+        "lake": [ [7, 0], [8, 0], [7, 1], [8, 1], [6, 2], [7, 2], [6, 3], [7, 3], [6, 4], [7, 4], [6, 5], [7, 5], [5, 6], [6, 6], [5, 7], [6, 7], [5, 8], [6, 8], [5, 9], [6, 9], [5, 10], [6, 10], [5, 11], [6, 11],
         [6, 12], [6, 13], [7, 12], [7, 13], [8, 12], [8, 13], [9, 12], [9, 13], [10, 12], [10, 13], [11, 12], [11, 13], 
         [10, 14], [11, 14], [10, 15], [11, 15]
         ],
@@ -1401,7 +1414,8 @@ export const StartGame = new ValidatedMethod({
         "group": "none",
         // "groupList":  baseList.slice(0,cityCount),
         "groupList":  baseList,
-        "year": year
+        "year": year,
+        "phase": "pre-bid"
       });
       for (var i = 0; i < cityCount; i++) {
         // console.log(baseList[i]);
@@ -1416,7 +1430,7 @@ export const StartGame = new ValidatedMethod({
           neighbors.push(baseList[((i + 1) % cityCount)]);
         }
         // neighbors = baseList[i - 1];
-        JoinGame.call({"playerName": baseList[i], "playerId": Meteor.users.findOne({"profile.name": baseList[i]})._id, "gameCode": newgc, "role": "base", "neighbors": neighbors}, (err, res) => {
+        JoinGame.call({"playerName": baseList[i], "playerId": Meteor.users.findOne({"profile.name": baseList[i]})._id, "gameCode": newgc, "role": "base", "year": year, "neighbors": neighbors}, (err, res) => {
           if (err) {
             console.log(err);
             return err;
@@ -1516,7 +1530,7 @@ generate_random_string = function(string_length){
 export const JoinGame = new ValidatedMethod({
   name: 'game.join',
   validate({}) {},
-  run({playerName, playerId, gameCode, role, neighbors = []}) {
+  run({playerName, playerId, gameCode, role, year = 0, neighbors = []}) {
     if (!this.isSimulation) {
       console.log(gameCode);
       gameCode = gameCode.toLowerCase();
@@ -1559,7 +1573,7 @@ export const JoinGame = new ValidatedMethod({
         }
 
         deets["group"] = group;
-
+        deets["year"] = year;
 
         Games.update({
           "gameCode": gameCode, 

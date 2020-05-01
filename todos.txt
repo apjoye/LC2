@@ -1,8 +1,50 @@
 TODOS
 
+BUGS:
+- the fixed navbar breaks things?
+// - the confirm placement popup is wrong currently
+// - update year for all accounts
+// - change river's diagonal contact with red city
 
-make bidding row look better - actually have images
-  give bidding feedback - either reset bids, and/or give an update
+Tutorial:
+  give everyone buildings in the first round
+  add tooltip for resource icons
+
+Base view tells what phase the game is in - bidding or buildings
+
+all online features
+  way to tell team composition
+  city view button of committing bids (and building statuses)
+  combine base view with user view **tricky
+
+confusions:
+- tried to play copper mine on copper ore; how to make clearer that you can only place on your city tiles
+- running/stopped switch
+
+- notify when you receive a trade
+- make trades promise based?
+
+more feedback:
+  - tell building ownership; bid feedback is important
+
+nicer future ui things:
+  lumber amount should change woods icon
+  do more graphical output of pollution from cities
+
+next features:
+  add population, happiness changes
+  add renewability
+  make bidding row look better - actually have images
+    give bidding feedback - either reset bids, and/or give an update
+  hitsory of things
+
+
+futures:
+- owned copper/clay/other resources throughout the universe
+- 
+
+------
+
 
 tutorialize
   the second row of numbers is upcoming info (Expected usage)
