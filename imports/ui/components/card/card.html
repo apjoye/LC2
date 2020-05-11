@@ -1,20 +1,19 @@
 <template name="factoryList">
-  <div class="container">
     <!-- <div class="row">
       <div class="col-md-12" style="text-align: center; font-size:18px; "> Marketplace </div>
     </div> -->
     <h4> Marketplace </h4>
 
-     <div class="container">
-      <div class="row">
+      <div class="row" style="text-align: center;">
         {{CityBids}}
         {{#each build in PublicBuildings}}
-          <div class="col-md-4">
+          <div class="col-md-4 buildingbid">
             <!-- {{buildingText build}} -->
-              <strong>{{build.name}}</strong>
+            <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+              <h4>{{build.name}}</h4>
               <br />
               {{build.infoText}}
-             <br />
+              <br />
             <!-- {{build.name}}  <br /> -->
             <br />
             <div class="btn-group" role="group">
@@ -25,7 +24,6 @@
           </div>
         {{/each}}
       </div>
-    </div>
 
 
     <!-- {{#each bidKinds}}
@@ -45,7 +43,6 @@
       </div> 
     {{/each}} -->
     
-    </div>
     
    
   </template>
