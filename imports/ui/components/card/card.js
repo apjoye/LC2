@@ -26,6 +26,16 @@ Template.factoryList.onCreated(function helloOnCreated() {
   this.gameStats = new ReactiveVar({});
   this.buildingBids = new ReactiveVar([]);
   this.resBids = new ReactiveVar([]);
+
+  buildingImg = {
+    "claymine": "../img/buildings/claymine.png",
+    "coppermine": "../img/buildings/coppermine.png",
+    "foodfarm": "../img/buildings/foodfarm.png",
+    "foodfishing": "../img/buildings/foodfishing.png",
+    "foodhunting": "../img/buildings/foodhunting.png",
+    "lumbercamp": "../img/buildings/lumbercamp.png"
+  }
+  this.buildingImg = buildingImg;
 });
 
 Template.factoryList.helpers({
@@ -37,7 +47,7 @@ Template.factoryList.helpers({
     // return ["wood", "lumber", "clay", "copper"];
   },
 
-  PublicFactories(bidKind) {
+  PublicFactories(bidKind) {    
     // console.log((Producers.find({})).toArray());
     // console.log(bidKind);
     prods = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": false}, {"visible": true}, {"bidKind": bidKind}]}).fetch();
@@ -121,6 +131,7 @@ Template.factoryList.helpers({
     text += " Uses:" + JSON.stringify(building.prodCost);
     text += " Produces: " + JSON.stringify(building.prodVal);
     text += " Bid Kind: " + JSON.stringify(building.bidKind);
+    building["image"] = buildingImg["building"];
     return text;
   },
 
@@ -220,6 +231,7 @@ Template.factoryList.events({
 Template.factoryList.onCreated(function helloOnCreated() {
   Meteor.subscribe('bids.local');
   Meteor.subscribe('games.minerunning');
+
 });
 
 Template.factory.onRendered(function () {

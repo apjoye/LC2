@@ -794,6 +794,7 @@ Template.cityFactory.events({
 });
 
 //sticky score bar function
+/*
 $(window).scroll(function(){
   if($(this).scrollTop() >= 82){
     $('.fixed-top-bar').addClass('fixed');
@@ -801,6 +802,7 @@ $(window).scroll(function(){
     $('.fixed-top-bar').removeClass('fixed');
   }
 });
+*/
 
 
 
