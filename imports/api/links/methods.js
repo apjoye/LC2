@@ -937,6 +937,15 @@ export const AddBuilding = new ValidatedMethod({
     //owner = ""
     //type = ""
 
+    var buildImages = {
+      "claymine": "../img/buildings/claymine.png",
+      "coppermine": "../img/buildings/coppermine.png",
+      "foodfarm": "../img/buildings/foodfarm.png",
+      "foodfishing": "../img/buildings/foodfishing.png",
+      "foodhunting": "../img/buildings/foodhunting.png",
+      "lumbercamp": "../img/buildings/lumbercamp.png"
+    }
+
     //mine kinds include metalmine, claymine, coppermine, etc
     //farm kinds include fishfarm, 
     
@@ -1021,6 +1030,13 @@ export const AddBuilding = new ValidatedMethod({
 
     buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "infoText": infoText, "running": false, "prodCost": prodCost, "prodVal": prodVal, "state": "auction", "placed": false, "visible": true};
     
+    // varList = [buildImages, neighborNeeds, neighborBonuses, neighborUses, neighborAffects, bonusProds];
+    // for (v in varList) {
+    //   buildObj
+    // }
+    if (buildingName in buildImages) {
+      buildObj["image"] = buildImages[buildingName];
+    }
     if (buildingName in neighborNeeds) {
       buildObj["neighborNeed"] = neighborNeeds[buildingName];
     }

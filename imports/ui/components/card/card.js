@@ -26,16 +26,6 @@ Template.factoryList.onCreated(function helloOnCreated() {
   this.gameStats = new ReactiveVar({});
   this.buildingBids = new ReactiveVar([]);
   this.resBids = new ReactiveVar([]);
-
-  buildingImg = {
-    "claymine": "../img/buildings/claymine.png",
-    "coppermine": "../img/buildings/coppermine.png",
-    "foodfarm": "../img/buildings/foodfarm.png",
-    "foodfishing": "../img/buildings/foodfishing.png",
-    "foodhunting": "../img/buildings/foodhunting.png",
-    "lumbercamp": "../img/buildings/lumbercamp.png"
-  }
-  this.buildingImg = buildingImg;
 });
 
 Template.factoryList.helpers({
@@ -60,8 +50,8 @@ Template.factoryList.helpers({
   },
 
   PublicBuildings () {
-    builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": false}, {"visible": true}, {"state": "auction"}] });
-    // console.log(builds.fetch());
+    builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {$or: [{"owned": false}, {"state": "last-round"}]}, {"visible": true}, {"state": "auction"}] });
+    console.log(builds.fetch());
     // console.log(Buildings.find().fetch());
     // console.log(FlowRouter.getParam("gameCode"));
     return builds;
@@ -131,7 +121,7 @@ Template.factoryList.helpers({
     text += " Uses:" + JSON.stringify(building.prodCost);
     text += " Produces: " + JSON.stringify(building.prodVal);
     text += " Bid Kind: " + JSON.stringify(building.bidKind);
-    building["image"] = buildingImg["building"];
+    // building["image"] = buildingImg["building"];
     return text;
   },
 
