@@ -18,6 +18,7 @@ Template.navBar.helpers({
      // console.log(gameCode);
      group = "";
      year = "";
+     phase = "";
      if (gameCode != undefined){
        game = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": gameCode}]});
        if (game != undefined) { 
@@ -25,11 +26,19 @@ Template.navBar.helpers({
          if ("year" in game) {
            year = game["year"];
          }
+         if ("phase" in game) {
+           if (game["phase"] == "pre-bid") {
+             phase = "Bidding!";
+           }
+           else if (game["phase"] == "post-bid") {
+             phase = "Choose and run your buildings!"
+           }
+         }
        }
      }
      if (group != ""){ group = group; }
      
-     return {"group": group, "year": year};
+     return {"group": group, "year": year, "phase": phase};
    },
 
    gameCode () {

@@ -108,6 +108,9 @@ Template.gameMap.helpers({
       "green-city": "rgba(0,255,0,0.3)",
       "pink-city": "rgba(255, 51, 153, 0.3)",
     }
+    isometricTiles = {
+      
+    }
     // highLightColors = {
     //   "red-city": "rgba(255,0,0,0.6)",
     //   "yellow-city": "rgba(255,255,0,0.3)",
