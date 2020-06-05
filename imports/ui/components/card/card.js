@@ -56,6 +56,7 @@ Template.factoryList.helpers({
         {"visible": true}, ] 
       }).fetch();
       for (b in builds) {
+        builds[b]["buttonClasses"] = "disabled";
         var classes = "";
         if (builds[b]["owned"] == true) {
           builds[b]["alertStatus"] = true;
@@ -75,8 +76,8 @@ Template.factoryList.helpers({
         builds[b]["classes"] = classes;
       }
     }
-    console.log(Buildings.find({"roundAcquired": thisGame.year}).fetch());
-    console.log(thisGame.year);
+    // console.log(Buildings.find({"roundAcquired": thisGame.year}).fetch());
+    console.log(builds);
     return builds;
   },
 
