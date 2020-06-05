@@ -1,11 +1,5 @@
 TODOS
 
-BUGS:
-- the fixed navbar breaks things?
-// - the confirm placement popup is wrong currently
-// - update year for all accounts
-// - change river's diagonal contact with red city
-
 Tutorial:
   give everyone buildings in the first round
   add tooltip for resource icons

@@ -120,6 +120,18 @@
     margin-bottom: 5px;*/
 }
 
+.bidWon {
+	background: green;
+}
+
+.bidLost {
+	background: red;
+}
+
+.otherAlert {
+	background: yellow;
+}
+
 /*.productionLabel {
 	font-size: 18px;
 	font-weight: bold;

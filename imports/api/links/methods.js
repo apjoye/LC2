@@ -198,12 +198,12 @@ export const RunBids2 = new ValidatedMethod({
           await Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
 
         // >> change producer owner
-          await Buildings.update({"_id": bid.buildingId}, {$set: { "owned": true, "state": "owned", "ownerId": thisGame.playerId, "ownerGame": thisGame._id, "owner": thisGame.group}});
+          await Buildings.update({"_id": bid.buildingId}, {$set: { "owned": true, "state": "bought", "ownerId": thisGame.playerId, "ownerGame": thisGame._id, "owner": thisGame.group, "roundAcquired": thisGame.year}});
 
         // >> add log about producer purchase
           evLog = bid;
           evLog["oldRes"] = oldRes;
-          evLog["newRes"] = newRes
+          evLog["newRes"] = newRes;
           MakeLog.call({"key": "BuildingAcquire", "log": evLog});
 
         // >> give note to success of bid?
@@ -288,7 +288,7 @@ export const RunBids2 = new ValidatedMethod({
           await resolveBids(allProducers[ap], gameCode);
         }
         // await Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}}, {$inc: {"year": 1}})
-        await Games.update({$and: [{"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}});
+        await Games.update({$and: [{"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}}, {multi: true});
         await clearBids(allProducers[ap], gameCode);
       }
       
@@ -1083,7 +1083,7 @@ export const AddBuilding = new ValidatedMethod({
       buildObj["owner"] = groupName;
       buildObj["ownerId"] = groupId;
       buildObj["ownerGame"] = groupGame
-      buildObj["state"] = "bought";
+      buildObj["state"] = "owned";
       if (locx != -1){
         buildObj["location"] = [locx, locy];
         buildObj["state"] = "placed";

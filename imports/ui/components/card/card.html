@@ -7,7 +7,7 @@
       <div class="row" style="text-align: center;">
         {{CityBids}}
         {{#each build in PublicBuildings}}
-          <div class="col-md-4 buildingbid">
+          <div class="col-md-4 buildingbid {{build.classes}}">
             <!-- {{buildingText build}} -->
             <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
               <h4>{{build.name}}</h4>
@@ -17,9 +17,9 @@
             <!-- {{build.name}}  <br /> -->
             <br />
             <div class="btn-group" role="group">
-              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}}" name="-1">   -1   </button>
-              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}}" name="+1">   +1   </button>
-              <button type="button" class="btn {{bidClass build._id}}" name="buildValue">   {{bidValue build._id}}  {{build.bidKind}} </button>
+              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.phase}} {{build.buttonClasses}}" name="-1">   -1   </button>
+              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.buttonClasses}}" name="+1">   +1   </button>
+              <button type="button" class="btn {{bidClass build._id}} {{build.buttonClasses}}" name="buildValue">   {{bidValue build._id}}  {{build.bidKind}} </button>
             </div>
           </div>
         {{/each}}

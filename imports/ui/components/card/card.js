@@ -20,7 +20,8 @@ Template.factoryList.onCreated(function helloOnCreated() {
   // counter starts at 0
   Meteor.subscribe('producers.public');
   Meteor.subscribe('games.minerunning');
-  Meteor.subscribe('buildings.auction', FlowRouter.getParam('gameCode'));
+  // Meteor.subscribe('buildings.auction', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('bids.local');
   this.city = new ReactiveVar("city1");
   this.gameStats = new ReactiveVar({});
@@ -37,23 +38,45 @@ Template.factoryList.helpers({
     // return ["wood", "lumber", "clay", "copper"];
   },
 
-  PublicFactories(bidKind) {    
-    // console.log((Producers.find({})).toArray());
-    // console.log(bidKind);
-    prods = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": false}, {"visible": true}, {"bidKind": bidKind}]}).fetch();
-    // while (prods.length < 4) {
-    //   prods.push({});
-    // }
-    // console.log(prods);
-    return prods; 
-    // return Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"owned": false}, {"visible": true}, {"bidKind": bidKind}]});
-  },
 
   PublicBuildings () {
-    builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {$or: [{"owned": false}, {"state": "last-round"}]}, {"visible": true}, {"state": "auction"}] });
-    console.log(builds.fetch());
-    // console.log(Buildings.find().fetch());
-    // console.log(FlowRouter.getParam("gameCode"));
+    thisGame = Template.instance().gameStats.get();
+    if (thisGame.phase == "pre-bid"){
+      builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {$or: [{"owned": false}]}, {"visible": true}, {"state": "auction"}] }).fetch();
+      builds = builds.map(x => {x["buttonClasses"] = ""; x["classes"] = ""; return x})
+    }
+    else if (thisGame.phase == "post-bid") {
+
+      builds = Buildings.find({$and: [
+        {"gameCode": FlowRouter.getParam("gameCode")}, 
+        {$or: [
+          {$or: [{"owned": false}, {"state": "auction"}]},
+          {"roundAcquired": thisGame.year}
+        ]}, 
+        {"visible": true}, ] 
+      }).fetch();
+      for (b in builds) {
+        var classes = "";
+        if (builds[b]["owned"] == true) {
+          builds[b]["alertStatus"] = true;
+          if (builds[b]["owner"] == thisGame.group) {
+            classes += "bidWon";
+            builds[b]["alert"] = "You won this building!";
+          }
+          else {
+            classes += "bidLost";
+            builds[b]["alert"] = "Someone else got this building!";
+          }
+        }
+        else if ("alert" in builds[b]) {
+          builds[b]["alertStatus"] = true;
+          classes += "otherAlert";
+        }
+        builds[b]["classes"] = classes;
+      }
+    }
+    console.log(Buildings.find({"roundAcquired": thisGame.year}).fetch());
+    console.log(thisGame.year);
     return builds;
   },
 
