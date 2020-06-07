@@ -123,7 +123,11 @@
             {{/each}}
             {{#if currentBuilding.buildingButtons}}
             <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
-              <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> {{currentBuilding.status}} <small>(Click to toggle) </small> </button>
+              <!-- <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> {{currentBuilding.status}} <small>(Click to toggle) </small> </button> -->
+              <label class="switch toggleBuilding" id="{{currentBuilding.mapCell.building._id}}">
+                <input type="checkbox" {{currentBuilding.buttonStatus}}>
+                <span class="slider round"></span>
+              </label>
               <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
             </div>
             {{/if}}

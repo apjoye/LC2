@@ -514,10 +514,12 @@ Template.cityMap.helpers({
         boxContent["buildingButtons"] = true;
         if (mapSelect["building"]["running"] == true) {
           boxContent["status"] = "Running";
+          boxContent["buttonStatus"] = "checked";
         }
         else {
           boxContent["status"] = "Idle";
           boxContent["image"] = boxContent["image"].slice(0, -4) + "_g.png";
+          boxContent["buttonStatus"] = "";
         }
       }
       else {
@@ -605,11 +607,12 @@ Template.cityMap.events({
   },
 
   'click .toggleBuilding': function (event, instance) {
-    event.preventDefault();
+    // event.preventDefault();
+    console.log(event.target)
     bb = Template.instance().data.map[Template.instance().selectedLoc.get()]["building"];
     bs = instance.buildings.get();
     pop = instance.game.get().population;
-    // console.log(pop);
+    console.log(pop);
     workingPop = 0;
     for (b in bs) {
       if (bs[b]["running"] == true) {
