@@ -15,15 +15,12 @@
     <!-- <h3>Your City's Production</h3> -->
 
     <div class ="row" style="margin-left: 0; margin-right: 0;">
-        <div class="col-md-1 col-sm-1" style="transform: translateY(50%);">
-          <p class="font-style" style="transform: translateX(-10%);"> Resources </p>
-        </div>
         <!-- {{#each cityResources}}
         {{this.image}}
         {{/each}} -->
         
         {{#each cr in cityResources}}
-        <div class="col-sm-1">
+        <div class="col-md-1 col-sm-2 col-xs-12">
           <div class = "image-part" style="display: inline-block; width: 46%; text-align: center;">
             <h4>{{cr.roundProduction}}</h4>
           <img class="cityIcon" src="{{cr.image}}">
@@ -31,7 +28,7 @@
           <div class = "status-part" style="display: inline-block; width: 46%;">
           <h2> {{cr.amount}} </h2> 
         </div>
-        <div class = "status-name"><h4>{{cr.res}}</h4></div>
+        <div class = "status-name" style="overflow-wrap: break-word;"><h4>{{cr.res}}</h4></div>
         </div>
         {{/each}}
     </div>
@@ -88,7 +85,7 @@
       <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Buildings</p>
   <div class="slider-building">
     {{#each build in boughtBuildings}}
-      <div class="col-md-4 boughtBuilding" style="border-style: outset; margin-right: 4%;">
+    <div class="col-md-4 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%;">
           <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
         <!--{{build.name}}-->
         <!-- <p>Produce</p>
@@ -97,7 +94,7 @@
         {{#if buildingPlacable build}}
 
                 <!-- <div class="placementButtons" style="position:absolute"> -->
-          <button id="startPlace-{{build._id}}" class="btn btn-primary startPlace" style=" display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Place Building </button>
+                  <button id="startPlace-{{build._id}}" class="btn btn-primary startPlace" style=" display: block; margin-top: 4%; margin-left: auto; margin-right: auto; padding-bottom: 4%;"> Place Building </button>
           <div id="confirmPlace-{{build._id}}" style="display: none">
             <button class="btn btn-success placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Confirm Placement </button>
             <button id="cancelPlace-{{build._id}}" class="btn btn-default cancelPlace" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Cancel Placement </button>
@@ -124,10 +121,13 @@
             {{#if currentBuilding.buildingButtons}}
             <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
               <!-- <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> {{currentBuilding.status}} <small>(Click to toggle) </small> </button> -->
+              <div>Off
               <label class="switch toggleBuilding" id="{{currentBuilding.mapCell.building._id}}">
                 <input type="checkbox" {{currentBuilding.buttonStatus}}>
                 <span class="slider round"></span>
               </label>
+              On
+            </div>
               <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
             </div>
             {{/if}}
