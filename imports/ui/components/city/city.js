@@ -101,6 +101,7 @@ Template.city.helpers({
     //GETTING OTHER CITY STATS INFO IN HERE
     resPrint = [];
     // console.log(thisGame);
+    resPrint.push({"roundProduction": "Resources"});
     for (r in thisGame.res) {
       thisRes = {"res": r};
       thisRes["amount"] = thisGame.res[r];

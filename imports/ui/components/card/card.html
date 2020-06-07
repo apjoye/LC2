@@ -2,12 +2,12 @@
     <!-- <div class="row">
       <div class="col-md-12" style="text-align: center; font-size:18px; "> Marketplace </div>
     </div> -->
-    <h4> Marketplace </h4>
+    <p class = "center-title" style="font-size: 2em; font-size: 30px; font-weight: 500px; margin-top: 20px;">Marketplace</p>
 
-      <div class="row" style="text-align: center;">
+    <div class="row equal-height-parent" style="text-align: center;">
         {{CityBids}}
         {{#each build in PublicBuildings}}
-          <div class="col-md-4 buildingbid {{build.classes}}">
+        <div class="col-md-3 buildingbid {{build.classes}} equal-height">
             <!-- {{buildingText build}} -->
             <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
               <h4>{{build.name}}</h4>
@@ -20,9 +20,11 @@
               {{build.alert}}
             {{/if}}
             <div class="btn-group" role="group">
-              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.phase}} {{build.buttonClasses}}" name="-1">   -1   </button>
-              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.buttonClasses}}" name="+1">   +1   </button>
+              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.phase}} {{build.buttonClasses}}" name="-1">   -   </button>
+              
               <button type="button" class="btn {{bidClass build._id}} {{build.buttonClasses}}" name="buildValue">   {{bidValue build._id}}  {{build.bidKind}} </button>
+
+              <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.buttonClasses}}" name="+1">   +   </button>
             </div>
           </div>
         {{/each}}
@@ -47,7 +49,15 @@
     {{/each}} -->
     
     
-   
+    <div class = "switch-button" style="margin-top: 3%;">
+      <h3>I'm ready!</h3>
+      <div class="checkbox-container">
+        <input type="checkbox" id="toggle" />
+        <label for="toggle"></label>
+        <div class="active-circle"></div>
+      </div>
+
+  </div>
   </template>
 
 
