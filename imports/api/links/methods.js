@@ -92,6 +92,8 @@ export const RandomProducer = new ValidatedMethod({
           "p1": { "m1": 0, "f1": 0, "m2": 0, "f2": 0 },
           "p2": { "m1": 0, "f1": 0, "m2": 0, "f2": 0 },
         };
+
+
         var kinds = Object.keys(buyCosts);
         
         //make this kindChosen number random, or incrementing
@@ -928,6 +930,40 @@ export const BuildingNeighbors = new ValidatedMethod ({
 // });
 
 
+function resDictToArr(dict) {
+  retArr = []
+  for (d in dict) {
+    if (dict[d] > 0) {
+      retArr.push({"res": d, "amount": dict[d], "image": resImages[d]})
+    }
+  }
+  return retArr;
+}
+
+const buildImages = {
+  "claymine": "../img/buildings/claymine.png",
+  "coppermine": "../img/buildings/coppermine.png",
+  "foodfarm": "../img/buildings/foodfarm.png",
+  "foodfishing": "../img/buildings/foodfishing.png",
+  "foodhunting": "../img/buildings/foodhunting.png",
+  "lumbercamp": "../img/buildings/lumbercamp.png"
+}
+
+
+const resImages = {
+  "m1": "../img/icons/gold_sml.png",
+  "f1": "../img/icons/food_sml.png",
+  "m2": "../img/icons/steel_sml.png",
+  "f2": "../img/icons/cotton_sml.png",
+  "food": "../img/resources/food.png",
+  "clay": "../img/resources/clay.png",
+  "copper": "../img/resources/copper.png",
+  "lumber": "../img/resources/lumber.png",
+  "pollution": "../img/icons/pollution_sml.png",
+  "population": "../img/icons/population_sml.png",
+  "happiness": "../img/icons/happiness_sml.png"
+};
+
 
 export const AddBuilding = new ValidatedMethod({
   name: 'add.build',
@@ -937,14 +973,7 @@ export const AddBuilding = new ValidatedMethod({
     //owner = ""
     //type = ""
 
-    var buildImages = {
-      "claymine": "../img/buildings/claymine.png",
-      "coppermine": "../img/buildings/coppermine.png",
-      "foodfarm": "../img/buildings/foodfarm.png",
-      "foodfishing": "../img/buildings/foodfishing.png",
-      "foodhunting": "../img/buildings/foodhunting.png",
-      "lumbercamp": "../img/buildings/lumbercamp.png"
-    }
+    
 
     //mine kinds include metalmine, claymine, coppermine, etc
     //farm kinds include fishfarm, 
@@ -1025,10 +1054,17 @@ export const AddBuilding = new ValidatedMethod({
     //neighborAffect affects the neigboring resource
 
     prodCost = prodCosts[buildingName];
+    prodCostArr = resDictToArr(prodCost);
     prodVal = prodVals[buildingName];
+    prodValArr = resDictToArr(prodVal);
     infoText = infoTexts[buildingName] ;
 
-    buildObj = {"gameCode": gameCode, "owned": false, "name": buildingName, "bidKind": bidKind, buildFeatures: buildFeatures[buildingName], "infoText": infoText, "running": false, "prodCost": prodCost, "prodVal": prodVal, "state": "auction", "placed": false, "visible": true};
+    buildObj = {
+      "gameCode": gameCode, "owned": false, "name": buildingName, 
+      "bidKind": bidKind, "buildFeatures": buildFeatures[buildingName], "infoText": infoText, 
+      "running": false, "prodCost": prodCost, "prodVal": prodVal, 
+      "prodCostArr": prodCostArr, "prodValArr": prodValArr,
+      "state": "auction", "placed": false, "visible": true};
     
     // varList = [buildImages, neighborNeeds, neighborBonuses, neighborUses, neighborAffects, bonusProds];
     // for (v in varList) {

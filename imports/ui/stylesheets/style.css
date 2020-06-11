@@ -3,7 +3,8 @@
 }
 
 .cityIcon {
-    max-height: 50px;
+    height: 40px;
+    width: auto;
     max-width: 90%;
     margin: 2px;
 }

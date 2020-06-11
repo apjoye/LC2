@@ -90,7 +90,16 @@
         <!--{{build.name}}-->
         <!-- <p>Produce</p>
         <p>Consume</p> -->
-        {{build.infoText}}
+        <!-- {{build.infoText}} -->
+        Uses: 
+        {{#each p in build.prodCostArr}}
+          {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+        {{/each}}
+        <br />
+        Produces: 
+        {{#each p in build.prodValArr}}
+          {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+        {{/each}}
         {{#if buildingPlacable build}}
 
                 <!-- <div class="placementButtons" style="position:absolute"> -->

@@ -266,7 +266,22 @@ Template.cityMap.onCreated(function helloOnCreated() {
       "pink-city": "rgba(255, 51, 153, 0.2)",
     }
 
+    resImages = {
+      "m1": "../img/icons/gold_sml.png",
+      "f1": "../img/icons/food_sml.png",
+      "m2": "../img/icons/steel_sml.png",
+      "f2": "../img/icons/cotton_sml.png",
+      "food": "../img/resources/food.png",
+      "clay": "../img/resources/clay.png",
+      "copper": "../img/resources/copper.png",
+      "lumber": "../img/resources/lumber.png",
+      "pollution": "../img/icons/pollution_sml.png",
+      "population": "../img/icons/population_sml.png",
+      "happiness": "../img/icons/happiness_sml.png"
+    };
+
     this.mapTiles = mapTiles;
+    this.resImages = resImages;
     this.bgColors = bgColors;
 });
 
@@ -423,12 +438,27 @@ Template.cityMap.helpers({
     // console.log(Meteor.userId());
     bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
     // console.log(Buildings.find().fetch());
-    mapTiles = Template.instance().mapTiles
+    mapTiles = Template.instance().mapTiles;
+    resImages = Template.instance().resImages;
     bb = bb.fetch();
 
     for (b in bb) {
-      // console.log(bb[b]);
+      // pCost = [];
+      // pVal = [];
+      // for (p in bb[b]["prodCost"]) {
+      //   if (bb[b]["prodCost"][p] != 0) {
+      //     pCost.push({"res": p, "amount": bb[b]["prodCost"][p], "image": resImages[p]});
+      //   }
+      // }
+      // for (p in bb[b]["prodVal"]) {
+      //   if (bb[b]["prodVal"][p] != 0) {
+      //     pVal.push({"res": p, "amount": bb[b]["prodVal"][p], "image": resImages[p]});
+      //   }
+      // }
+      // bb[b]["pCost"] = pCost;
+      // bb[b]["pVal"] = pVal;
       bb[b]["image"] = mapTiles[bb[b]["name"]];
+      console.log(bb[b]);
     }
     return bb;
   },

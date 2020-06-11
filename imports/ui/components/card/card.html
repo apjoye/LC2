@@ -12,7 +12,16 @@
             <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
               <h4>{{build.name}}</h4>
               <br />
-              {{build.infoText}}
+              Uses: 
+              {{#each p in build.prodCostArr}}
+                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+              {{/each}}
+              <br />
+              Produces: 
+              {{#each p in build.prodValArr}}
+                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+              {{/each}}
+              
               <br />
             <!-- {{build.name}}  <br /> -->
             <br />
@@ -52,12 +61,11 @@
     <div class = "switch-button" style="margin-top: 3%;">
       <h3>I'm ready!</h3>
       <div class="checkbox-container">
-        <input type="checkbox" id="toggle" />
+        <input type="checkbox" id="ready-toggle" />
         <label for="toggle"></label>
         <div class="active-circle"></div>
       </div>
-
-  </div>
+    </div>
   </template>
 
 
