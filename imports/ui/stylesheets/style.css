@@ -122,15 +122,15 @@
 }
 
 .bidWon {
-	background: green;
+	background: #CAFFB9;
 }
 
 .bidLost {
-	background: red;
+	background: #ff6666;
 }
 
 .otherAlert {
-	background: yellow;
+	background: #ffff9f;
 }
 
 /*.productionLabel {
@@ -509,5 +509,5 @@ input:checked + .slider:before {
 	background-color: #47B881;
 }
 .equal-height{
-	height:350px;
+	height:380px;
 }
