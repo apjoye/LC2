@@ -556,6 +556,7 @@ Template.cityMap.helpers({
       else {
         if (mapSelect.ownerId == Meteor.userId()) {
           // console.log("owned cell, looking into neighbors");
+          boxContent.text.push("You own this cell! Place some buildings here!");
           resTexts = {
             "water": "Water nearby! You can fish here. Also, farms produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well",
             "lumber": "Woods nearby! You can hunt and collect lumber here.",
@@ -575,9 +576,21 @@ Template.cityMap.helpers({
             }
           }
         }
+        else {
+          boxContent.text.push("You don't own this cell! Place buildings on cells you own.");
+          if ("resource" in mapSelect) {
+            resTexts2 = {
+              "water": "This cell has water! Farms in adjacent squares produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well. You can also collect available fish for food from this!",
+              "lumber": "Woods nearby! You can hunt and collect lumber here.",
+              "clay": "Clay ore here! Clay mines placed adjacently use the ore, produce extra clay, and also extra pollution.",
+              "copper": "Copper ore here! Copper mines placed adjacently use the ore, produce extra clay, and also extra pollution.",
+            }
+            boxContent.text.push(resTexts2[mapSelect["resource"]["kind"]]);
+          }
+        }
       }
     }
-    // console.log(mapSelect);
+    console.log(mapSelect);
     // console.log(boxContent);
     return boxContent;
   },
@@ -590,7 +603,7 @@ Template.cityMap.helpers({
 
 Template.cityMap.events({
   'click .toggleImages' (event, instance) {
-    console.log(Template.instance().imageMode.get());
+    // console.log(Template.instance().imageMode.get());
     Template.instance().imageMode.set(!Template.instance().imageMode.get());
   },
   'click .mapCell' (event, instance) {
