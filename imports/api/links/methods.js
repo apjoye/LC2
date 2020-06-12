@@ -940,6 +940,10 @@ function resDictToArr(dict) {
   return retArr;
 }
 
+
+//mine kinds include metalmine, claymine, coppermine, etc
+//farm kinds include fishfarm, 
+
 const buildImages = {
   "claymine": "../img/buildings/claymine.png",
   "coppermine": "../img/buildings/coppermine.png",
@@ -964,190 +968,162 @@ const resImages = {
   "happiness": "../img/icons/happiness_sml.png"
 };
 
+const buildFeatures = {
+  "claymine": { "resKind": "clay", "buildKind": "mine", "resUse": "clay"},
+  "coppermine": { "resKind": "copper", "buildKind": "mine", "resUse": "copper"},
+  "foodfarm": { "resKind": "food", "buildKind": "farm", "resUse": "" },
+  "foodfishing": { "resKind": "food", "buildKind": "fishing", "resUse": "fish" },
+  "foodhunting": { "resKind": "food", "buildKind": "hunting", "resUse": "animals" },
+  "lumbercamp": { "resKind": "lumber", "buildKind": "camp", "resUse": "lumber" }
+};
+
+const prodCosts = {
+  "claymine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
+  "coppermine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
+  "foodfarm": { "lumber": 1, "clay" : 1, "copper": 0, "food": 0 },
+  "foodfishing": { "lumber": 0, "clay" : 0, "copper": 1, "food": 0 },
+  "foodhunting": { "lumber": 0, "clay" : 0, "copper": 0, "food": 0 },
+  "lumbercamp": { "lumber": 0, "clay" : 1, "copper": 0, "food": 0 }
+};
+
+const prodVals = {
+  "claymine": { "clay": 5, "pollution": 2 },
+  "coppermine": {"copper": 5, "pollution": 2},
+  "foodfarm": {"food": 5},
+  "foodfishing": {"food": 5},
+  "foodhunting": {"food": 3},
+  "lumbercamp": {"lumber": 8}
+};
+
+//neighborNeeds specifies requirement which restricts  placement
+//neighborBonuses indicates bonusmode if neighboring resource is available
+//neighborUses gets used, if neighboring resource is present. Either by neighborneed or bonus mdoe
+  //bonusProds is the extra production that happens is neighborUse succeeds
+//neighborAffect affects the neigboring resource
+
+
+const neighborBonuses = {
+ "claymine": {"resources": "clay", "buildings": []},
+  "coppermine": {"resources": "copper", "buildings": []},
+  "foodfarm": {"resources": "water", "buildings": []},
+}
+const neighborNeeds = {
+  "foodfishing": {"resources": "water", "buildings": []},
+  "foodhunting": {"resources": "lumber", "buildings": []},
+  "lumbercamp": {"resources": "lumber", "buildings": []}
+};
+
+
+const neighborUses = {
+  "claymine":  {"res": "clay", "amount": 2},
+  "coppermine": {"res": "copper", "amount": 2},
+  "foodfishing": {"res": "fish", "amount": 2},
+  "foodhunting": {"res": "animals", "amount": 2},
+  "lumbercamp": {"res": "lumber", "amount": 3}
+};
+
+const neighborAffects = {
+  "foodfarm": {"pollution": 2}
+}
+
+const bonusProds = {
+  "claymine": {"res": "clay", "amount" : 3, "pollution": 1},
+  "coppermine": {"res": "copper", "amount": 3, "pollution": 1},
+  "foodfarm": {"res": "food", "amount": 3}
+};
+
+const infoTexts = {
+  "claymine":  "Produces: 5 clay, 2 pollution (or 8 clay and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
+  "coppermine": "Produces: 5 copper, 2 pollution (or 8 copper and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
+  "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 1 lumber, 1 clay. ",
+  "foodfishing": "Produces: 5 food, Uses: 1 copper, and 2 fish from nearby water. Can only be placed next to water.",
+  "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest). Needs forest nearby.",
+  "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest). Needs forest nearby."
+};
+
+const bonusTexts = {
+  "claymine":  "+3 clay, +1 pollution if ore nearby",
+  "coppermine": "+3 copper, +1 pollution if ore nearby",
+  "foodfarm": "+3 food, 2 water pollution if river nearby",
+  "foodfishing": "Also uses: 2 fish from nearby water. Can only be placed next to water.",
+  "foodhunting": "Also uses: 2 animals (from the forest). Needs forest nearby.",
+  "lumbercamp": "Uses: 3 lumber (from the forest). Needs forest nearby."
+};
 
 export const AddBuilding = new ValidatedMethod({
   name: 'add.build',
   validate ({}) {},
   run({gameCode, locx, locy, bidKind, buildingName, groupName}) {
-    //locs = []
-    //owner = ""
-    //type = ""
+    if (!this.isSimulation) {
+ 
+      prodCost = prodCosts[buildingName];
+      prodCostArr = resDictToArr(prodCost);
+      prodVal = prodVals[buildingName];
+      prodValArr = resDictToArr(prodVal);
+      infoText = infoTexts[buildingName] ;
+      bonusText = bonusTexts[buildingName] ;
 
-    
-
-    //mine kinds include metalmine, claymine, coppermine, etc
-    //farm kinds include fishfarm, 
-    
-    
-    // valAssign
-    //wood = m1, clay = m2, copper = m3
-    var buildFeatures = {
-      "claymine": { "resKind": "clay", "buildKind": "mine", "resUse": "clay"},
-      "coppermine": { "resKind": "copper", "buildKind": "mine", "resUse": "copper"},
-      "foodfarm": { "resKind": "food", "buildKind": "farm", "resUse": "" },
-      "foodfishing": { "resKind": "food", "buildKind": "fishing", "resUse": "fish" },
-      "foodhunting": { "resKind": "food", "buildKind": "hunting", "resUse": "animals" },
-      "lumbercamp": { "resKind": "lumber", "buildKind": "camp", "resUse": "lumber" }
-    };
-
-    var prodCosts = {
-      "claymine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
-      "coppermine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
-      "foodfarm": { "lumber": 1, "clay" : 1, "copper": 0, "food": 0 },
-      "foodfishing": { "lumber": 0, "clay" : 0, "copper": 1, "food": 0 },
-      "foodhunting": { "lumber": 0, "clay" : 0, "copper": 0, "food": 0 },
-      "lumbercamp": { "lumber": 0, "clay" : 1, "copper": 0, "food": 0 }
-    };
-
-    var prodVals = {
-      "claymine": { "clay": 5, "pollution": 2 },
-      "coppermine": {"copper": 5, "pollution": 2},
-      "foodfarm": {"food": 5},
-      "foodfishing": {"food": 5},
-      "foodhunting": {"food": 3},
-      "lumbercamp": {"lumber": 8}
-    };
-
-    var neighborBonuses = {
-     "claymine": {"resources": "clay", "buildings": []},
-      "coppermine": {"resources": "copper", "buildings": []},
-      "foodfarm": {"resources": "water", "buildings": []},
-    }
-    var neighborNeeds = {
-      "foodfishing": {"resources": "water", "buildings": []},
-      "foodhunting": {"resources": "lumber", "buildings": []},
-      "lumbercamp": {"resources": "lumber", "buildings": []}
-    };
-
-
-    var neighborUses = {
-      "claymine":  {"res": "clay", "amount": 2},
-      "coppermine": {"res": "copper", "amount": 2},
-      "foodfishing": {"res": "fish", "amount": 2},
-      "foodhunting": {"res": "animals", "amount": 2},
-      "lumbercamp": {"res": "lumber", "amount": 3}
-    };
-
-    var neighborAffects = {
-      "foodfarm": {"pollution": 2}
-    }
-
-    var bonusProds = {
-      "claymine": {"res": "clay", "amount" : 3, "pollution": 1},
-      "coppermine": {"res": "copper", "amount": 3, "pollution": 1},
-      "foodfarm": {"res": "food", "amount": 3}
-    };
-
-    var infoTexts = {
-      "claymine":  "Produces: 5 clay, 2 pollution (or 8 clay and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
-      "coppermine": "Produces: 5 copper, 2 pollution (or 8 copper and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
-      "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 1 lumber, 1 clay. ",
-      "foodfishing": "Produces: 5 food, Uses: 1 copper, and 2 fish from nearby water. Can only be placed next to water.",
-      "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest). Needs forest nearby.",
-      "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest). Needs forest nearby."
-    }
-
-    //neighborNeeds specifies requirement which restricts  placement
-    //neighborBonuses indicates bonusmode if neighboring resource is available
-    //neighborUses gets used, if neighboring resource is present. Either by neighborneed or bonus mdoe
-      //bonusProds is the extra production that happens is neighborUse succeeds
-    //neighborAffect affects the neigboring resource
-
-    prodCost = prodCosts[buildingName];
-    prodCostArr = resDictToArr(prodCost);
-    prodVal = prodVals[buildingName];
-    prodValArr = resDictToArr(prodVal);
-    infoText = infoTexts[buildingName] ;
-
-    buildObj = {
-      "gameCode": gameCode, "owned": false, "name": buildingName, 
-      "bidKind": bidKind, "buildFeatures": buildFeatures[buildingName], "infoText": infoText, 
-      "running": false, "prodCost": prodCost, "prodVal": prodVal, 
-      "prodCostArr": prodCostArr, "prodValArr": prodValArr,
-      "state": "auction", "placed": false, "visible": true};
-    
-    // varList = [buildImages, neighborNeeds, neighborBonuses, neighborUses, neighborAffects, bonusProds];
-    // for (v in varList) {
-    //   buildObj
-    // }
-    if (buildingName in buildImages) {
-      buildObj["image"] = buildImages[buildingName];
-    }
-    if (buildingName in neighborNeeds) {
-      buildObj["neighborNeed"] = neighborNeeds[buildingName];
-    }
-    if (buildingName in neighborBonuses) {
-      buildObj["neighborBonus"] = neighborBonuses[buildingName];
-    }
-    if (buildingName in neighborUses) {
-      buildObj["neighborUse"] = neighborUses[buildingName];
-    }
-    if (buildingName in neighborAffects) {
-      buildObj["neighborAffect"] = neighborAffects[buildingName];
-    }
-    if (buildingName in bonusProds) {
-      buildObj["bonusProd"] = bonusProds[buildingName];
-    }
-
-    // console.log(prodCosts[buildingName] + " " + buildingName);
-
-    // Buildings.update(
-    //   {$and: [{"gameCode": gameCode, "location": [locx, locy]}]}, 
-    //   {$set: {"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName},
-    //   {upsert: true} );
-    // Buildings.insert({"gameCode": gameCode, "owner": groupName, "ownerId": groupId, "ownerGame": groupGame, "location": [locx, locy], "name": buildingName}, function (err, buildingId) {
-    //   if (err) {
-    //     console.log("Building addition failed!!!");
-    //   }
-    //   else {
-    //     Maps.update(
-    //       {$and: [{"x": locx}, {"y": locy}]}, 
-    //       {$set: {"building": , "object": "building", "kind": kind, "name": buildingName, "buildingId": buildingId}}
-    //     );    
-    //   }
-    // });
-
-    mapPlaced = false;
-    if (groupName == "auctions") {
-      buildObj["auction"] = true;
-    }
-    else {
-      gameObj = Games.findOne({$and: [{"gameCode": gameCode}, {"group": groupName}]});
-      groupGame = gameObj['_id'];
-      groupId = gameObj["playerId"];
-      buildObj["owned"] = true;
-      buildObj["owner"] = groupName;
-      buildObj["ownerId"] = groupId;
-      buildObj["ownerGame"] = groupGame
-      buildObj["state"] = "owned";
-      if (locx != -1){
-        buildObj["location"] = [locx, locy];
-        buildObj["state"] = "placed";
-        mapPlaced = true;
+      buildObj = {
+        "gameCode": gameCode, "owned": false, "name": buildingName, 
+        "bidKind": bidKind, "buildFeatures": buildFeatures[buildingName], 
+        "infoText": infoText, "bonusText": bonusText,
+        "running": false, "prodCost": prodCost, "prodVal": prodVal, 
+        "prodCostArr": prodCostArr, "prodValArr": prodValArr,
+        "state": "auction", "placed": false, "visible": true};
+      
+      if (buildingName in buildImages) {
+        buildObj["image"] = buildImages[buildingName];
       }
+      if (buildingName in neighborNeeds) {
+        buildObj["neighborNeed"] = neighborNeeds[buildingName];
+      }
+      if (buildingName in neighborBonuses) {
+        buildObj["neighborBonus"] = neighborBonuses[buildingName];
+      }
+      if (buildingName in neighborUses) {
+        buildObj["neighborUse"] = neighborUses[buildingName];
+      }
+      if (buildingName in neighborAffects) {
+        buildObj["neighborAffect"] = neighborAffects[buildingName];
+      }
+      if (buildingName in bonusProds) {
+        buildObj["bonusProd"] = bonusProds[buildingName];
+      }
+
+      mapPlaced = false;
+      if (groupName == "auctions") {
+        buildObj["auction"] = true;
+      }
+      else {
+        gameObj = Games.findOne({$and: [{"gameCode": gameCode}, {"group": groupName}]});
+        groupGame = gameObj['_id'];
+        groupId = gameObj["playerId"];
+        buildObj["owned"] = true;
+        buildObj["owner"] = groupName;
+        buildObj["ownerId"] = groupId;
+        buildObj["ownerGame"] = groupGame
+        buildObj["state"] = "owned";
+        if (locx != -1){
+          buildObj["location"] = [locx, locy];
+          buildObj["state"] = "placed";
+          mapPlaced = true;
+        }
+      }
+      Buildings.insert(buildObj);
+      //*** TODO: POSSIBLY FORCE building Id (and resource Id) to be epoch+gameCode+building+kind so that this find query doesn't return empty and leave buildingId undefined
+      if (mapPlaced == true) {
+        thisBuild = Buildings.findOne(buildObj);
+        Maps.update(
+          {$and: [{"x": locx}, {"y": locy}, {"gameCode": gameCode}]}, 
+          {$set: {"building": thisBuild, "buildingId": thisBuild["_id"] }},
+          {upsert: true}
+        ); 
+
+        BuildingNeighbors.call({"gameCode": gameCode, "building": thisBuild})
+      }
+      // });
+      // build = Buildings.findOne()
     }
-    Buildings.insert(buildObj);
-    // console.log(buildObj);
-    // Buildings.insert(buildObj, function (err, res) {
-    //   if (err) {console.log("building insert failed!??!?!");}
-    //   else {
-
-    //   }
-    // });
-
-    //*** TODO: POSSIBLY FORCE building Id (and resource Id) to be epoch+gameCode+building+kind so that this find query doesn't return empty and leave buildingId undefined
-    if (mapPlaced == true) {
-      thisBuild = Buildings.findOne(buildObj);
-      Maps.update(
-        {$and: [{"x": locx}, {"y": locy}, {"gameCode": gameCode}]}, 
-        {$set: {"building": thisBuild, "buildingId": thisBuild["_id"] }},
-        {upsert: true}
-      ); 
-
-      BuildingNeighbors.call({"gameCode": gameCode, "building": thisBuild})
-    }
-    // });
-    // build = Buildings.findOne()
   }
 });
 

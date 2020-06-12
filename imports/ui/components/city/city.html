@@ -100,18 +100,22 @@
         {{#each p in build.prodValArr}}
           {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
         {{/each}}
-        {{#if buildingPlacable build}}
+        <br />
+        {{build.bonusText}}
+        {{#if buildingPlacable build }}
 
-                <!-- <div class="placementButtons" style="position:absolute"> -->
-                  <button id="startPlace-{{build._id}}" class="btn btn-primary startPlace" style=" display: block; margin-top: 4%; margin-left: auto; margin-right: auto; padding-bottom: 4%;"> Place Building </button>
+          <!-- <div class="placementButtons" style="position:absolute"> -->
+          <button id="startPlace-{{build._id}}" class="btn btn-primary startPlace" style=" display: block; margin-top: 4%; margin-left: auto; margin-right: auto; padding-bottom: 4%;"> Place Building </button>
           <div id="confirmPlace-{{build._id}}" style="display: none">
-            <button class="btn btn-success placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Confirm Placement </button>
+            <button class="btn btn-success placeBuilding" id="{{build._id}}" style="display: block; margin-top: 4%; margin-left: auto;margin-right: auto; margin-bottom: 4%;"> Confirm Placement </button>
             <button id="cancelPlace-{{build._id}}" class="btn btn-default cancelPlace" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Cancel Placement </button>
             <p>This is permanent. Are you sure?</p>
           </div>
         <!-- </div> -->
             <!-- <button class="btn btn-primary placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Place Building </button> -->
         {{/if}}
+        <br />
+
         <!-- {{buildingPlacable build}} -->
     </div>
     {{/each}}

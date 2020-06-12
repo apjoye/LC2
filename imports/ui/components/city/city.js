@@ -463,6 +463,10 @@ Template.cityMap.helpers({
     return bb;
   },
 
+  equals: function(a, b) {
+    return a == b;
+  },
+
   buildingPlacable(building) {
     buyingBuilds = ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
     map = Template.instance().fullmap.get();
@@ -470,6 +474,9 @@ Template.cityMap.helpers({
     mapSelect = map[loc];
     placeMode = false;
     placable = false;
+    placeBonus = false;
+    placeBonusStyle = "";
+    placeOut = "";
     // console.log(mapSelect);
     if (mapSelect == "" || mapSelect == {} || mapSelect == undefined) {}
     else {
@@ -486,10 +493,8 @@ Template.cityMap.helpers({
     nc = mapSelect["neighbors"]
     if (placeMode) {
       if ("neighborNeed" in building){
-        // console.log(building["neighborNeed"]);
         nn = building["neighborNeed"]["resources"];
         placable = false;
-        // for (n in nn) {
         for (c in nc) {
           if ("resource"in nc[c]) {
             if (nc[c]["resource"]["kind"] == nn) {
@@ -501,11 +506,26 @@ Template.cityMap.helpers({
       }
       else {
         placable = true;
+        placeOut = "place";
+        if ("neighborBonus" in building) {
+          nb = building["neighborBonus"]["resources"];
+          for (c in nc) {
+            if ("resource"in nc[c]) {
+              if (nc[c]["resource"]["kind"] == nb) {
+                placeBonus = true;
+                placeBonusStyle = "placeBonus";
+                placeOut = "bonus";
+              }
+            }
+          }
+        }
       }
     }
     else {
       placeable = false;
     }
+    // return {"placable": placable, "placeBonus": placeBonus, "placeBonusStyle": placeBonusStyle};
+    // return placeOut;
     return placable;
   },
 
@@ -590,7 +610,7 @@ Template.cityMap.helpers({
         }
       }
     }
-    console.log(mapSelect);
+    // console.log(mapSelect);
     // console.log(boxContent);
     return boxContent;
   },
@@ -613,7 +633,7 @@ Template.cityMap.events({
     // instance.selectedLoc.set(event.target.id);
     instance.selectedLoc.set(loc);
     console.log(loc);
-    console.log(document.getElementById("cell-" + loc).getBoundingClientRect());
+    // console.log(document.getElementById("cell-" + loc).getBoundingClientRect());
     cellLoc = document.getElementById("cell-" + loc).getBoundingClientRect();
     d = document.getElementById("cell-highlighter");
       d.style.position = "absolute";

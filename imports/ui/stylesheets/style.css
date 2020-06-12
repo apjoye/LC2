@@ -246,6 +246,10 @@ body {
 .boughtBuilding{
 	flex-shrink: 0;
 }
+.placeBonus {
+	background: rgba(0, 200, 10, 0.8)
+}
+
 .gameMapchart-table{
 	position: relative;
 }
@@ -345,7 +349,7 @@ body {
 	border: 1px solid;
 	border-style: outset;
 	margin-top: 15px;
-	padding:15px;
+	/*padding:15px;*/
 }
 
 
