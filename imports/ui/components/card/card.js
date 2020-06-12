@@ -60,13 +60,13 @@ Template.factoryList.helpers({
         var classes = "";
         if (builds[b]["owned"] == true) {
           builds[b]["alertStatus"] = true;
-          if (builds[b]["owner"] == thisGame.group) {
+          if (builds[b]["owner"] === thisGame.group) {
             classes += "bidWon";
-            builds[b]["alert"] = "You won this building!";
+            builds[b]["alert"] = "Won!";
           }
           else {
             classes += "bidLost";
-            builds[b]["alert"] = "Someone else got this building!";
+            builds[b]["alert"] = "Sold Out!";
           }
         }
         else if ("alert" in builds[b]) {
