@@ -1,3 +1,6 @@
 node_modules/
 .deploy/mup.js
 imports/ui/components/.DS_Store
+illinois-city-settlers.pem
+dump/*
+.deploy/mup-old.js
