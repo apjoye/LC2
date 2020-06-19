@@ -275,16 +275,16 @@
     {{#each cityStats}}
       <!-- <div id="cityStat-{{this.className}}" class="{{this.className}} cityStatBox" style="{{this.style}}"> -->
       <div id="cityStat-{{this.className}}" class="cityStatBox" style="position: absolute; {{this.style}}">
-        <p>Pop:{{this.population}}</p>
-        <p>Happ: {{this.happiness}}</p>
-        <p>Poll: {{this.pollution}}</p>
+        <p class="mapinfo">Pop:{{this.population}}</p>
+        <p class="mapinfo">Happ: {{this.happiness}}</p>
+        <p class="mapinfo">Poll: {{this.pollution}}</p>
       </div>
     {{/each}}
 
     {{#each resStats}}
       <div class="{{this.className}} resStatBox">
         {{#each s in this.statList}}
-          <p>{{s.name}}: {{s.amount}}</p>
+          <p class="mapinfo">{{s.name}}: {{s.amount}}</p>
         {{/each}}
         <!-- <p>Happ: {{this.happiness}}</p>
         <p>Poll: {{this.pollution}}</p> -->

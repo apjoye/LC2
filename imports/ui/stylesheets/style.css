@@ -1,3 +1,7 @@
+/*p {
+	font-family: "Nunito"
+}*/
+
 .pull-right {
   float: right !important;
 }
@@ -259,13 +263,24 @@ body {
 }
 
 .cityStatBox{
-	height: 200px;
+	min-height: 70px;
+	padding: 10px;
 	width: 100px;
+	background-color: rgba(255, 255, 255, 0.5);
+	border-radius: 2px;
 }
 
 .resStatBox{
-	height: 50px;
+	min-height: 50px;
 	min-width: 100px;
+	padding: 0.3em;
+	border-radius: 2px;
+	background-color: rgba(255, 255, 255, 0.8);
+}
+
+.mapinfo {
+	font-family: 'Solway';
+	font-size: 15px;
 }
 
 
@@ -273,31 +288,31 @@ body {
 	position: absolute;
 	top: 925px;
 	left: 200px;
-	background-color:white;
+	/*background-color:white;*/
 }
 .mine2-status{
 	position: absolute;
 	top: 1230px;
 	left: 860px;
-	background-color:white;
+	/*background-color:white;*/
 }
 .lake-status{
 	position: absolute;
 	top: 1200px;
 	left: 325px;
-	background-color:white;
+	/*background-color:white;*/
 }
 .woods1-status{
 	position: absolute;
 	top: 1200px;
 	left: 60px;
-	background-color:white;
+	/*background-color:white;*/
 }
 .woods2-status{
 	position: absolute;
 	top: 900px;
 	left: 830px;
-	background-color:white;
+	/*background-color:white;*/
 }
 /*
 @media (max-width:1200px){
