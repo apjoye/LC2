@@ -1,10 +1,52 @@
 TODOS
 
-Tutorial:
-  give everyone buildings in the first round
-  add tooltip for resource icons
+// 1. how to make phase noticeable
+  Toast or alert box at top to notify phase change
 
-Base view tells what phase the game is in - bidding or buildings
+2. Fix empty cell information panel
+  make the tint red for non owned cells
+
+3. in central view: add icons
+  add padding; consider rounded corners; ** think about pixelating corners
+
+  [links of ideas:
+  https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2F199.101.98.242%2Fmedia%2Fimages%2F55335-Dragon_Warrior_III_(USA)-7.jpg&f=1&nofb=1 
+  From Me to Everyone: (3:22 PM)
+   https://www.mmogames.com/wp-content/uploads/2018/05/Stardew-Valley-Screenshot-11.jpg 
+  From Michael Benjamin Tissenbaum to Everyone: (3:23 PM)
+   https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.gamehackstudios.com%2Fwp-content%2Fuploads%2F2014%2F12%2Fdont-starve-together-download-free-crack-full-version-PC-13.jpg&f=1&nofb=1]
+
+4. transition to add auction builds one by one was nice
+
+5. turn off i'm ready at every new round
+
+6. If next to ore, produces:
+
+7. (bid information) sold out = someone else got it
+tied = no one got this yet
+  provide information of bought for <5 gold> or whatever
+
+mechanic: 8. should we allow to bid more money than you have (8 across everything); should that be the only constraint or other ways to cost
+
+8. population and happiness to change
+
+9. if it's red, i'm ready should update that red unaffordable bids are pointless
+
+10. history of factory running
+  - indicate factories that won't run!
+
+11. wealth amount of cities
+
+
+
+
+
+
+// Tutorial:
+  // give everyone buildings in the first round
+  // add tooltip for resource icons
+
+// Base view tells what phase the game is in - bidding or buildings
 
 all online features
   way to tell team composition
