@@ -50,43 +50,58 @@ Template.factoryList.helpers({
 
   PublicBuildings () {
     thisGame = Template.instance().gameStats.get();
+    builds = Buildings.find({$and: [
+        {"gameCode": FlowRouter.getParam("gameCode")}, 
+        {"visible": true}, 
+        {$or: [{"state": "auction"}, {"roundAcquired": thisGame.year}]}] }).fetch();
+
     if (thisGame.phase == "pre-bid"){
-      builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {$or: [{"owned": false}]}, {"visible": true}, {"state": "auction"}] }).fetch();
-      builds = builds.map(x => {x["buttonClasses"] = ""; x["classes"] = ""; return x})
+      builds = builds.map(x => {x["buttonClasses"] = ""; x["classes"] = ""; return x});
     }
     else if (thisGame.phase == "post-bid") {
-
-      builds = Buildings.find({$and: [
-        {"gameCode": FlowRouter.getParam("gameCode")}, 
-        {$or: [
-          {$or: [{"owned": false}, {"state": "auction"}]},
-          {"roundAcquired": thisGame.year}
-        ]}, 
-        {"visible": true}, ] 
-      }).fetch();
+      // console.log(builds);
       for (b in builds) {
         builds[b]["buttonClasses"] = "disabled";
         var classes = "";
         if (builds[b]["owned"] == true) {
           builds[b]["alertStatus"] = true;
+          infText = "";
+          if ("info" in builds[b]) {
+            binfo = builds[b]["info"];
+            console.log(binfo);
+            if ("value" in binfo && "kind" in binfo) {
+              infText += "for " + binfo["value"] + " " + binfo["kind"];
+            }
+          }
           if (builds[b]["owner"] === thisGame.group) {
             classes += "bidWon";
-            builds[b]["alert"] = "Won!";
+            builds[b]["alert"] = "Won! ";
           }
           else {
             classes += "bidLost";
-            builds[b]["alert"] = "Sold Out!";
+            builds[b]["alert"] = "Sold Out! ";
           }
+          builds[b]["alert"] += infText;
         }
-        else if ("alert" in builds[b]) {
-          builds[b]["alertStatus"] = true;
-          classes += "otherAlert";
+        // else if ("alert" in builds[b]) {
+        //   builds[b]["alertStatus"] = true;
+        //   classes += "otherAlert";
+        // }
+        else if ("info" in builds[b]) {
+          // console.log(builds[b]["info"]);
+          if (builds[b]["info"]["state"] == "tied") {
+            builds[b]["alertStatus"] = true;
+            // console.log("found the tied build!");
+            builds[b]["alert"] = "Did not sell from tie";
+            classes += "otherAlert";
+
+          }
         }
         builds[b]["classes"] = classes;
       }
     }
     // console.log(Buildings.find({"roundAcquired": thisGame.year}).fetch());
-    console.log(builds);
+    // console.log(builds);
     return builds;
   },
 

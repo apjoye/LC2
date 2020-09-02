@@ -458,7 +458,7 @@ Template.cityMap.helpers({
       // bb[b]["pCost"] = pCost;
       // bb[b]["pVal"] = pVal;
       bb[b]["image"] = mapTiles[bb[b]["name"]];
-      console.log(bb[b]);
+      // console.log(bb[b]);
     }
     return bb;
   },

@@ -208,10 +208,27 @@ export const RunBids2 = new ValidatedMethod({
         else {
           console.log("committing the bid!!");
           thisGame = Games.findOne({$and: [{"playerId": bid.baseId}, {"role": "base"}, {"gameCode": bid.gameCode}]});
-          await Games.update({"_id": thisGame._id }, {$set: {res: newRes}});
+          await Games.update({
+            "_id": thisGame._id }, 
+            {$set: {
+              res: newRes
+            }
+          });
 
         // >> change producer owner
-          await Buildings.update({"_id": bid.buildingId}, {$set: { "owned": true, "state": "bought", "ownerId": thisGame.playerId, "ownerGame": thisGame._id, "owner": thisGame.group, "roundAcquired": thisGame.year}});
+          // console.log(bid);
+          await Buildings.update(
+            {"_id": bid.buildingId}, 
+            {$set: { 
+              "owned": true, 
+              "state": "bought", 
+              "ownerId": thisGame.playerId, 
+              "ownerGame": thisGame._id, 
+              "owner": thisGame.group, 
+              "info": {"state": "acquired", "value": bid.bidVal, "kind": bid.bidKind},
+              "roundAcquired": thisGame.year
+            }
+          });
 
         // >> add log about producer purchase
           evLog = bid;
@@ -290,12 +307,14 @@ export const RunBids2 = new ValidatedMethod({
         }
         else {
           console.log("non zero max tie");
+          console.log("bids on " + producer._id);
+          return await Buildings.update({"_id": producer._id}, {$set: {"info": {"state": "tied", "value": maxBid, "kind": maxBidObj.kind}}})
           // return await bidTieMessage(bidTeams);   // ugh can skip
         }
       }
 
       async function runThroughBids(gameCode) {
-        allProds = await Buildings.find({$and: [{"gameCode": gameCode}, {"state": "auction"}]});
+        allProds = await Buildings.find({$and: [{"gameCode": gameCode}, {"owned": false}, {"state": "auction"}]});
         allProducers = allProds.fetch();
         for (ap in allProducers) {
           await resolveBids(allProducers[ap], gameCode);
@@ -891,7 +910,7 @@ export const RunBuildings = new ValidatedMethod({
       else {thisyear = 1;}
       Games.update(
         {"gameCode": gameCode}, 
-        {$set: {"year": thisyear, "phase": "pre-bid", "bidCommit": false}},
+        {$set: {"year": thisyear, "phase": "pre-bid", "bidCommit": false, "info": {}}},
         {multi: true});
       // console.log(Games.find({"gameCode": gameCode}).fetch());
     }

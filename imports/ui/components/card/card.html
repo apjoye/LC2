@@ -9,6 +9,16 @@
         {{#each build in PublicBuildings}}
         <div class="col-md-3 buildingbid {{build.classes}} equal-height" style="">
             <!-- {{buildingText build}} -->
+            <div class="bid-alert">
+              <p>
+                <strong>
+                  {{#if build.alertStatus}}
+                    {{build.alert}}
+                  {{/if}}
+                </strong>
+              </p>
+            </div>
+            
             <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
               <h4>{{build.name}}</h4>
               <br />
@@ -35,11 +45,7 @@
             </div>
             <br />
             {{build.bonusText}}
-            <div style="font-size: 35px;">
-              {{#if build.alertStatus}}
-                {{build.alert}}
-              {{/if}}
-            </div>
+
           </div>
         {{/each}}
       </div>
