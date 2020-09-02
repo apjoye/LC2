@@ -316,6 +316,10 @@ Template.adminGame.helpers({
     // return ["res.m1", "res.m2", "res.f1", "res.f2", "pollution", "population", "happiness"];
   },
 
+  committedBids() {
+    return Games.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"bidCommit": true}]});
+  },
+
   status() {
     return Games.findOne({"gameCode": FlowRouter.getParam("gameCode")}).status;
   },

@@ -14,7 +14,7 @@ import { MakeBid2 } from '/imports/api/links/methods.js';
 import { BuyProducer } from '/imports/api/links/methods.js';
 import { MakeBid } from '/imports/api/links/methods.js';
 import { UpdateBid } from '/imports/api/links/methods.js';
-
+import { CommitBids } from '/imports/api/links/methods.js';
 
 Template.factoryList.onCreated(function helloOnCreated() {
   // counter starts at 0
@@ -38,6 +38,15 @@ Template.factoryList.helpers({
     // return ["wood", "lumber", "clay", "copper"];
   },
 
+  checkedStatus() {
+    console.log(Template.instance().gameStats.get().bidCommit);
+    if ((Template.instance().gameStats.get()).bidCommit == true) {
+      return "checked";
+    }
+    else {
+      return "";
+    }
+  },
 
   PublicBuildings () {
     thisGame = Template.instance().gameStats.get();
@@ -239,6 +248,13 @@ Template.factoryList.events({
         "bidKind": event.target.classList[4]});  
     }
     
+  },
+
+  'click #bidToggle' (event, instance) {
+    // event.preventDefault()
+    console.log(event.target.checked);
+    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
+
   }
 });
 

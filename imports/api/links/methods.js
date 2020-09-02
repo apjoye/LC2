@@ -152,6 +152,17 @@ export const UpdateBid = new ValidatedMethod({
   }
 });
 
+export const CommitBids = new ValidatedMethod({
+  name: 'bids.commit',
+  validate ({}) {},
+  run ({baseId, gameCode, commitState}) {
+    if (!this.isSimulation) {
+      console.log("changing bid commit state");
+      Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerId": baseId}]}, {$set: {"bidCommit": commitState}});
+    }
+  }
+});
+
 export const ClearBids = new ValidatedMethod({
   name: 'bids.clear',
   validate ({}) {},
@@ -532,24 +543,24 @@ export const NewRound = new ValidatedMethod({
 
       ResetTeamNotes.call({"gameCode": gameCode});
 
-      RunBids.call({"gameCode": gameCode}, (err, res) => {
-        if (err) {console.log(err);}
-        else {
-          ConsumeResources.call({"gameCode": gameCode}, (err, res) => {
-            if (err) { console.log(err); }
-            else {
-              console.log("calling back after completion!");
-              // SpreadPollution.call({"gameCode": admin.gameCode});
-              SpreadPollution.call({"gameCode": gameCode}, (err, res) => {
-                if (err) { console.log(err); }
-                else {
-                  SpawnFactories.call({"gameCode": gameCode, "producerCount": producerCount});
-                }
-              });
-            }
-          });
-        }
-      })
+      // RunBids.call({"gameCode": gameCode}, (err, res) => {
+      //   if (err) {console.log(err);}
+      //   else {
+      //     ConsumeResources.call({"gameCode": gameCode}, (err, res) => {
+      //       if (err) { console.log(err); }
+      //       else {
+      //         console.log("calling back after completion!");
+      //         // SpreadPollution.call({"gameCode": admin.gameCode});
+      //         SpreadPollution.call({"gameCode": gameCode}, (err, res) => {
+      //           if (err) { console.log(err); }
+      //           else {
+      //             SpawnFactories.call({"gameCode": gameCode, "producerCount": producerCount});
+      //           }
+      //         });
+      //       }
+      //     });
+      //   }
+      // });
           
 
       /*      
@@ -830,6 +841,14 @@ export const RunBuildings = new ValidatedMethod({
           thisGame["notes"].push(building.name + " did not run cause out of people");
 
         }
+        // wealth = 0;
+        // for (s in newRes) {
+        //   wealth += newRes[s];  
+        // }
+
+        //********* NEW HAPPINESS CALCULATOR
+        // Happiness = Wealth / {(Population/Food) + Pollution}
+        // Population = (# of current available food around the city + Happiness) / {Pollution + (# of initial available food around city - # of current round)}
         console.log("trying to update game");
         Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
 
@@ -872,7 +891,7 @@ export const RunBuildings = new ValidatedMethod({
       else {thisyear = 1;}
       Games.update(
         {"gameCode": gameCode}, 
-        {$set: {"year": thisyear, "phase": "pre-bid"}}, 
+        {$set: {"year": thisyear, "phase": "pre-bid", "bidCommit": false}},
         {multi: true});
       // console.log(Games.find({"gameCode": gameCode}).fetch());
     }
@@ -1598,6 +1617,7 @@ export const JoinGame = new ValidatedMethod({
           deets["population"] = 5;
           deets["happiness"] = 5;
           deets["neighbors"] = neighbors;
+          deets["bidCommit"] = false;
         }
 
         deets["group"] = group;
