@@ -124,7 +124,7 @@
 	/*padding-right: 5px;
     margin-bottom: 5px;*/
 }
-
+/*
 .bidWon {
 	background: #CAFFB9;
 }
@@ -132,7 +132,7 @@
 .bidLost {
 	background: #ff6666;
 }
-
+*/
 .otherAlert {
 	background: #ffff9f;
 }
@@ -531,16 +531,37 @@ input:checked + .slider:before {
 	display: grid;
 }
 
-.bid-alert, .usage, .bysbtext{
-	grid-area:1/1/1;
+.bid-alert, .usage, .bysbtext-red, .red-border{
+	grid-area:1/1/1/1;
+}
+.bid-alert, .usage, .bysbtext-green, .green-border{
+	grid-area:1/1/1/1;
+}
+.red-border{
+	border: solid #d05c5b 3px;
+	background: rgba(255, 255, 255, 0.6)
+}
+.green-border{
+	border: solid green 3px;
+	background: rgba(255, 255, 255, 0.6)
 }
 .usage{
-	padding-top: 15%;
+	padding-top: 10%;
 }
-.bysbtext{
-	padding-top:15%;
+.bysbtext-red, .bysbtext-green{
+	padding-top:10%;
 	padding-left: 42%;
+	font-weight: bold;
 }
-
+.bysbtext-green{
+	color: green;
+}
+.bysbtext-red{
+	color: #d05c5b;
+}
+.bid-alert{
+	text-align: left;
+	position: relative;
+}
 
 

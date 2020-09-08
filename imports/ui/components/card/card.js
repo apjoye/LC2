@@ -91,11 +91,14 @@ Template.factoryList.helpers({
             builds[b]["alertOutput"] = bidOutput["success"];
             classes += "bidWon";
             builds[b]["alert"] = "by you ";
+            builds[b]["successJS"] = "True";
+            //console.log(document.getElementById('').className);
           }
           else {
             builds[b]["alertOutput"] = bidOutput["fail"];
             classes += "bidLost";
-            builds[b]["alert"] = "by someone else  ";
+            builds[b]["alert"] = "by others  ";
+            builds[b]["failJS"] = "True";
           }
           builds[b]["alertText"] = infText;
           builds[b]["alertImage"] = image;

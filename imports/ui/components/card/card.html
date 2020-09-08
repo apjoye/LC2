@@ -29,19 +29,36 @@
                 </div>
               <!-- {{build.name}}  <br /> -->
                 {{#if build.alertStatus}}
+                  {{#if build.successJS}}
+                    <div class="green-border"></div>
+                  {{/if}}
+                  {{#if build.failJS}}
+                    <div class="red-border"></div>
+                  {{/if}}
                 <div class="bid-alert">
-                  <img src="{{build.alertOutput}}" style="max-width: 100%; max-height:100%; height:auto;"/>
+                  <img src="{{build.alertOutput}}" style="width: 108px; height:74.4px;"/>
                 </div> 
-                <div class="bysbtext">
-                  {{build.alert}}
-                  <br />
-                  {{build.alertText}}
-                  <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
-                </div>   
-                {{/if}}
+                {{#if build.successJS}}
+                  <div class="bysbtext-green">
+                    {{build.alert}}
+                    <br />
+                    {{build.alertText}}
+                    <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
+                  </div>  
+                {{/if}} 
+                {{#if build.failJS}}
+                  <div class="bysbtext-red">
+                    {{build.alert}}
+                    <br />
+                    {{build.alertText}}
+                    <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
+                  </div>  
+                {{/if}} 
+              {{/if}}
             </div> 
           </div>
           <div class="card_bottom">
+            <br />
             <div class="btn-group" role="group">
               <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.phase}} {{build.buttonClasses}}" name="-1">   -   </button>
               
