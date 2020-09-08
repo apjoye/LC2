@@ -526,3 +526,21 @@ input:checked + .slider:before {
 .equal-height{
 	height:380px;
 }
+
+.overlay-img{
+	display: grid;
+}
+
+.bid-alert, .usage, .bysbtext{
+	grid-area:1/1/1;
+}
+.usage{
+	padding-top: 15%;
+}
+.bysbtext{
+	padding-top:15%;
+	padding-left: 42%;
+}
+
+
+

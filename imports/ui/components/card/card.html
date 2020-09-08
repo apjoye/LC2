@@ -9,33 +9,39 @@
         {{#each build in PublicBuildings}}
         <div class="col-md-3 buildingbid {{build.classes}} equal-height" style="">
             <!-- {{buildingText build}} -->
-            <div class="bid-alert">
-              <p>
-                <strong>
-                  {{#if build.alertStatus}}
-                    {{build.alert}}
-                  {{/if}}
-                </strong>
-              </p>
-            </div>
+            
             
             <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
               <h4>{{build.name}}</h4>
-              <br />
-              Uses: 
-              {{#each p in build.prodCostArr}}
-                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-              {{/each}}
-              <br />
-              Produces: 
-              {{#each p in build.prodValArr}}
-                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-              {{/each}}
-              
-              <br />
-            <!-- {{build.name}}  <br /> -->
-            <br />
-            
+              <div class="adjust">
+              <div class="overlay-img">
+                <div class="usage">
+                  Uses: 
+                  {{#each p in build.prodCostArr}}
+                    {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+                  {{/each}}
+                  <br />
+                  Produces: 
+                  {{#each p in build.prodValArr}}
+                    {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+                  {{/each}}
+                  <br />
+                </div>
+              <!-- {{build.name}}  <br /> -->
+                {{#if build.alertStatus}}
+                <div class="bid-alert">
+                  <img src="{{build.alertOutput}}" style="max-width: 100%; max-height:100%; height:auto;"/>
+                </div> 
+                <div class="bysbtext">
+                  {{build.alert}}
+                  <br />
+                  {{build.alertText}}
+                  <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
+                </div>   
+                {{/if}}
+            </div> 
+          </div>
+          <div class="card_bottom">
             <div class="btn-group" role="group">
               <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.phase}} {{build.buttonClasses}}" name="-1">   -   </button>
               
@@ -44,8 +50,9 @@
               <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.buttonClasses}}" name="+1">   +   </button>
             </div>
             <br />
+            <br />
             {{build.bonusText}}
-
+          </div>
           </div>
         {{/each}}
       </div>
