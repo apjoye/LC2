@@ -245,6 +245,7 @@ Template.gameMap.helpers({
       xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
       yloc = topMargin + 80 + (60 * cities[c]["visibleCorner"][1]);
       cities[c]["className"] = cities[c]["group"] + "-status";
+      console.log(cities[c]["className"]);
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
       // console.log(loc);
       // console.log(document.getElementById(loc));
@@ -259,13 +260,21 @@ Template.gameMap.helpers({
   },
 
   resStats() {
+    resourceMapImg = {
+      "clay": "../img/resources/clay.png",
+      "copper": "../img/resources/copper.png",
+      "lumber": "../img/map/res_status/treeresource.png",
+      "animals": "../img/map/res_status/deer.png",
+      "pollution": "../img/map/city_status/pollution.png",
+      "fish": "../img/map/res_status/fish.png",
+    }
     res = Resources.find({"gameCode": FlowRouter.getParam('gameCode')}).fetch();
     stats = [];
     for (r in res) {
       res[r]["className"] = res[r]["name"] + "-status";
       res[r]["statList"] = [];
       for (s in res[r]["stats"]) {
-        res[r]["statList"].push({"name": s, "amount": res[r]["stats"][s]});
+        res[r]["statList"].push({"name": s, "amount": res[r]["stats"][s], "img": resourceMapImg[s]});
       }
       stats.push(res[r]);
     }
