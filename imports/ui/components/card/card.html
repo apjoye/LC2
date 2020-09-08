@@ -68,7 +68,23 @@
             </div>
             <br />
             <br />
-            {{build.bonusText}}
+            {{#if build.successJS}}
+            <div class="tooltip">
+              See more info
+              <span class="tooltiptext">
+              {{build.bonusText}}
+              </span>
+            </div>
+            {{else if build.failJS}}
+            <div class="tooltip">
+                See more info
+                <span class="tooltiptext">
+                {{build.bonusText}}
+                </span>
+              </div>
+            {{else}}
+              {{build.bonusText}}
+            {{/if}}
           </div>
           </div>
         {{/each}}
