@@ -124,7 +124,7 @@
 	/*padding-right: 5px;
     margin-bottom: 5px;*/
 }
-
+/*
 .bidWon {
 	background: #CAFFB9;
 }
@@ -132,7 +132,7 @@
 .bidLost {
 	background: #ff6666;
 }
-
+*/
 .otherAlert {
 	background: #ffff9f;
 }
@@ -263,19 +263,21 @@ body {
 }
 
 .cityStatBox{
-	min-height: 70px;
-	padding: 10px;
-	width: 100px;
-	background-color: rgba(255, 255, 255, 0.5);
 	border-radius: 2px;
+	padding-top: 120px;
 }
-
+.inline-style{
+	display: table-cell;
+	padding-right: 12px;
+}
 .resStatBox{
 	min-height: 50px;
 	min-width: 100px;
 	padding: 0.3em;
-	border-radius: 2px;
+	border-radius: 10px;
 	background-color: rgba(255, 255, 255, 0.8);
+	text-align: center;
+
 }
 
 .mapinfo {
@@ -526,3 +528,70 @@ input:checked + .slider:before {
 .equal-height{
 	height:380px;
 }
+
+.overlay-img{
+	display: grid;
+}
+
+.bid-alert, .usage, .bysbtext-red, .red-border{
+	grid-area:1/1/1/1;
+}
+.bid-alert, .usage, .bysbtext-green, .green-border{
+	grid-area:1/1/1/1;
+}
+.red-border{
+	border: solid #d05c5b 3px;
+	background: rgba(255, 255, 255, 0.6)
+}
+.green-border{
+	border: solid green 3px;
+	background: rgba(255, 255, 255, 0.6)
+}
+.usage{
+	padding-top: 10%;
+}
+.bysbtext-red, .bysbtext-green{
+	padding-top:10%;
+	padding-left: 42%;
+	font-weight: bold;
+}
+.bysbtext-green{
+	color: green;
+}
+.bysbtext-red{
+	color: #d05c5b;
+}
+.bid-alert{
+	text-align: left;
+	position: relative;
+}
+
+.tooltip {
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px dotted black;
+  }
+  
+  .tooltip .tooltiptext {
+	visibility: hidden;
+	width: 120px;
+	background-color: black;
+	color: #fff;
+	text-align: center;
+	border-radius: 6px;
+	padding: 5px 0;
+	
+	/* Position the tooltip */
+	position: absolute;
+	z-index: 1;
+	top: 100%;
+	left: 50%;
+	margin-left: -60px;
+  }
+  
+  .tooltip:hover .tooltiptext {
+	visibility: visible;
+  }
+  .tooltip{
+	  opacity:1 !important;
+  }

@@ -9,33 +9,56 @@
         {{#each build in PublicBuildings}}
         <div class="col-md-3 buildingbid {{build.classes}} equal-height" style="">
             <!-- {{buildingText build}} -->
-            <div class="bid-alert">
-              <p>
-                <strong>
-                  {{#if build.alertStatus}}
-                    {{build.alert}}
-                  {{/if}}
-                </strong>
-              </p>
-            </div>
+            
             
             <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
               <h4>{{build.name}}</h4>
-              <br />
-              Uses: 
-              {{#each p in build.prodCostArr}}
-                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-              {{/each}}
-              <br />
-              Produces: 
-              {{#each p in build.prodValArr}}
-                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-              {{/each}}
-              
-              <br />
-            <!-- {{build.name}}  <br /> -->
+              <div class="adjust">
+              <div class="overlay-img">
+                <div class="usage">
+                  Uses: 
+                  {{#each p in build.prodCostArr}}
+                    {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+                  {{/each}}
+                  <br />
+                  Produces: 
+                  {{#each p in build.prodValArr}}
+                    {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+                  {{/each}}
+                  <br />
+                </div>
+              <!-- {{build.name}}  <br /> -->
+                {{#if build.alertStatus}}
+                  {{#if build.successJS}}
+                    <div class="green-border"></div>
+                  {{/if}}
+                  {{#if build.failJS}}
+                    <div class="red-border"></div>
+                  {{/if}}
+                <div class="bid-alert">
+                  <img src="{{build.alertOutput}}" style="width: 108px; height:74.4px;"/>
+                </div> 
+                {{#if build.successJS}}
+                  <div class="bysbtext-green">
+                    {{build.alert}}
+                    <br />
+                    {{build.alertText}}
+                    <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
+                  </div>  
+                {{/if}} 
+                {{#if build.failJS}}
+                  <div class="bysbtext-red">
+                    {{build.alert}}
+                    <br />
+                    {{build.alertText}}
+                    <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
+                  </div>  
+                {{/if}} 
+              {{/if}}
+            </div> 
+          </div>
+          <div class="card_bottom">
             <br />
-            
             <div class="btn-group" role="group">
               <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.phase}} {{build.buttonClasses}}" name="-1">   -   </button>
               
@@ -44,8 +67,25 @@
               <button type="button" class="btn btn-default changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.buttonClasses}}" name="+1">   +   </button>
             </div>
             <br />
-            {{build.bonusText}}
-
+            <br />
+            {{#if build.successJS}}
+            <div class="tooltip">
+              See more info
+              <span class="tooltiptext">
+              {{build.bonusText}}
+              </span>
+            </div>
+            {{else if build.failJS}}
+            <div class="tooltip">
+                See more info
+                <span class="tooltiptext">
+                {{build.bonusText}}
+                </span>
+              </div>
+            {{else}}
+              {{build.bonusText}}
+            {{/if}}
+          </div>
           </div>
         {{/each}}
       </div>

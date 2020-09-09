@@ -49,6 +49,16 @@ Template.factoryList.helpers({
   },
 
   PublicBuildings () {
+    resourceImage = {
+      "food": "../img/resources/food.png",
+      "clay": "../img/resources/clay.png",
+      "copper": "../img/resources/copper.png",
+      "lumber": "../img/resources/lumber.png",
+    }
+    bidOutput = {
+      "success": "../img/bid/boughtbyyou.png",
+      "fail":"../img/bid/boughtbysomeone.png",
+    }
     thisGame = Template.instance().gameStats.get();
     builds = Buildings.find({$and: [
         {"gameCode": FlowRouter.getParam("gameCode")}, 
@@ -63,6 +73,7 @@ Template.factoryList.helpers({
       for (b in builds) {
         builds[b]["buttonClasses"] = "disabled";
         var classes = "";
+        var image;
         if (builds[b]["owned"] == true) {
           builds[b]["alertStatus"] = true;
           infText = "";
@@ -70,18 +81,27 @@ Template.factoryList.helpers({
             binfo = builds[b]["info"];
             console.log(binfo);
             if ("value" in binfo && "kind" in binfo) {
-              infText += "for " + binfo["value"] + " " + binfo["kind"];
+              infText += "for " + binfo["value"] + " ";
+              image = resourceImage[binfo["kind"]];
+              console.log(image)
+              // + binfo["kind"]
             }
           }
           if (builds[b]["owner"] === thisGame.group) {
+            builds[b]["alertOutput"] = bidOutput["success"];
             classes += "bidWon";
-            builds[b]["alert"] = "Won! ";
+            builds[b]["alert"] = "by you ";
+            builds[b]["successJS"] = "True";
+            //console.log(document.getElementById('').className);
           }
           else {
+            builds[b]["alertOutput"] = bidOutput["fail"];
             classes += "bidLost";
-            builds[b]["alert"] = "Sold Out! ";
+            builds[b]["alert"] = "by others  ";
+            builds[b]["failJS"] = "True";
           }
-          builds[b]["alert"] += infText;
+          builds[b]["alertText"] = infText;
+          builds[b]["alertImage"] = image;
         }
         // else if ("alert" in builds[b]) {
         //   builds[b]["alertStatus"] = true;
