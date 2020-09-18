@@ -191,6 +191,7 @@ export const RunBids2 = new ValidatedMethod({
         // return await Bids.
         // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
         Bids.update({$and: [{"gameCode": gameCode}]}, {$set: {"bidVal": 0}}, {multi: true});
+        Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"bidCommit": false}});
       }
 
       async function commitBid (bid, teams, resources) {
@@ -868,8 +869,15 @@ export const RunBuildings = new ValidatedMethod({
         //********* NEW HAPPINESS CALCULATOR
         // Happiness = Wealth / {(Population/Food) + Pollution}
         // Population = (# of current available food around the city + Happiness) / {Pollution + (# of initial available food around city - # of current round)}
+        //
+        deltaHapp = (newRes["lumber"] + newRes["clay"] + newRes["copper"]) / thisGame["population"];
+        if (deltaHapp > 0.6) { deltaHapp = Math.min(3, parseInt(deltaHapp)); }
+        else if (deltaHapp < 0.3) { deltaHapp = -1; }
+        newHapp = thisGame["happiness"] + deltaHapp;
+        newPop = thisGame["population"] + parseInt(((0.5 * newRes["food"]) - (0.5 * newPoll)  + (2 * newHapp)) / thisGame["population"]);
+        
         console.log("trying to update game");
-        Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
+        Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "population": newPop, "happiness": newHapp, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
 
       }
 

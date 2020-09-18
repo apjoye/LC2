@@ -32,6 +32,11 @@
         </div>
         {{/each}}
     </div>
+    <br />
+    {{#each tradeHistory}}
+      {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}}
+      <br />
+    {{/each}}
      <!-- <p> -->
         
         <!-- <h5>

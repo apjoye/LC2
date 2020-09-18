@@ -28,7 +28,7 @@
                   <br />
                 </div>
               <!-- {{build.name}}  <br /> -->
-                {{#if build.alertStatus}}
+                {{#if build.owned}}
                   {{#if build.successJS}}
                     <div class="green-border"></div>
                   {{/if}}
@@ -68,23 +68,12 @@
             </div>
             <br />
             <br />
-            {{#if build.successJS}}
             <div class="tooltip">
               See more info
               <span class="tooltiptext">
               {{build.bonusText}}
               </span>
             </div>
-            {{else if build.failJS}}
-            <div class="tooltip">
-                See more info
-                <span class="tooltiptext">
-                {{build.bonusText}}
-                </span>
-              </div>
-            {{else}}
-              {{build.bonusText}}
-            {{/if}}
           </div>
           </div>
         {{/each}}

@@ -61,6 +61,9 @@ Meteor.publish('buildings.city', function (gameCode) {
   return Buildings.find({$and: [{"gameCode": gameCode }, {"ownerId": Meteor.userId()} ] } );
 });
 
+Meteor.publish('trades.city', function (gameCode) {
+  return Acts.find({$and: [{"gameCode": gameCode }, {"key": "tradeResource"} ] } );
+});
 
 Meteor.publish('resources.thisGame', function (gameCode) {
   // console.log(this.users());

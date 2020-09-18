@@ -241,12 +241,15 @@ Template.gameMap.helpers({
     for (c in cities) {
 
       loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
-      console.log(loc);
+      // console.log(loc);
       xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
       yloc = topMargin + 80 + (60 * cities[c]["visibleCorner"][1]);
       cities[c]["className"] = cities[c]["group"] + "-status";
-      console.log(cities[c]["className"]);
+      // console.log(cities[c]["className"]);
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
+      console.log(cities[c]);
+      res = cities[c]["res"];
+      cities[c]["wealth"] = res["lumber"] + res["food"] + res["clay"] + res["copper"]
       // console.log(loc);
       // console.log(document.getElementById(loc));
       // console.log(document.getElementById("cell-x0y0"));

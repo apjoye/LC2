@@ -541,11 +541,11 @@ input:checked + .slider:before {
 }
 .red-border{
 	border: solid #d05c5b 3px;
-	background: rgba(255, 255, 255, 0.6)
+	background: rgba(255, 255, 255, 0.8)
 }
 .green-border{
 	border: solid green 3px;
-	background: rgba(255, 255, 255, 0.6)
+	background: rgba(255, 255, 255, 0.8)
 }
 .usage{
 	padding-top: 10%;

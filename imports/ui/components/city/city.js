@@ -6,6 +6,7 @@ import { Cities } from '/imports/api/links/links.js';
 import { Maps } from '/imports/api/links/links.js';
 import { Resources } from '/imports/api/links/links.js';
 import { Buildings } from '/imports/api/links/links.js';
+import { Acts } from '/imports/api/links/links.js';
 
 import { Producers } from '/imports/api/links/links.js';
 import { Games } from '/imports/api/links/links.js';
@@ -56,6 +57,7 @@ Template.city.onCreated(function helloOnCreated() {
   Meteor.subscribe('producers.owned');
   Meteor.subscribe('games.minerunning');
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('trades.city', FlowRouter.getParam('gameCode'));
   this.gameInfo = new ReactiveVar({});
   // this.roundProduction = new ReactiveVar({});
 });
@@ -122,6 +124,21 @@ Template.city.helpers({
     }
 
     return resPrint;
+  },
+
+  tradeHistory() {
+    ts = Acts.find({
+      $and: [
+        {"gameCode": FlowRouter.getParam("gameCode")},
+        {$or: [
+          {"from.group": Template.instance().gameInfo.get().group},
+          {"to.group": Template.instance().gameInfo.get().group}
+        ]},
+        {"success": true}
+      ]});
+    // console.log(Template.instance().gameInfo.get().group);
+    console.log(ts.fetch());
+    return ts;
   },
 
   cityFactories() {
