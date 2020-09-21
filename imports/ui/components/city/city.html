@@ -23,20 +23,18 @@
         <div class="col-md-1 col-sm-2 col-xs-12">
           <div class = "image-part" style="display: inline-block; width: 46%; text-align: center;">
             <h4>{{cr.roundProduction}}</h4>
-          <img class="cityIcon" src="{{cr.image}}">
+            <div class="tooltip">
+              <img class="cityIcon" src="{{cr.image}}">
+              <span class="tooltiptext">{{cr.res}}</span>
+            </div>
           </div>
           <div class = "status-part" style="display: inline-block; width: 46%;">
           <h2> {{cr.amount}} </h2> 
         </div>
-        <div class = "status-name" style="overflow-wrap: break-word;"><h4>{{cr.res}}</h4></div>
         </div>
         {{/each}}
     </div>
-    <br />
-    {{#each tradeHistory}}
-      {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}}
-      <br />
-    {{/each}}
+    
      <!-- <p> -->
         
         <!-- <h5>

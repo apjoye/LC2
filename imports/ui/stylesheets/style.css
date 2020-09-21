@@ -347,11 +347,18 @@ body {
 }
 
 .modal, .modal-backdrop {
-    position: absolute !important;
+	position: absolute !important;
 }
-
+.modal-content{
+	width: 50%;
+	height: 80%;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, 0)
+}
 .info-panel{
 	position: relative;
+	width: 50%;
 }
 
 .font-style{
@@ -547,6 +554,15 @@ input:checked + .slider:before {
 	border: solid green 3px;
 	background: rgba(255, 255, 255, 0.8)
 }
+.equal-height{
+	position: relative;
+}
+.cover-the-market{
+	background: rgba(255, 255, 255, 0.8);
+	position: absolute;
+	width: 200px;
+	height: 395px;
+}
 .usage{
 	padding-top: 10%;
 }
@@ -569,7 +585,6 @@ input:checked + .slider:before {
 .tooltip {
 	position: relative;
 	display: inline-block;
-	border-bottom: 1px dotted black;
   }
   
   .tooltip .tooltiptext {
