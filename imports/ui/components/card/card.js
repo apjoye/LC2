@@ -72,6 +72,7 @@ Template.factoryList.helpers({
       // console.log(builds);
       for (b in builds) {
         builds[b]["buttonClasses"] = "disabled";
+        builds[b]["gamePhase"] = "True";
         var classes = "";
         var image;
         if (builds[b]["owned"] == true) {

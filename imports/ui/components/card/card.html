@@ -3,14 +3,16 @@
       <div class="col-md-12" style="text-align: center; font-size:18px; "> Marketplace </div>
     </div> -->
     <p class = "center-title" style="font-size: 2em; font-size: 30px; font-weight: 500px; margin-top: 20px;">Marketplace</p>
-
+    
     <div class="row equal-height-parent" style="text-align: center;">
         {{CityBids}}
         {{#each build in PublicBuildings}}
+        
         <div class="col-md-3 buildingbid {{build.classes}} equal-height" style="">
             <!-- {{buildingText build}} -->
-            
-            
+            {{#if build.gamePhase}}
+          <div class = "cover-the-market"></div>
+          {{/if}}
             <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
               <h4>{{build.name}}</h4>
               <div class="adjust">
@@ -35,26 +37,26 @@
                   {{#if build.failJS}}
                     <div class="red-border"></div>
                   {{/if}}
-                <div class="bid-alert">
-                  <img src="{{build.alertOutput}}" style="width: 108px; height:74.4px;"/>
-                </div> 
-                {{#if build.successJS}}
-                  <div class="bysbtext-green">
-                    {{build.alert}}
-                    <br />
-                    {{build.alertText}}
-                    <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
-                  </div>  
-                {{/if}} 
-                {{#if build.failJS}}
-                  <div class="bysbtext-red">
-                    {{build.alert}}
-                    <br />
-                    {{build.alertText}}
-                    <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
-                  </div>  
-                {{/if}} 
-              {{/if}}
+                  <div class="bid-alert">
+                    <img src="{{build.alertOutput}}" style="width: 108px; height:74.4px;"/>
+                  </div> 
+                  {{#if build.successJS}}
+                    <div class="bysbtext-green">
+                      {{build.alert}}
+                      <br />
+                      {{build.alertText}}
+                      <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
+                    </div>  
+                  {{/if}} 
+                  {{#if build.failJS}}
+                    <div class="bysbtext-red">
+                      {{build.alert}}
+                      <br />
+                      {{build.alertText}}
+                      <img style="width:30px; height:30px" src="{{build.alertImage}}"/>
+                    </div>
+                  {{/if}} 
+                {{/if}}
             </div> 
           </div>
           <div class="card_bottom">
