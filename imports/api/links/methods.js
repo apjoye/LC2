@@ -384,6 +384,14 @@ export const ToggleBuilding = new ValidatedMethod({
   }
 });
 
+export const ReadNotif = new ValidatedMethod({
+  name: 'logs.read',
+  validate ({}) {},
+  run ({logId, userId}) {
+    Acts.update({"_id": logId}, {$addToSet: {"readBy": userId}});
+  }
+})
+
 
 export const MakeLog = new ValidatedMethod({
   name: 'logs.add',

@@ -19,6 +19,7 @@ import { PlaceBuilding } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
+import { ReadNotif }  from '/imports/api/links/methods.js';
 import 'animate.css/animate.css';
 
 // import { NewRound } from '/imports/api/links/methods.js';
@@ -130,6 +131,7 @@ Template.city.helpers({
     ts = Acts.find({
       $and: [
         {"gameCode": FlowRouter.getParam("gameCode")},
+        {"readBy": {$not: Meteor.userId()}},
         {$or: [
           {"from.group": Template.instance().gameInfo.get().group},
           {"to.group": Template.instance().gameInfo.get().group}
@@ -179,13 +181,7 @@ Template.city.helpers({
     // return this;
   },
 
-  // roundProd() {
-
-  // }
-
   roundProduction(res) {
-    // prodOutput = {"m1": 0, "m2": 0, "f1": 0, "f2": 0, "pollution": 0};
-    // prodOutStr = {"m1": "+0", "m2": "+0", "f1": "+0", "f2": "+0", "pollution": "+0"};
     prodOutput = {"copper": 0, "clay": 0, "lumber": 0, "food": 0, "pollution": 0, "population": "+0", "happiness": "+0"};
     prodOutStr = {"copper": "+0", "clay": "+0", "lumber": "+0", "food": "+0", "pollution": "+0", "population": "+0", "happiness": "+0"};
     runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
@@ -201,47 +197,16 @@ Template.city.helpers({
       }
     });
 
-
-    /*
-    runningBuilds = Producers.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
-
-    var parks = 0;
-    runningProds.forEach(function (prod) {
-      if (prod.kind == "p1" || prod.kind == "p2") {
-        parks += 1;
-      }
-      for (r in prod.prodValues) {
-        prodOutput[r] += prod.prodValues[r];
-      }
-
-      for (r in prod.prodCosts) {
-        prodOutput[r] = prodOutput[r] - prod.prodCosts[r];
-      }
-    });
-
-    var thisgame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]})
-    var totalFood = thisgame.res.f1 + thisgame.res.f2 + prodOutput["f1"] + prodOutput["f2"];
-    var foodToPoll = totalFood / (thisgame.pollution + prodOutput["pollution"]);
-    var parksToPop = parks / thisgame.population;
-    var happChange = 0;
-    var popChange = 0;
-    if (parksToPop <= 0.25) {      happChange += -1;    }
-    else if (parksToPop >= 0.6) {      happChange += 1;    }
-
-    if (foodToPoll < 0.7) {      popChange += 1;    }
-    else {      popChange += -1;    }
-    prodOutput["population"] = popChange;
-    prodOutput["happiness"] = happChange;
-
-    for (k in prodOutput) {
-      if (prodOutput[k] >= 0) {        prodOutStr[k] = "+" + prodOutput[k].toString();      }
-      else {       prodOutStr[k] = prodOutput[k].toString();       }
-    }
-    */
-    // console.log(res)
     return prodOutStr[res];
   }
 });
+
+Template.city.events ({
+  'click .readNotif' (event) {
+    console.log(event.target);
+    ReadNotif.call({"logId": event.target.id, "userId": Meteor.userId()});
+  }
+})
 
 
 Template.cityMap.onCreated(function helloOnCreated() {
