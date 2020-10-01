@@ -317,6 +317,7 @@ export const RunBids2 = new ValidatedMethod({
       async function runThroughBids(gameCode) {
         allProds = await Buildings.find({$and: [{"gameCode": gameCode}, {"owned": false}, {"state": "auction"}]});
         allProducers = allProds.fetch();
+        var ap = 0;
         for (ap in allProducers) {
           await resolveBids(allProducers[ap], gameCode);
         }
