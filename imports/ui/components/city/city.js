@@ -417,30 +417,12 @@ Template.cityMap.helpers({
   },
 
   boughtBuildings() {
-    // console.log(Meteor.userId());
     bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
-    // console.log(Buildings.find().fetch());
     mapTiles = Template.instance().mapTiles;
-    resImages = Template.instance().resImages;
     bb = bb.fetch();
 
     for (b in bb) {
-      // pCost = [];
-      // pVal = [];
-      // for (p in bb[b]["prodCost"]) {
-      //   if (bb[b]["prodCost"][p] != 0) {
-      //     pCost.push({"res": p, "amount": bb[b]["prodCost"][p], "image": resImages[p]});
-      //   }
-      // }
-      // for (p in bb[b]["prodVal"]) {
-      //   if (bb[b]["prodVal"][p] != 0) {
-      //     pVal.push({"res": p, "amount": bb[b]["prodVal"][p], "image": resImages[p]});
-      //   }
-      // }
-      // bb[b]["pCost"] = pCost;
-      // bb[b]["pVal"] = pVal;
       bb[b]["image"] = mapTiles[bb[b]["name"]];
-      // console.log(bb[b]);
     }
     return bb;
   },
@@ -528,8 +510,10 @@ Template.cityMap.helpers({
       }
       // 
       if ("building" in mapSelect) {
-        boxContent["building"] = true;
+        boxContent["placedBuilding"] = true;
+        boxContent["building"] = mapSelect["building"];
         boxContent["image"] = Template.instance().mapTiles[mapSelect["building"]["name"]];
+        console.log(boxContent);
         boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
         pcs = mapSelect["building"]["prodCost"];
         pcText = [];

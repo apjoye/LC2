@@ -93,7 +93,7 @@
   <div class="slider-building">
     {{#each build in boughtBuildings}}
     <div class="col-md-4 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
-          <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+        <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
         <!--{{build.name}}-->
         <!-- <p>Produce</p>
         <p>Consume</p> -->
@@ -109,7 +109,7 @@
         {{/each}}
         <br />
         {{build.bonusText}}
-        {{#if buildingPlacable build }}
+        {{#if buildingPlacable build}}
 
           <!-- <div class="placementButtons" style="position:absolute"> -->
           <button id="startPlace-{{build._id}}" class="btn btn-primary startPlace" style=" display: block; margin-top: 4%; margin-left: auto; margin-right: auto; padding-bottom: 4%;"> Place Building </button>
@@ -135,9 +135,32 @@
     <div class = "info-panel" style="border: 1px solid grey; padding: 2%; text-align: center;">
         <div>
         <h3><img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+          {{#if currentBuilding.placedBuilding}}
+            Uses: 
+            {{#each p in currentBuilding.building.prodCostArr}}
+              {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+            {{/each}}
+            <br />
+            Produces: 
+            {{#each p in currentBuilding.building.prodValArr}}
+              {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+            {{/each}}
+            <br />
+            {{currentBuilding.building.bonusText}}
+          {{else}}
             {{#each currentBuilding.text}}
               {{this}} <br />
             {{/each}}
+          {{/if}}
+            
+             
+            <!--{{build.name}}-->
+            <!-- <p>Produce</p>
+            <p>Consume</p> -->
+            <!-- {{build.infoText}} -->
+
+            
+
             {{#if currentBuilding.buildingButtons}}
             <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
               <!-- <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> {{currentBuilding.status}} <small>(Click to toggle) </small> </button> -->
