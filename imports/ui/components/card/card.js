@@ -261,27 +261,29 @@ Template.factoryList.events({
     //event.target.classList[3]   event.target.name
     // console.log(event.target);
     // console.log(event.target.classList);
-    oldVal = parseInt(event.target.classList[5]);
-    change = parseInt(event.target.name);
-    if (isNaN(parseInt(oldVal))) {
-      oldVal = 0;
-    }
-    // console.log(oldVal + " " + change);
+    if (!(event.target.classList).contains("disabled")) {
+      oldVal = parseInt(event.target.classList[5]);
+      change = parseInt(event.target.name);
+      if (isNaN(parseInt(oldVal))) {
+        oldVal = 0;
+      }
+      // console.log(oldVal + " " + change);
 
-    if (oldVal == 0 && change == -1) {
-      console.log("no negative bids");
-    }
-    else {
-      newVal = oldVal + change;
-      MakeBid2.call({
-        "baseId": Meteor.userId(), 
-        "building": event.target.classList[3], 
-        // "group": thisGroup.group, 
-        "gameCode": FlowRouter.getParam("gameCode"), 
-        "change": change, 
-        "oldVal": oldVal,
-        "newVal": newVal,
-        "bidKind": event.target.classList[4]});  
+      if (oldVal == 0 && change == -1) {
+        console.log("no negative bids");
+      }
+      else {
+        newVal = oldVal + change;
+        MakeBid2.call({
+          "baseId": Meteor.userId(), 
+          "building": event.target.classList[3], 
+          // "group": thisGroup.group, 
+          "gameCode": FlowRouter.getParam("gameCode"), 
+          "change": change, 
+          "oldVal": oldVal,
+          "newVal": newVal,
+          "bidKind": event.target.classList[4]});  
+      }
     }
     
   },
