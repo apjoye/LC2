@@ -49,14 +49,18 @@
 
 
       <!-- </p> -->
-    <br />
-    {{#each tradeHistory}}
-      {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} <button class="btn-default btn readNotif" id="{{_id}}">x</button>
-      <br />
-    {{/each}}
-
+    
+      
   </div>
-
+  <div>
+    {{#each tradeHistory}}
+    <div class="alert alert-danger fade in">
+      <span class="closebtn readNotif" id = "{{_id}}">&times;</span>
+      {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
+      <br />
+    </div>
+    {{/each}}
+  </div>
     
   {{> cityMap}}
 </template>
