@@ -57,6 +57,16 @@
                     </div>
                   {{/if}} 
                 {{/if}}
+                {{#if build.tieBuilding}}
+                <div class="yellow-border"></div>
+                <div class="tie-alert">
+                  <img src="{{build.alertOutput}}" style="width: 108px; height:74.4px;"/>
+                </div> 
+                <div class="bysbtext-yellow">
+                    {{build.alert}}
+                    {{build.alertText}}
+                </div> 
+                {{/if}}
             </div> 
           </div>
           <div class="card_bottom">

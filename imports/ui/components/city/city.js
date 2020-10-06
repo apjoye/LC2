@@ -611,6 +611,21 @@ Template.cityMap.events({
     // map = instance.fullmap.get();
 
   },
+  
+  'zoom .updateSelect': function (event, instance){
+    console.log('11');
+    event.preventDefault();
+    loc = instance.selectedLoc.get();
+    console.log(loc);
+    cellLoc = document.getElementById("cell-" + loc).getBoundingClientRect();
+    d = document.getElementById("cell-highlighter");
+      d.style.position = "absolute";
+      d.style.left = (cellLoc.x + window.scrollX) +'px';
+      d.style.top = (cellLoc.y + window.scrollY) +'px';
+      d.style.width = cellLoc.width + "px";
+      d.style.height = cellLoc.height + "px";
+  },
+  
 
   'click .placeBuilding': function (event, instance) {
     event.preventDefault();
@@ -839,4 +854,34 @@ $(window).scroll(function(){
 */
 
 
+/*
+function updateSelect(blueElem){
+    loc = instance.selectedLoc.get();
+    console.log(loc);
+    cellLoc = document.getElementById("cell-" + loc).getBoundingClientRect();
+    d = document.getElementById("cell-highlighter");
+    d.style.position = "absolute";
+    d.style.left = (cellLoc.x + window.scrollX) +'px';
+    d.style.top = (cellLoc.y + window.scrollY) +'px';
+    d.style.width = cellLoc.width + "px";
+    d.style.height = cellLoc.height + "px";
+}
+*/
+
+/*
+window.addEventListener("resize", myFunction);
+function myFunction(){
+    
+    loc = event.target.classList[2];
+    instance.selectedLoc.set(loc);
+    console.log(loc);
+    cellLoc = document.getElementById("cell-" + loc).getBoundingClientRect();
+    d = document.getElementById("cell-highlighter");
+    d.style.position = "absolute";
+    d.style.left = (cellLoc.x + window.scrollX) +'px';
+    d.style.top = (cellLoc.y + window.scrollY) +'px';
+    d.style.width = cellLoc.width + "px";
+    d.style.height = cellLoc.height + "px";
+}
+*/
 

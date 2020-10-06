@@ -58,6 +58,7 @@ Template.factoryList.helpers({
     bidOutput = {
       "success": "../img/bid/boughtbyyou.png",
       "fail":"../img/bid/boughtbysomeone.png",
+      "tie":"../img/bid/tie.png",
     }
     thisGame = Template.instance().gameStats.get();
     builds = Buildings.find({$and: [
@@ -94,8 +95,7 @@ Template.factoryList.helpers({
             builds[b]["alert"] = "by you ";
             builds[b]["successJS"] = "True";
             //console.log(document.getElementById('').className);
-          }
-          else {
+          }else{
             builds[b]["alertOutput"] = bidOutput["fail"];
             classes += "bidLost";
             builds[b]["alert"] = "by others  ";
@@ -111,10 +111,12 @@ Template.factoryList.helpers({
         else if ("info" in builds[b]) {
           // console.log(builds[b]["info"]);
           if (builds[b]["info"]["state"] == "tied") {
+            builds[b]["tieBuilding"] = true;
+            builds[b]["alertOutput"] = bidOutput["tie"];
+            classes += "otherAlert";
             builds[b]["alertStatus"] = true;
             // console.log("found the tied build!");
             builds[b]["alert"] = "Did not sell from tie";
-            classes += "otherAlert";
 
           }
         }
