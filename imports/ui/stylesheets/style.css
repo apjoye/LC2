@@ -344,14 +344,20 @@ body {
 }
 
 .modal, .modal-backdrop {
-	position: absolute !important;
+	/*position: relative;*/
+	z-index: 5;
 }
+
+.modal-dialog {
+	/*width: 80%;*/
+}
+
 .modal-content{
-	width: 50%;
+/*	width: 50%;
 	height: 80%;
 	left: 50%;
-	top: 50%;
-	transform: translate(-50%, 0)
+	top: 50%;*/
+	transform: translate(0, 90%)
 }
 .info-panel{
 	position: relative;

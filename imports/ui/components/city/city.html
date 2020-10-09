@@ -73,7 +73,7 @@
   </div>
   <div class="col-md-5" style="overflow-x:auto;">
     <p></p>
-      <button type="button" class="btn btn-default disabled small"> Toggle Images </button> <small> Click on a cell you own to see information and place buildings</small>
+    <!--   <button type="button" class="btn btn-default disabled small"> Toggle Images </button> <small> Click on a cell you own to see information and place buildings</small> -->
     <p></p>
     <table id="smallMap">
       {{#each mapRows}}
@@ -138,7 +138,9 @@
     <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Information Panel</p>
     <div class = "info-panel" style="border: 1px solid grey; padding: 2%; text-align: center;">
         <div>
-        <h3><img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+        <h3> </h3>
+        <h3>
+          <img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
           {{#if currentBuilding.placedBuilding}}
             Uses: 
             {{#each p in currentBuilding.building.prodCostArr}}
@@ -176,11 +178,12 @@
               On
             </div>
               <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
+              <!-- <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button> -->
             </div>
             {{/if}}
             <!-- {{#else}} -->
         </div>
-        <div id="myModal" class="modal fade" role="dialog">
+        <div id="myModal" tabindex="-1" class="modal fade" role="dialog"  aria-labelledby="deleteBuildingModal">
           <div class="modal-dialog">
      
             <!-- Modal content-->

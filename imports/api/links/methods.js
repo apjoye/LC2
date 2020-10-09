@@ -196,7 +196,7 @@ export const RunBids2 = new ValidatedMethod({
 
       async function commitBid (bid, teams, resources) {
         // >> check affordability
-        console.log(JSON.stringify(resources) + " " + JSON.stringify(bid));
+        // console.log(JSON.stringify(resources) + " " + JSON.stringify(bid));
         newRes = resources[bid["baseId"]];
         oldRes = newRes;
         newRes[bid["bidKind"]] -=  bid["bidVal"];
@@ -274,8 +274,8 @@ export const RunBids2 = new ValidatedMethod({
           return 0;
         }
         producerBids.sort(compareBids);
-        console.log(producerBids);
-        console.log(teamResources);
+        // console.log(producerBids);
+        // console.log(teamResources);
 
         for (pb in producerBids) {
           bid = producerBids[pb];
@@ -760,6 +760,7 @@ export const RunBuildings = new ValidatedMethod({
         newPoll = thisGame["pollution"];
         roundEmployed = 0;
         running = false
+        console.log("are we here?");
         if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
         console.log("employed " + roundEmployed);
         if (!("notes" in thisGame)) {
@@ -861,6 +862,30 @@ export const RunBuildings = new ValidatedMethod({
               }
             }
             // }
+            
+          
+          //********* NEW HAPPINESS CALCULATOR
+          // Happiness = Wealth / {(Population/Food) + Pollution}
+          // Population = (# of current available food around the city + Happiness) / {Pollution + (# of initial available food around city - # of current round)}
+          //
+          
+          // deltaHapp = (newRes["lumber"] + newRes["clay"] + newRes["copper"]) / thisGame["population"];
+          // if (deltaHapp > 0.6) { deltaHapp = Math.min(3, parseInt(deltaHapp)); }
+          // else if (deltaHapp < 0.3) { deltaHapp = -1; }
+          // newHapp = thisGame["happiness"] + deltaHapp;
+          // newPop = thisGame["population"] + parseInt(((0.5 * newRes["food"]) - (0.5 * newPoll)  + (2 * newHapp)) / thisGame["population"]);
+          
+          console.log("trying to update game");
+          return Games.update(
+            {"_id": thisGame._id}, 
+            {$set: {
+              "res": newRes, 
+              // "population": newPop, 
+              // "happiness": newHapp, 
+              "pollution": newPoll, 
+              "roundEmployed": roundEmployed, 
+              "running": running
+            }} );
             // return true;
           }
         }
@@ -874,20 +899,42 @@ export const RunBuildings = new ValidatedMethod({
         // for (s in newRes) {
         //   wealth += newRes[s];  
         // }
-
-        //********* NEW HAPPINESS CALCULATOR
-        // Happiness = Wealth / {(Population/Food) + Pollution}
-        // Population = (# of current available food around the city + Happiness) / {Pollution + (# of initial available food around city - # of current round)}
-        //
-        deltaHapp = (newRes["lumber"] + newRes["clay"] + newRes["copper"]) / thisGame["population"];
-        if (deltaHapp > 0.6) { deltaHapp = Math.min(3, parseInt(deltaHapp)); }
-        else if (deltaHapp < 0.3) { deltaHapp = -1; }
-        newHapp = thisGame["happiness"] + deltaHapp;
-        newPop = thisGame["population"] + parseInt(((0.5 * newRes["food"]) - (0.5 * newPoll)  + (2 * newHapp)) / thisGame["population"]);
         
-        console.log("trying to update game");
-        Games.update({"_id": thisGame._id}, {$set: {"res": newRes, "population": newPop, "happiness": newHapp, "pollution": newPoll, "roundEmployed": roundEmployed, "running": running}} );
 
+      }
+
+      async function updateStats(gameCode) {
+        gg = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch();
+        for (g in gg) {
+          thisGame = gg[g];
+          newRes = thisGame["res"];
+          newPoll = thisGame["pollution"]; newPop = thisGame["population"]; newHapp = thisGame["happiness"];
+          console.log("what the what, employing " + thisGame["roundEmployed"]);
+          newHapp = thisGame["happiness"];
+          newPop = thisGame["population"];
+          wealth = newRes["clay"] + newRes["lumber"] + newRes["copper"];
+          pollHere = thisGame["pollution"] == 0 ? 1: newPoll;
+          happFactor = ((newRes["food"] / thisGame["population"]) + wealth) / ( + pollHere);
+          console.log("trying to update happiness " + thisGame["group"] + " " + happFactor);
+          if (happFactor > 1) { newHapp +=  1; }
+          else if (happFactor < 0.5) { newHapp -= 1; }
+          
+          popFactor = (newPop + newRes["food"]) / (newPop + pollHere);
+          if (popFactor > 1) { newPop += 1; }
+          else if (popFactor < 0.5) { newPop -= 1; }  
+          return Games.update(
+            {"_id": thisGame._id}, 
+            {$set: {
+              "res": newRes, 
+              "population": newPop, 
+              "happiness": newHapp, 
+              // "pollution": newPoll, 
+              // "roundEmployed": roundEmployed, 
+              // "running": running
+            }
+          });
+        }
+        
       }
 
       async function runThroughBuilds(buildings) {
@@ -903,7 +950,7 @@ export const RunBuildings = new ValidatedMethod({
               // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
               try {
                 console.log("calling eat and make");
-                console.log(bb);
+                // console.log(bb);
                 await EatAndMake(bb["ownerGame"], bb);
               }
               catch (err) {
@@ -915,12 +962,16 @@ export const RunBuildings = new ValidatedMethod({
           // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
           // console.log(bb["kind"]);
         }
+        console.log("updating happiness etc");
+        await updateStats(gameCode);
       }
+
       Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
       buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
       if (buildings.length > 0){
         runThroughBuilds(buildings);
       }
+
       console.log("trying to update year");
       thisyear = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
       if ("year" in thisyear) {thisyear = thisyear.year + 1;}
