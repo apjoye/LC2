@@ -191,7 +191,7 @@ export const RunBids2 = new ValidatedMethod({
         // return await Bids.
         // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
         Bids.update({$and: [{"gameCode": gameCode}]}, {$set: {"bidVal": 0}}, {multi: true});
-        Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"bidCommit": false}});
+        Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"bidCommit": false}}, {multi: true});
       }
 
       async function commitBid (bid, teams, resources) {
@@ -922,7 +922,7 @@ export const RunBuildings = new ValidatedMethod({
           popFactor = (newPop + newRes["food"]) / (newPop + pollHere);
           if (popFactor > 1) { newPop += 1; }
           else if (popFactor < 0.5) { newPop -= 1; }  
-          return Games.update(
+          await Games.update(
             {"_id": thisGame._id}, 
             {$set: {
               "res": newRes, 
