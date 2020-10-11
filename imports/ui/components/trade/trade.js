@@ -29,7 +29,7 @@ Template.trade.helpers({
     thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": gCode}]});
     thisGroup = thisGame.group;
     // console.log(thisGame);
-    return Games.find({$and: [{"gameCode": gCode}, {"role": "player"}, {"group": {$ne: thisGroup}}]}, {$sort: {"group": 1}}  );
+    return Games.find({$and: [{"gameCode": gCode}, {"role": {$in: ["base", "player"]}}, {"group": {$ne: thisGroup}}]}, {$sort: {"group": 1}}  );
   },
 
 });

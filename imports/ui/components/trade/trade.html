@@ -1,43 +1,45 @@
 <template name="trade">
   <div class="container-fluid">
-  <h3> Trade! </h3>
-  <form class="trade form-horizontal">
-    <div class="form-group">
-      <input class = "form-control" type="number" name="amount" placeholder="Amount to send" />
-    </div>
-    
-    <div class="form-group">
-    <select class = "form-control" id="resource">
-      {{#each resource}}
-        <option value = {{name}}>{{displayName}}</option>
-      {{/each}}
-    </select>
-    </div>
+    <div class="row"> <div class="col-lg-4 col-md-6 col-sm-12">
+      <h3> Trade! </h3>
+      <form class="trade form-horizontal">
+        <div class="form-group">
+          <input class = "form-control" type="number" name="amount" placeholder="Amount to send" />
+        </div>
+        
+        <div class="form-group">
+        <select class = "form-control" id="resource">
+          {{#each resource}}
+            <option value = {{name}}>{{displayName}}</option>
+          {{/each}}
+        </select>
+        </div>
 
-    <div class="form-group">
-      To: <select class = "form-control" id="to-city">
-        {{#each otherPlayers}}
-          <option value = {{_id}}>{{playerName}}: {{group}}</option>
-        {{/each}}
-      </select>
-    </div>
+        <div class="form-group">
+          To: <select class = "form-control" id="to-city">
+            {{#each otherPlayers}}
+              <option value = {{_id}}>{{playerName}}: {{group}}</option>
+            {{/each}}
+          </select>
+        </div>
 
-<!--     From: <select id="from-city">
-      {{#each city}}
-        <option value = {{name}}>{{name}}</option>
-      {{/each}}
-    </select> -->
-    <input class="form-control" type="submit" value="trade"/>
-  </form>
-  <br />
+    <!--     From: <select id="from-city">
+          {{#each city}}
+            <option value = {{name}}>{{name}}</option>
+          {{/each}}
+        </select> -->
+        <input class="form-control" type="submit" value="trade"/>
+      </form>
+      <br />
 
-  <!-- <section id="metalResourceBox"> -->
-    <div id="m1Items">  <img class="cityIcon" src="../img/icons/copper.png">  = Copper</div>  
-    <div id="m2Items"><img class="cityIcon" src="../img/icons/clay.png">   = Clay</div>
- <!--  </section>
-  <section id=foodResourceBox> -->
-    <div id="f1Items"> <img class="cityIcon" src="../img/icons/food.png">  = Food</div>   
-    <div id="f2Items"> <img class="cityIcon" src="../img/icons/lumber.png">  = Lumber </div>
-  <!-- </section> -->
+      <!-- <section id="metalResourceBox"> -->
+        <div id="m1Items">  <img class="cityIcon" src="../img/icons/copper.png">  = Copper</div>  
+        <div id="m2Items"><img class="cityIcon" src="../img/icons/clay.png">   = Clay</div>
+     <!--  </section>
+      <section id=foodResourceBox> -->
+        <div id="f1Items"> <img class="cityIcon" src="../img/icons/food.png">  = Food</div>   
+        <div id="f2Items"> <img class="cityIcon" src="../img/icons/lumber.png">  = Lumber </div>
+      <!-- </section> -->
+    </div></div>
   </div>
 </template>
