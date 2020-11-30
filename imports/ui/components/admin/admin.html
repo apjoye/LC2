@@ -159,37 +159,8 @@
     </div>
   </form>
   </p>
-  <!--  Make a new player a base -->
-<!--   <p>
-  <form class="makeBase form-inline">
-    <div class="form-group">
-      <input class = "form-control" type="text" name="playerName" placeholder="player" />
-    </div>
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Make Base"/>
-    </div>
-  </form>
-  </p> -->
-  <!--  Set neighbors for a base -->
-  <!-- <p>
-  <form class="setNeighbors form-inline">
-    <div class="form-group">
-      <input class = "form-control" type="text" name="cityName" placeholder="city name" />
-    </div>
-    <div class="form-group">
-      <input class = "form-control" type="text" name="neighborName" placeholder="neighbor name" />
-    </div>
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Add Neighbor"/>
-    </div>
-  </form>
-  </p> -->
-  <!-- Add Building -->
   <p>
   <form class="addBuilding form-inline">
-    <!-- <div class="form-group">
-      <input class = "form-control" type="text" name="bidKind" placeholder="Bid Kind" />
-    </div> -->
     <div class="form-group">
       <select class = "custom-select form-control" id="bidKind" name="bidKind">
         {{#each bidKinds}}
@@ -249,91 +220,56 @@
   <button type="button" class="toggleImages btn btn-default"> Toggle Images </button>
   <p></p>
   <div gameMapchart-table>
-  <table id = "gameMapTable">
-    {{#each mapRows}}
-    <tr>
-      <!-- <pre> -->
-        {{#each this}}
-        <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
-          {{#if imageMode}}
-            <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px; background-color:{{this.bgColor}}">
-          {{else}}
-            {{this.text}}&emsp;
-          {{/if}}
-        </td>
-        {{/each}}
-        <!-- {{this.rowCol}}&emsp;
-        {{rowCol}} &emsp; -->
-      <!-- </pre> -->
-      <!-- <br /> -->
-    </tr>
-    {{/each}}
-  </table>
-  <br />
-  {{#each mapRows}} 
-  {{/each}}
-  <br />
-  <div class="status-chart">
-  {{#if imageMode}}
-
-    {{#each cityStats}}
-      <!-- <div id="cityStat-{{this.className}}" class="{{this.className}} cityStatBox" style="{{this.style}}"> -->
-      <div id="cityStat-{{this.className}}" class="cityStatBox" style="position: absolute; {{this.style}}">
-          <div class="inline-style"><img src = "../img/map/city_status/population.png" style="width: 20px; height: 20px;"></div>
-          <div class="inline-style">{{this.population}}</div>
-          <div class="inline-style"><img src = "../img/map/city_status/happiness.png" style="width: 20px; height: 20px;"></div>
-          <div class="inline-style">{{this.happiness}}</div>
-          <div class="inline-style"><img src = "../img/map/city_status/pollution.png" style="width: 20px; height: 20px;"></div>
-          <div class="inline-style">{{this.pollution}}</div>
-          <div class="inline-style"><img src = "../img/map/city_status/coin.png" style="width: 20px; height: 20px;"></div>
-          <div class="inline-style">{{this.wealth}}</div>
-      </div>
-    {{/each}}
-
-    {{#each resStats}}
-      <div class="{{this.className}} resStatBox">
-        {{#each s in this.statList}}
-          <p class="mapinfo">
-            <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; margin-top: 5px;">
-            {{s.amount}}</p>
-        {{/each}}
-        <!-- <p>Happ: {{this.happiness}}</p>
-        <p>Poll: {{this.pollution}}</p> -->
-      </div>
-    {{/each}}
-    
-    <!-- <div class="clay-left-status">
-      <p>Clay: </p>
-    </div>
-    <div class="clay-right-status">
-      <p>Clay</p>
-    </div>
-    <div class="woods1-status">
-      <p>Woods:</p>
-      <p>Animals:</p>
-    </div>
-    <div class="woods2-status">
-      <p>Woods:</p>
-      <p>Animals:</p>
-    </div> -->
-    {{/if}}
-  </div>
-</div>
-</template>
-
-<!-- <template name="adminGames">
-  <div class="panel panel-default">
-    <div class="panel-heading">Play Games</div>
-    <ul class="list-group">
-
-      {{#each gameList}}
-        <a href="/games/{{gameCode}}">
-          <li class="list-group-item">
-            {{gameCode}}
-          </li>
-        </a>
+    <img src="../img/map/mapbase.png" style="position: absolute; width:960px; z-index: 1">
+    <table id = "gameMapTable">
+      {{#each mapRows}}
+      <tr>
+          {{#each this}}
+          <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
+            {{#if imageMode}}
+              <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px; background-color:{{this.bgColor}}; z-index: -2">
+            {{else}}
+              {{this.text}}&emsp;
+            {{/if}}
+          </td>
+          {{/each}}
+      </tr>
       {{/each}}
-    </ul>
+    </table>
+    
+    <br />
+    {{#each mapRows}} 
+    {{/each}}
+    <br />
+    <div class="status-chart">
+    {{#if imageMode}}
+
+      {{#each cityStats}}
+        <!-- <div id="cityStat-{{this.className}}" class="{{this.className}} cityStatBox" style="{{this.style}}"> -->
+        <div id="cityStat-{{this.className}}" class="cityStatBox" style="position: absolute; {{this.style}}">
+            <div class="inline-style"><img src = "../img/map/city_status/population.png" class="cityStatImage"></div>
+            <div class="inline-style">{{this.population}}</div>
+            <div class="inline-style"><img src = "../img/map/city_status/happiness.png" class="cityStatImage"></div>
+            <div class="inline-style">{{this.happiness}}</div>
+            <div class="inline-style"><img src = "../img/map/city_status/pollution.png" class="cityStatImage"></div>
+            <div class="inline-style">{{this.pollution}}</div>
+            <div class="inline-style"><img src = "../img/map/city_status/coin.png" class="cityStatImage"></div>
+            <div class="inline-style">{{this.wealth}}</div>
+        </div>
+      {{/each}}
+
+      {{#each resStats}}
+        <div class="{{this.className}} resStatBox">
+          {{#each s in this.statList}}
+            
+              <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; margin-top: 5px; z-index: 4">
+              <p class="mapinfo">
+              {{s.amount}}</p>
+          {{/each}}
+        </div>
+      {{/each}}
+      
+      {{/if}}
+    </div>
   </div>
 </template>
- -->

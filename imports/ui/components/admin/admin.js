@@ -235,7 +235,7 @@ Template.gameMap.helpers({
   },
 
   cityStats() {
-    topMargin = 620;
+    topMargin = 680;
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
     for (c in cities) {
