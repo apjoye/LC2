@@ -558,6 +558,7 @@ Template.cityMap.helpers({
       else {
         if (mapSelect.ownerId == Meteor.userId()) {
           // console.log("owned cell, looking into neighbors");
+          boxContent["image"] = "../img/buildings/construction.png";
           boxContent.text.push("You own this cell! Place some buildings here!");
           resTexts = {
             "water": "Water nearby! You can fish here. Also, farms produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well",
@@ -579,6 +580,7 @@ Template.cityMap.helpers({
           }
         }
         else {
+          boxContent["image"] = "../img/buildings/no-construction.png";
           boxContent.text.push("You don't own this cell! Place buildings on cells you own.");
           if ("resource" in mapSelect) {
             resTexts2 = {
