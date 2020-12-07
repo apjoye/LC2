@@ -53,9 +53,20 @@
       
   </div>
   <div>
-    {{#each tradeHistory}}
+    {{#each tradeAlerts}}
     <div class="alert alert-danger fade in">
       <span class="closebtn readNotif" id = "{{_id}}">&times;</span>
+      {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
+      <br />
+    </div>
+    {{/each}}
+  </div>
+
+  <h3> Trade History </h3>
+  <div>
+    {{#each tradeHistory}}
+    <div class="alert alert-dark fade in">
+      
       {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
       <br />
     </div>

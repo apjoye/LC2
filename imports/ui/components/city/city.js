@@ -127,11 +127,27 @@ Template.city.helpers({
     return resPrint;
   },
 
-  tradeHistory() {
+  tradeAlerts() {
     ts = Acts.find({
       $and: [
         {"gameCode": FlowRouter.getParam("gameCode")},
         {"readBy": {$not: Meteor.userId()}},
+        {$or: [
+          {"from.group": Template.instance().gameInfo.get().group},
+          {"to.group": Template.instance().gameInfo.get().group}
+        ]},
+        {"success": true}
+      ]});
+    // console.log(Template.instance().gameInfo.get().group);
+    console.log(ts.fetch());
+    return ts;
+  },
+
+  tradeHistory() {
+    ts = Acts.find({
+      $and: [
+        {"gameCode": FlowRouter.getParam("gameCode")},
+        // {"readBy": {$not: Meteor.userId()}},
         {$or: [
           {"from.group": Template.instance().gameInfo.get().group},
           {"to.group": Template.instance().gameInfo.get().group}
