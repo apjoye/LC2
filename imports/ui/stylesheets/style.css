@@ -303,19 +303,19 @@ body {
 }
 .lake-status{
 	position: absolute;
-	top: 1200px;
+	top: 1100px;
 	left: 325px;
 	/*background-color:white;*/
 }
 .woods1-status{
 	position: absolute;
-	top: 1200px;
+	top: 1100px;
 	left: 60px;
 	/*background-color:white;*/
 }
 .woods2-status{
 	position: absolute;
-	top: 900px;
+	top: 700px;
 	left: 830px;
 	/*background-color:white;*/
 }

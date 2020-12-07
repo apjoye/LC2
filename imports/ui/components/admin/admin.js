@@ -238,12 +238,17 @@ Template.gameMap.helpers({
     topMargin = 680;
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
+    // console.log(cities);
     for (c in cities) {
 
       loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
       // console.log(loc);
       xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
       yloc = topMargin + 80 + (60 * cities[c]["visibleCorner"][1]);
+      if (cities[c]["playerName"] == "green-city") {
+        // xloc -= 50;
+        yloc -= 50;
+      }
       cities[c]["className"] = cities[c]["group"] + "-status";
       // console.log(cities[c]["className"]);
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
