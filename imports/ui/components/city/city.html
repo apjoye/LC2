@@ -10,8 +10,8 @@
 
 <template name="city">
   <!-- {{}} -->
-    <div style="display:flex; flex-direction: row;  height: 80px; overflow: auto;"> 
-      <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px"> 
+    <div class="resLabel" style="display:flex; flex-direction: row;  height: 80px; overflow: auto;"> 
+      <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px; visibility: {{getLabelVis}}"> 
         <div style="display:flex; flex: 1; flex-direction: row;  height: 40px; overflow: clip;"> 
             <div style="display:flex; overflow: clip; flex-direction: column; height:100%;"> 
               <div style="flex:40%; font-size: 90%; font-weight: 400; overflow: clip; text-align: left;">
@@ -43,56 +43,14 @@
             </div>
           </div>
         </div>
-        <div style="display:flex; flex-direction: row; height: 10px; justify-content: left; padding-left: 30%; padding-top: 4px">
+        <div style="display:flex; flex-direction: row; height: 10px; justify-content: left; padding-left: 30%; padding-top: 4px; visibility: {{getLabelVis}}">
           {{cr.res}}
         </div>
       </div>
     {{/each}}
   </div>
 
-  <div class = "fixed-top-bar" id="cityBox">
-    <!-- <p class="cityName">{{name}} </p> -->
-    <!-- <h3>Your City's Production</h3> -->
-
-    <div class ="row" style="margin-left: 0; margin-right: 0;">
-        <!-- {{#each cityResources}}
-        {{this.image}}
-        {{/each}} -->
-
-
-        {{#each cr in cityResources}}
-        <div class="col-md-1 col-sm-2 col-xs-12">
-          <div class = "image-part" style="display: inline-block; width: 46%; text-align: center;">
-            <h4>{{cr.roundProduction}}</h4>
-            <div class="tooltip">
-              <img class="cityIcon" src="{{cr.image}}">
-              <span class="tooltiptext">{{cr.res}}</span>
-            </div>
-          </div>
-          <div class = "status-part" style="display: inline-block; width: 46%;">
-          <h2> {{cr.amount}} </h2> 
-        </div>
-        </div>
-        {{/each}}
-    </div>
-    
-     <!-- <p> -->
-        
-        <!-- <h5>
-          Resource changes are estimates and don't always work out! <br />
-          Population increases when people have enough food <br />
-          Happiness increases when people have enough parks to visit
-        </h5>
-
-        <button type="button" style="max-width:400pt" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="right" data-html="true" title="Events over last round" data-content="<ul>{{#each roundNotes}} <li>{{this}} </li> {{/each}}">Notes from Last Run</button> -->
-
-        <!-- <p>Notes from last run: {{#each roundNotes}}  <p> {{this}}  </p>  -->
-
-
-      <!-- </p> -->
-    
-      
-  </div>
+  
   <div>
     {{#each tradeAlerts}}
     <div class="alert alert-danger fade in">

@@ -60,10 +60,16 @@ Template.city.onCreated(function helloOnCreated() {
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('trades.city', FlowRouter.getParam('gameCode'));
   this.gameInfo = new ReactiveVar({});
+  this.labelVisibility = new ReactiveVar({"index": 1, "list": ["visibile", "hidden"]});
   // this.roundProduction = new ReactiveVar({});
 });
 
 Template.city.helpers({
+  getLabelVis() {
+    lv = Template.instance().labelVisibility.get()
+    return lv["list"][lv["index"]];
+  },
+
   cityResources() {
     resImages = {
       "m1": "../img/icons/gold_sml.png",
@@ -237,6 +243,12 @@ Template.city.events ({
   'click .readNotif' (event) {
     console.log(event.target);
     ReadNotif.call({"logId": event.target.id, "userId": Meteor.userId()});
+  },
+
+  'click .resLabel' (event, instance) {
+    lv = instance.labelVisibility.get();
+
+    instance.labelVisibility.set({"index": (1 - lv.index), "list": lv.list});
   }
 })
 
