@@ -81,7 +81,7 @@
   <div id = "cell-highlighter" style="background-color: rgba(0, 60, 255, 0.2); z-index: 2">
 
   </div>
-  <div class="col-md-8" style="overflow-x:auto; width: ">
+  <div class="col-md-6" style="overflow-x:auto; width: ">
     <p></p>
     <!--   <button type="button" class="btn btn-default disabled small"> Toggle Images </button> <small> Click on a cell you own to see information and place buildings</small> -->
     <p></p>
@@ -91,7 +91,7 @@
           {{#each this}}
             <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
               {{#if imageMode}}
-                <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:120px; height:120px; background-color:{{this.bgColor}}">
+                <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:90px; height:90px; background-color:{{this.bgColor}}">
               {{else}}
                 {{this.text}}&emsp;
               {{/if}}
@@ -101,12 +101,13 @@
       {{/each}}
     </table>
 </div>
-<div class="col-md-4" style="padding-left: 15px;">
+<div class="col-md-6" style="padding-left: 15px;">
   <div class="top-sidebar" style="padding-top: 2%; padding-bottom: 4%;">
       <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Buildings</p>
   <div class="slider-building">
+    
     {{#each build in boughtBuildings}}
-    <div class="col-md-4 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
+    <div class="col-md-5 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
         <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
         <!--{{build.name}}-->
         <!-- <p>Produce</p>
@@ -140,6 +141,12 @@
         <!-- {{buildingPlacable build}} -->
     </div>
     {{/each}}
+    <div class="col-md-5 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
+      <div style="height: 140px">
+
+      </div>
+ 
+    </div>
   </div>
 
   

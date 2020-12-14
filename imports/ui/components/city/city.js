@@ -464,6 +464,7 @@ Template.cityMap.helpers({
     bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
     mapTiles = Template.instance().mapTiles;
     bb = bb.fetch();
+    // bb.append({});
 
     for (b in bb) {
       bb[b]["image"] = mapTiles[bb[b]["name"]];
