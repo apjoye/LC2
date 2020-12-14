@@ -104,7 +104,11 @@ Template.city.helpers({
     //GETTING OTHER CITY STATS INFO IN HERE
     resPrint = [];
     // console.log(thisGame);
-    resPrint.push({"roundProduction": "Resources"});
+    // resPrint.push({
+      // "roundProduction": "Change",
+      // "amount": "Current",
+      // "res": "Resources",
+    // });
     for (r in thisGame.res) {
       thisRes = {"res": r};
       thisRes["amount"] = thisGame.res[r];
@@ -113,13 +117,25 @@ Template.city.helpers({
       // console.log(prodOutStr[r]);
       resPrint.push(thisRes);
     }
-    resPrint.push({"roundProduction": "Metrics"});
+    resPrint.push({
+      // "roundProduction": "Change",
+      // "amount": "Current",
+      // "res": "Metrics",
+    });
     otherStats = ["pollution", "population", "happiness"];
     for (r in otherStats) {
       thisRes = {"res": otherStats[r]};
+
       thisRes["amount"] = thisGame[otherStats[r]];
       thisRes["image"] = resImages[otherStats[r]];
-      thisRes["roundProduction"] = prodOutStr[otherStats[r]];
+      if (otherStats[r] == "pollution"){
+        thisRes["roundProduction"] = prodOutStr[otherStats[r]];  
+      }
+      else {
+        thisRes["roundProduction"] = " - ";
+      }
+      
+
       // console.log(thisRes + r);
       resPrint.push(thisRes);
     }
