@@ -22,7 +22,8 @@ Template.navBar.helpers({
      if (gameCode != undefined){
        game = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": gameCode}]});
        if (game != undefined) { 
-         group = game.group; 
+         group = game.group;
+         console.log(game) 
          if ("year" in game) {
            year = game["year"];
          }
@@ -36,6 +37,7 @@ Template.navBar.helpers({
          }
        }
      }
+     console.log({"group": group, "year": year, "phase": phase})
      if (group != ""){ group = group; }
      
      return {"group": group, "year": year, "phase": phase};

@@ -10,6 +10,17 @@
 
 <template name="city">
   <!-- {{}} -->
+  <div style="height: 70px; width: 100%;">
+    <img src = "../img/phase/trade.svg" style="width:30px; height:30px;">
+    <img src = "../img/phase/line.svg" style="width:60.2px;">
+    <img src = "../img/phase/check.svg" style="width:20px; height:20px">      
+    <span class="readyCity" style="position: absolute; top: 65px; left: 195px;">{{readyCities}} / 5</span>
+    <img src = "../img/phase/line.svg" style="width:60.2px;">
+    <img src = "../img/phase/build.svg" style="width:30px; height:30px">
+    <img src = "../img/phase/line.svg" style="width:60.2px;">
+    <img src = "../img/phase/check.svg" style="width:20px; height:20px">
+    <img src = "../img/phase/end_line.svg" style="width:65.22px; height:12px">
+  </div>
     <div class="resLabel" style="display:flex; flex-direction: row;  height: 80px; overflow: auto;"> 
       <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px; visibility: {{getLabelVis}}"> 
         <div style="display:flex; flex: 1; flex-direction: row;  height: 40px; overflow: clip;"> 
@@ -71,7 +82,6 @@
     </div>
     {{/each}}
   </div>
-    
   {{> cityMap}}
 </template>
 

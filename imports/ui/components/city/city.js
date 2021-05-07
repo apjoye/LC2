@@ -149,6 +149,10 @@ Template.city.helpers({
     return resPrint;
   },
 
+  readyCities() {
+    return Template.instance().gameInfo.get().readyCities.length;
+  },
+
   tradeAlerts() {
     ts = Acts.find({
       $and: [

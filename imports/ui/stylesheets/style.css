@@ -665,3 +665,12 @@ input:checked + .slider:before {
 .closebtn:hover {
 	color: black;
   }
+
+.readyCity{
+	font-family: 'Roboto', sans-serif;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 18px;
+	line-height: 21px;
+	color: #ffa233;
+}

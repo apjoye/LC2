@@ -292,7 +292,7 @@ Template.factoryList.events({
 
   'click #bidToggle' (event, instance) {
     // event.preventDefault()
-    console.log(event.target.checked);
+    console.log(`bid toggle ${event.target.checked}`);
     CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
 
   }
