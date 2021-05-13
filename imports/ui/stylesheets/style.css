@@ -271,7 +271,7 @@ body {
 
 .inline-style{
 	display: table-cell;
-	padding-right: 12px;
+	padding-right: 8px;
 }
 .resStatBox{
 	min-height: 50px;
