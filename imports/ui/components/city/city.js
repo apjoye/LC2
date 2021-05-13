@@ -265,6 +265,21 @@ Template.cityMap.onCreated(function helloOnCreated() {
   this.buildings = new ReactiveVar({});
   this.imageMode = new ReactiveVar(true);
 
+  tileNameTitle = {
+    "claymine": "Clay Mine",
+    "coppermine": "Copper Mine",
+    "foodfarm": "Farm",
+    "foodfishing": "Fishing Camp",
+    "foodhunting": "Hunting Camp",
+    "lumbercamp": "Lumber Camp",
+    "background": "Empty",
+    "water": "River",
+    "woods": "Woods",
+    "lumber": "Lumber",
+    "copper": "Copper Ore",
+    "clay": "Clay Ore",
+  }
+
   mapTiles = {
       "claymine": "../img/buildings/claymine.png",
       "coppermine": "../img/buildings/coppermine.png",
@@ -542,6 +557,7 @@ Template.cityMap.helpers({
     text = "";
     boxContent = {};
     boxContent["text"] = [];
+    boxContent["heading"] = "";
     map = Template.instance().fullmap.get();
     mapSelect = map[Template.instance().selectedLoc.get()];
     boxContent["mapCell"] = mapSelect;
@@ -555,8 +571,10 @@ Template.cityMap.helpers({
       }
       // 
       if ("building" in mapSelect) {
+        // var thisb = 
         boxContent["placedBuilding"] = true;
         boxContent["building"] = mapSelect["building"];
+        boxContent["heading"] = Template.instance().tileNameTitle[mapSelect["building"]["name"]];
         boxContent["image"] = Template.instance().mapTiles[mapSelect["building"]["name"]];
         console.log(boxContent);
         boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
