@@ -10,8 +10,6 @@ import '../../components/card/card.js';
 import '../../components/city/city.js';
 import '../../components/trade/trade.js';
 import '../../components/info/info.js';
-// import '../../components/hello/hello.js';
-// import '../../stylesheets/bootstrap.css';
 
 import '../../components/admin/admin.js';
 import '../../components/central/central.js';
