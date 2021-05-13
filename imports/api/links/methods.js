@@ -921,7 +921,7 @@ export const RunBuildings = new ValidatedMethod({
           
           popFactor = (newPop + newRes["food"]) / (newPop + pollHere);
           if (popFactor > 1) { newPop += 1; }
-          else if (popFactor < 0.5) { newPop -= 1; }  
+          else if (popFactor < 0.5) { if (newPop > 0) {newPop -= 1;} }  
           await Games.update(
             {"_id": thisGame._id}, 
             {$set: {
