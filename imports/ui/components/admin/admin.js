@@ -235,7 +235,7 @@ Template.gameMap.helpers({
   },
 
   cityStats() {
-    topMargin = 680;
+    topMargin = 1335;
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
     // console.log(cities);
@@ -248,6 +248,10 @@ Template.gameMap.helpers({
       if (cities[c]["playerName"] == "green-city") {
         // xloc -= 50;
         yloc -= 50;
+      }
+      if (cities[c]["playerName"] == "blue-city" || cities[c]["playerName"] == "pink-city") {
+        // xloc -= 50;
+        xloc += 20;
       }
       cities[c]["className"] = cities[c]["group"] + "-status";
       // console.log(cities[c]["className"]);

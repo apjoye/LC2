@@ -13,7 +13,6 @@ import { Games } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import '/imports/ui/stylesheets/style.css';
-// import '/node_modules/bootstrap/dist/css/bootstrap.css';
 
 import { PlaceBuilding } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';

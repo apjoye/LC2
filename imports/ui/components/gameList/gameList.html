@@ -1,16 +1,10 @@
-
 <template name="gameList">
-  <div class="panel panel-default">
-    <div class="panel-heading">Live Games</div>
-    <ul class="list-group">
-
+  <div class="card">
+    <div class="card-header">Live Games</div>
+    <div class="card-body">
       {{#each userGames}}
-        <a href="/games/{{gameCode}}">
-          <li class="list-group-item">
-            {{gameCode}}  {{gameSize}}
-          </li>
-        </a>
+        <p class="card-text"><a href="/games/{{gameCode}}">{{gameCode}}  {{gameSize}}</a></p>
       {{/each}}
-    </ul>
+    </div>
   </div>
 </template>

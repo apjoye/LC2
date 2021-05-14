@@ -1,17 +1,17 @@
 <template name="makeGame">
   <form class = "hostGame form form-inline" role = "form">
-    <div class="form-group">
-      <label for="groupSizeTextBox" class="control-label">Cities:</label>
-          <input type="number" placeholder="5" name="groups" class = "form-control" id = "groupSizeTextBox"/>
-    <input type="submit" value = "Host new game" class = "btn btn-default" /> 
-    <sub>(Leave this empty for now)</sub>
+    <div class="col">
+      <label for="groupSizeTextBox" class="control-label form-label">Cities:</label>
+      <input type="number" placeholder="5" name="groups" class = "form-control" id = "groupSizeTextBox"/>
+      <input type="submit" value = "Host new game" class = "btn btn-default" /> 
+      <sub>(Leave this empty for now)</sub>
     </div>
   </form>
 
   {{> gameList }}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">Paused Games</div>
+  <div class="card">
+    <div class="card-header">Paused Games</div>
     <ul class="list-group">
 
       {{#each pausedGames}}
@@ -29,247 +29,242 @@
 
 <!-- TODO: try to pass game as argument to reduce template querying -->
 <template name="adminGame">
-  <table>
-    {{#each allPlayers}}
-    <tr>
-      <td> {{this}} </td>
-      <td>
-        <form class="changeStat form-inline">
-          <div class="form-group">
-            <input class = "form-control" type="number" name="amount" placeholder="value" />
-          </div>
-          <div class="form-group">
-            <select class = "custom-select form-control" id="resource" name={{this}}>
-              {{#each gameResource}}
-                <option value = {{this}}>{{this}}</option>
-              {{/each}}
-            </select>
-          </div>
-          <div class="form-group">
-            <input class="form-control" type="submit" value="submit"/>
-          </div>
-        </form>
-      </td>
-    </tr>
-    {{/each}}
-  </table>
-<!--   <div class="btn-group" role="group" aria-label="Basic example">
-    <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
-    <button type="button" class="runBuilds btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
- </div>
-  
-  <p> </p>
-  
-  <form class="addFacts form-inline">
-    <div class="form-group">
-      <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+  <div class="container">
+    <div class="row">
+      {{#each allPlayers}}
+      <form class="row g-3 changeStat">
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="resourceAmount">{{this}}</span>
+          <input class="form-control" type="number" name="amount" id="resourceAmount" placeholder="value" />
+          <label for="resource" class="form-label visually-hidden">Resource</label>
+          <select class="form-select" id="resource" name={{this}}>
+            {{#each gameResource}}
+              <option value={{this}}>{{this}}</option>
+            {{/each}}
+          </select>
+          <button class="btn btn-outline-secondary" type="submit" value="submit">Submit</button>
+        </div>
+      </form>
+      {{/each}}
     </div>
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Add Factories"/>
-    </div>
-  </form>
-
-  <form class="newCustomRound form-inline">
-    <div class="form-group">
-      <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
-    </div>
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Next Round"/>
-    </div>
-  </form>
- -->
-  <p> </p>
-<!--   <p>    <button class="runBids btn btn-default">Run Bids</button>  </p>
-  <p>    <button class="runBuilds btn btn-default">Run Builds & End Round</button>  </p>
-  <p>    <button class="newRound btn btn-default">Next Round</button>  </p> -->
-
-  <!-- <button type="button" class="asyncTest btn btn-default">Async Test</button>
-    <button type="button" class="reset btn btn-default"> Reset everything </button> -->
-
-  <div class="btn-group" role="group" aria-label="Basic example">
-    <button type="button" class="resetRes btn btn-default"> Reset Map Resources </button>
-    <button type="button" class="resetMap btn btn-default"> Reset Map </button>
-    <button type="button" class="resetTeamResources btn btn-default"> Reset Team Resources </button>
-    <button type="button" class="makeMap btn btn-default"> Make Map </button>
+  <!--   <div class="btn-group" role="group" aria-label="Basic example">
+      <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
+      <button type="button" class="runBuilds btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
   </div>
-  <p> </p>
-  <div class="btn-group" role="group" aria-label="Basic example">
-    <button type="button" class="addAuction btn btn-default"> Add Auction Build </button>
-    <!-- <button type="button" class="runBuildings btn btn-default"> Run Builds </button> -->
-    <button type="button" class="removeBuildings btn btn-default"> Remove Builds </button>
-    <!-- <button type="button" class="btn btn-primary seeScore">See scoreboard</button>  -->
+    
+    <p> </p>
+    
+    <form class="addFacts form-inline">
+      <div class="form-group">
+        <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="submit" value="Add Factories"/>
+      </div>
+    </form>
 
-  </div>
+    <form class="newCustomRound form-inline">
+      <div class="form-group">
+        <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="submit" value="Next Round"/>
+      </div>
+    </form>
+  -->
+  <!--   <p>    <button class="runBids btn btn-default">Run Bids</button>  </p>
+    <p>    <button class="runBuilds btn btn-default">Run Builds & End Round</button>  </p>
+    <p>    <button class="newRound btn btn-default">Next Round</button>  </p> -->
 
-  <p> </p>
+    <!-- <button type="button" class="asyncTest btn btn-default">Async Test</button>
+      <button type="button" class="reset btn btn-default"> Reset everything </button> -->
+
     <div class="btn-group" role="group" aria-label="Basic example">
-    <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
-    <button type="button" class="runBuildings btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
- </div>
-  
-  <p> </p>
-  
-  <!-- <form class="addFacts form-inline">
-    <div class="form-group">
-      <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+      <button type="button" class="resetRes btn btn-light"> Reset Map Resources </button>
+      <button type="button" class="resetMap btn btn-light"> Reset Map </button>
+      <button type="button" class="resetTeamResources btn btn-light"> Reset Team Resources </button>
+      <button type="button" class="makeMap btn btn-light"> Make Map </button>
     </div>
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Add Factories"/>
-    </div>
-  </form>
+    <p> </p>
+    <div class="btn-group" role="group" aria-label="Basic example">
+      <button type="button" class="addAuction btn btn-light"> Add Auction Build </button>
+      <!-- <button type="button" class="runBuildings btn btn-default"> Run Builds </button> -->
+      <button type="button" class="removeBuildings btn btn-light"> Remove Builds </button>
+      <!-- <button type="button" class="btn btn-primary seeScore">See scoreboard</button>  -->
 
-  <form class="newCustomRound form-inline">
-    <div class="form-group">
-      <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
     </div>
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Next Round"/>
-    </div>
-  </form>
- -->
- <p>
-  Bid commits: {{#each committedBids}} {{playerName}}, {{/each}}
- </p>
 
+    <p> </p>
+      <div class="btn-group" role="group" aria-label="Basic example">
+      <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
+      <button type="button" class="runBuildings btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
+  </div>
+    
+    <p> </p>
+    
+    <!-- <form class="addFacts form-inline">
+      <div class="form-group">
+        <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="submit" value="Add Factories"/>
+      </div>
+    </form>
+
+    <form class="newCustomRound form-inline">
+      <div class="form-group">
+        <input class = "form-control" type="number" name="amount" placeholder="Number of Factories" />
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="submit" value="Next Round"/>
+      </div>
+    </form>
+  -->
   <p>
-    Status: {{status}}
-    <button class="btn btn-default toggleGameState">Toggle</button>
-  </p>
-  <!--  Change people's teams-->
-  <p>
-  <form class="changeTeam form-inline">
-    <div class="form-group">
-      <select class = "custom-select form-control" id="player" name="player">
-        {{#each gamePlayers}}
-          <option value = {{playerName}}>{{playerName}}</option>
-        {{/each}}
-      </select>
-    </div>
-
-    <div class="form-group">
-      <select class = "custom-select form-control" id="team" name="team">
-        {{#each gameTeams}}
-          <option value = {{playerName}}>{{playerName}}</option>
-        {{/each}}
-      </select>
-    </div>
-
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Change Team"/>
-    </div>
-  </form>
-  </p>
-  <p>
-  <form class="addBuilding form-inline">
-    <div class="form-group">
-      <select class = "custom-select form-control" id="bidKind" name="bidKind">
-        {{#each bidKinds}}
-          <option value = {{this}}>{{this}}</option>
-        {{/each}}
-      </select>
-    </div>
-
-    <div class="form-group">
-      <input class = "form-control" type="number" name="x" placeholder="x-loc" />
-    </div>
-    <div class="form-group">
-      <input class = "form-control" type="number" name="y" placeholder="y-loc" />
-    </div>
-    <div class="form-group">
-      <select class = "custom-select form-control" id="buildingName" name="buildingName">
-        {{#each buildingNames}}
-          <option value = {{this}}>{{this}}</option>
-        {{/each}}
-      </select>
-    </div>
-    <div class="form-group">
-      <select class = "custom-select form-control" id="groupName" name="groupName">
-        {{#each gameTeams}}
-          <option value = {{playerName}}>{{playerName}}</option>
-        {{/each}}
-          <option value = {{playerName}}>auctions</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Add Building"/>
-    </div>
-  </form>
-  </p>
-  <!-- remove specific buildings -->
-  <p>
-  <form class="removeBuilding form-inline">
-    <div class="form-group">
-      <select class = "custom-select form-control" id="presentBuilding" name="presentBuilding">
-        {{#each pb in presentBuildings}}
-          <option value = {{pb._id}}>{{pb.location}} {{pb.owner}} {{pb.name}}</option>
-        {{/each}}
-      </select>
-    </div>
-
-    <div class="form-group">
-      <input class="form-control" type="submit" value="Remove Building"/>
-    </div>
-  </form>
+    Bid commits: {{#each committedBids}} {{playerName}}, {{/each}}
   </p>
 
-  {{> gameMap}}
+    <p>
+      Status: {{status}}
+      <button class="btn btn-light toggleGameState">Toggle</button>
+    </p>
+    <!--  Change people's teams-->
+    <p>
+    <form class="changeTeam form-inline">
+      <div class="form-group">
+        <select class = "custom-select form-control" id="player" name="player">
+          {{#each gamePlayers}}
+            <option value = {{playerName}}>{{playerName}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <select class = "custom-select form-control" id="team" name="team">
+          {{#each gameTeams}}
+            <option value = {{playerName}}>{{playerName}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <input class="form-control" type="submit" value="Change Team"/>
+      </div>
+    </form>
+    </p>
+    <p>
+    <form class="addBuilding form-inline">
+      <div class="form-group">
+        <select class = "custom-select form-control" id="bidKind" name="bidKind">
+          {{#each bidKinds}}
+            <option value = {{this}}>{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <input class = "form-control" type="number" name="x" placeholder="x-loc" />
+      </div>
+      <div class="form-group">
+        <input class = "form-control" type="number" name="y" placeholder="y-loc" />
+      </div>
+      <div class="form-group">
+        <select class = "custom-select form-control" id="buildingName" name="buildingName">
+          {{#each buildingNames}}
+            <option value = {{this}}>{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="form-group">
+        <select class = "custom-select form-control" id="groupName" name="groupName">
+          {{#each gameTeams}}
+            <option value = {{playerName}}>{{playerName}}</option>
+          {{/each}}
+            <option value = {{playerName}}>auctions</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="submit" value="Add Building"/>
+      </div>
+    </form>
+    </p>
+    <!-- remove specific buildings -->
+    <p>
+    <form class="removeBuilding form-inline">
+      <div class="form-group">
+        <select class = "custom-select form-control" id="presentBuilding" name="presentBuilding">
+          {{#each pb in presentBuildings}}
+            <option value = {{pb._id}}>{{pb.location}} {{pb.owner}} {{pb.name}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <input class="form-control" type="submit" value="Remove Building"/>
+      </div>
+    </form>
+    </p>
+
+    {{> gameMap}}
+  </div>
 </template>
 
 <template name="gameMap">
-  
-  <button type="button" class="toggleImages btn btn-default"> Toggle Images </button>
-  <p></p>
-  <div gameMapchart-table>
-    <img src="../img/map/mapbase.png" style="position: absolute; width:960px; z-index: 1">
-    <table id = "gameMapTable">
-      {{#each mapRows}}
-      <tr>
-          {{#each this}}
-          <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
-            {{#if imageMode}}
-              <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px; background-color:{{this.bgColor}}; z-index: -2">
-            {{else}}
-              {{this.text}}&emsp;
-            {{/if}}
-          </td>
-          {{/each}}
-      </tr>
-      {{/each}}
-    </table>
-    
-    <br />
-    {{#each mapRows}} 
-    {{/each}}
-    <br />
-    <div class="status-chart">
-    {{#if imageMode}}
-
-      {{#each cityStats}}
-        <!-- <div id="cityStat-{{this.className}}" class="{{this.className}} cityStatBox" style="{{this.style}}"> -->
-        <div id="cityStat-{{this.className}}" class="cityStatBox" style="position: absolute; {{this.style}}">
-            <div class="inline-style"><img src = "../img/map/city_status/population.png" class="cityStatImage"></div>
-            <div class="inline-style">{{this.population}}</div>
-            <div class="inline-style"><img src = "../img/map/city_status/happiness.png" class="cityStatImage"></div>
-            <div class="inline-style">{{this.happiness}}</div>
-            <div class="inline-style"><img src = "../img/map/city_status/pollution.png" class="cityStatImage"></div>
-            <div class="inline-style">{{this.pollution}}</div>
-            <div class="inline-style"><img src = "../img/map/city_status/coin.png" class="cityStatImage"></div>
-            <div class="inline-style">{{this.wealth}}</div>
-        </div>
-      {{/each}}
-
-      {{#each resStats}}
-        <div class="{{this.className}} resStatBox">
-          {{#each s in this.statList}}
-            
-              <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; margin-top: 5px; z-index: 4">
-              <p class="mapinfo">
-              {{s.amount}}</p>
-          {{/each}}
-        </div>
-      {{/each}}
+  <div class="container">
+    <button type="button" class="toggleImages btn btn-light"> Toggle Images </button>
+    <p></p>
+    <div gameMapchart-table>
+      <img src="../img/map/mapbase.png" style="position: absolute; width:993px; z-index: 1">
+      <table id = "gameMapTable">
+        {{#each mapRows}}
+        <tr>
+            {{#each this}}
+            <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
+              {{#if imageMode}}
+                <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:60px; height:60px; background-color:{{this.bgColor}}; z-index: -2">
+              {{else}}
+                {{this.text}}&emsp;
+              {{/if}}
+            </td>
+            {{/each}}
+        </tr>
+        {{/each}}
+      </table>
       
-      {{/if}}
+      <br />
+      {{#each mapRows}} 
+      {{/each}}
+      <br />
+      <div class="status-chart">
+      {{#if imageMode}}
+
+        {{#each cityStats}}
+          <!-- <div id="cityStat-{{this.className}}" class="{{this.className}} cityStatBox" style="{{this.style}}"> -->
+          <div id="cityStat-{{this.className}}" class="cityStatBox" style="position: absolute; {{this.style}}">
+              <div class="inline-style"><img src = "../img/map/city_status/population.png" class="cityStatImage"></div>
+              <div class="inline-style">{{this.population}}</div>
+              <div class="inline-style"><img src = "../img/map/city_status/happiness.png" class="cityStatImage"></div>
+              <div class="inline-style">{{this.happiness}}</div>
+              <div class="inline-style"><img src = "../img/map/city_status/pollution.png" class="cityStatImage"></div>
+              <div class="inline-style">{{this.pollution}}</div>
+              <div class="inline-style"><img src = "../img/map/city_status/coin.png" class="cityStatImage"></div>
+              <div class="inline-style">{{this.wealth}}</div>
+          </div>
+        {{/each}}
+
+        {{#each resStats}}
+          <div class="{{this.className}} resStatBox">
+            {{#each s in this.statList}}
+              
+                <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; margin-top: 5px; z-index: 4">
+                <p class="mapinfo">
+                {{s.amount}}</p>
+            {{/each}}
+          </div>
+        {{/each}}
+        
+        {{/if}}
+      </div>
     </div>
   </div>
 </template>
