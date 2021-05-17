@@ -144,6 +144,9 @@ table {
 	border-spacing: 10px;
 }
 
+td {
+  padding: 0px;
+}
 /*td {
   width: 35%;
   font-weight: bold;

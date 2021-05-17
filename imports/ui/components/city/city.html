@@ -52,24 +52,36 @@
   
   <div>
     {{#each tradeAlerts}}
-    <div class="alert alert-danger fade show" role="alert">
-      <span class="closebtn readNotif" id = "{{_id}}">&times;</span>
-      {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
-      <br />
-    </div>
-    {{/each}}
-  </div>
-
-  <h3> Trade History </h3>
-  <div>
-    {{#each tradeHistory}}
-    <div class="alert alert-dark fade show" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
       
       {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
-      <br />
+       <button id = "{{_id}}" type="button" class="btn-close readNotif" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {{/each}}
   </div>
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Trade History
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        {{#each tradeHistory}}
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            
+            {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
+            <br />
+          </div>
+        {{/each}}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
     
   {{> cityMap}}
 </template>
