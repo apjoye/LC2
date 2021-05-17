@@ -664,7 +664,7 @@ input:checked + .slider:before {
 	color: black;
   }
 
-.readyCity{
+.ready-city {
 	font-family: 'Roboto', sans-serif;
 	font-style: normal;
 	font-weight: normal;

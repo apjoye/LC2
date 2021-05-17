@@ -10,16 +10,43 @@
 
 <template name="city">
   <!-- {{}} -->
-  <div style="height: 70px; width: 100%;">
-    <img src = "../img/phase/trade.svg" style="width:30px; height:30px;">
-    <img src = "../img/phase/line.svg" style="width:60.2px;">
-    <img src = "../img/phase/check.svg" style="width:20px; height:20px">      
-    <span class="readyCity" style="position: absolute; top: 65px; left: 195px;">{{readyCities}} / 5</span>
-    <img src = "../img/phase/line.svg" style="width:60.2px;">
+  <div class="container" style="padding: 15px 0px;">
+    <div class="row g-1 row-cols-auto">
+      <div class="col-sm-1">
+        <span class="ready-city">Round 5</span>
+      </div>
+      <div class="col-xs-1">
+        <img src = "../img/phase/trade.svg" style="width:30px; height:30px;">
+      </div>
+      <div class="col-xs-1">
+        <img src = "../img/phase/line.svg" style="width:60.2px;">
+      </div>
+      <div class="col-xs-1">
+        <img src = "../img/phase/check.svg" style="width:20px; height:20px">
+        <span class="ready-city position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{readyCities}} / 5</span>
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/line.svg" style="width:60.2px;">
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/build.svg" style="width:30px; height:30px">
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/line.svg" style="width:60.2px;">
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/check.svg" style="width:20px; height:20px">
+        <span class="ready-city position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{readyCities}} / 5</span>
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/end_line.svg" style="width:65.22px; height:12px">
+      </div>
+    </div>
+    <!-- <img src = "../img/phase/line.svg" style="width:60.2px;">
     <img src = "../img/phase/build.svg" style="width:30px; height:30px">
     <img src = "../img/phase/line.svg" style="width:60.2px;">
     <img src = "../img/phase/check.svg" style="width:20px; height:20px">
-    <img src = "../img/phase/end_line.svg" style="width:65.22px; height:12px">
+    <img src = "../img/phase/end_line.svg" style="width:65.22px; height:12px"> -->
   </div>
     <div class="resLabel" style="display:flex; flex-direction: row;  height: 100px; overflow: auto;"> 
       <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px; visibility: {{getLabelVis}}"> 
