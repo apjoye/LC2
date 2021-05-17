@@ -148,8 +148,25 @@ Template.city.helpers({
     return resPrint;
   },
 
-  readyCities() {
-    return Template.instance().gameInfo.get().readyCities.length;
+  phaseBar() {
+    game = Template.instance().gameInfo.get()
+    // if ("year" in game) {
+    //   year = game["year"];
+    // }
+    // if ("phase" in game) {
+    //   if (game["phase"] == "pre-bid") {
+    //     phase = "Bidding!";
+    //   }
+    //   else if (game["phase"] == "post-bid") {
+    //     phase = "Choose and run your buildings!"
+    //   }
+    // }
+    return {
+      'readyCitiesPreBid': game.readyCities.length,
+      'readyCitiesPostBid': game.readyCities.length,
+      'year': game.year,
+      'phaseIndication': (game.phase == 'pre-bid') ? 'inactive' : 'active'
+    };
   },
 
   tradeAlerts() {

@@ -23,7 +23,7 @@ Template.navBar.helpers({
        game = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": gameCode}]});
        if (game != undefined) { 
          group = game.group;
-         console.log(game) 
+         console.log('navbar: ', game) 
          if ("year" in game) {
            year = game["year"];
          }
