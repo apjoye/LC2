@@ -13,7 +13,6 @@ import { Games } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import '/imports/ui/stylesheets/style.css';
-// import '/node_modules/bootstrap/dist/css/bootstrap.css';
 
 import { PlaceBuilding } from '/imports/api/links/methods.js';
 import { ToggleBuilding } from '/imports/api/links/methods.js';
@@ -269,6 +268,21 @@ Template.cityMap.onCreated(function helloOnCreated() {
   this.buildings = new ReactiveVar({});
   this.imageMode = new ReactiveVar(true);
 
+  tileNameTitle = {
+    "claymine": "Clay Mine",
+    "coppermine": "Copper Mine",
+    "foodfarm": "Farm",
+    "foodfishing": "Fishing Camp",
+    "foodhunting": "Hunting Camp",
+    "lumbercamp": "Lumber Camp",
+    "background": "Empty",
+    "water": "River",
+    "woods": "Woods",
+    "lumber": "Lumber",
+    "copper": "Copper Ore",
+    "clay": "Clay Ore",
+  }
+
   mapTiles = {
       "claymine": "../img/buildings/claymine.png",
       "coppermine": "../img/buildings/coppermine.png",
@@ -310,6 +324,7 @@ Template.cityMap.onCreated(function helloOnCreated() {
       "happiness": "../img/icons/happiness_sml.png"
     };
 
+    this.tnt = tileNameTitle;
     this.mapTiles = mapTiles;
     this.resImages = resImages;
     this.bgColors = bgColors;
@@ -468,6 +483,7 @@ Template.cityMap.helpers({
     bb =  Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"ownerId": Meteor.userId()}, {"location": {$exists: false}} ]})
     mapTiles = Template.instance().mapTiles;
     bb = bb.fetch();
+    // bb.append({});
 
     for (b in bb) {
       bb[b]["image"] = mapTiles[bb[b]["name"]];
@@ -545,6 +561,7 @@ Template.cityMap.helpers({
     text = "";
     boxContent = {};
     boxContent["text"] = [];
+    boxContent["heading"] = " . ";
     map = Template.instance().fullmap.get();
     mapSelect = map[Template.instance().selectedLoc.get()];
     boxContent["mapCell"] = mapSelect;
@@ -558,8 +575,10 @@ Template.cityMap.helpers({
       }
       // 
       if ("building" in mapSelect) {
+        // var thisb = 
         boxContent["placedBuilding"] = true;
         boxContent["building"] = mapSelect["building"];
+        boxContent["heading"] = Template.instance().tnt[mapSelect["building"]["name"]];
         boxContent["image"] = Template.instance().mapTiles[mapSelect["building"]["name"]];
         console.log(boxContent);
         boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
@@ -591,6 +610,7 @@ Template.cityMap.helpers({
         if (mapSelect.ownerId == Meteor.userId()) {
           // console.log("owned cell, looking into neighbors");
           boxContent["image"] = "../img/buildings/construction.png";
+          
           boxContent.text.push("You own this cell! Place some buildings here!");
           resTexts = {
             "water": "Water nearby! You can fish here. Also, farms produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well",
@@ -614,7 +634,11 @@ Template.cityMap.helpers({
         else {
           boxContent["image"] = "../img/buildings/no-construction.png";
           boxContent.text.push("You don't own this cell! Place buildings on cells you own.");
+          // 
+          // console.log(Template.instance().tnt)
+          // console.log(mapSelect["resource"]["kind"])
           if ("resource" in mapSelect) {
+            boxContent["heading"] = Template.instance().tnt[mapSelect["resource"]["kind"]];
             resTexts2 = {
               "water": "This cell has water! Farms in adjacent squares produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well. You can also collect available fish for food from this!",
               "lumber": "Woods nearby! You can hunt and collect lumber here.",

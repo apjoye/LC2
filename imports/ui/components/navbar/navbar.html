@@ -4,39 +4,28 @@
 </template>
  -->
 
-<template name ="navBar">
-  <nav class="navbar navbar-default">
+<template name="navBar">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 1rem;">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/">City Settlers</a>
-      </div>
+      <span class="navbar-brand mb-0 h1">City Settlers</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           {{#if currentUser}}
-          <!-- {{#if gameView}} -->
-              <!-- <li><a href="#">Year: {{gameYear}}</a></li> -->
-              <li><a href="#">City: {{groupInfo.group}}</a></li>
-              <li><a href="#">Game: {{gameCode}}</a></li>
-              <li><a href="#">Year: {{groupInfo.year}}</a></li>
-              <li><a href="#">Phase: {{groupInfo.phase}}</a></li>
-
-          <!-- {{/if}} -->
-          <li><p class="nav navbar-text">Username: {{currentUser.username}}</p></li>
-          <li><button class="btn btn-default navbar-btn logOut">Sign out</button></li>
+            <li class="nav-item"><a class="nav-link" href="#">City: {{groupInfo.group}}</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Game: {{gameCode}}</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Year: {{groupInfo.year}}</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Phase: {{groupInfo.phase}}</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Username: {{currentUser.username}}</a></li>
+            <li class="nav-item"><button class="btn btn-default navbar-btn logOut">Sign out</button></li>
           {{/if}}
         </ul>
       </div>
     </div>
   </nav>
-
-
 </template>

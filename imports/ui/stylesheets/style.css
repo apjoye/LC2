@@ -144,6 +144,9 @@ table {
 	border-spacing: 10px;
 }
 
+td {
+  padding: 0px;
+}
 /*td {
   width: 35%;
   font-weight: bold;
@@ -291,31 +294,31 @@ body {
 
 .mine1-status{
 	position: absolute;
-	top: 925px;
+	top: 1600px;
 	left: 200px;
 	/*background-color:white;*/
 }
 .mine2-status{
 	position: absolute;
-	top: 1230px;
+	top: 1900px;
 	left: 860px;
 	/*background-color:white;*/
 }
 .lake-status{
 	position: absolute;
-	top: 1100px;
+	top: 1700px;
 	left: 325px;
 	/*background-color:white;*/
 }
 .woods1-status{
 	position: absolute;
-	top: 1100px;
+	top: 1700px;
 	left: 60px;
 	/*background-color:white;*/
 }
 .woods2-status{
 	position: absolute;
-	top: 700px;
+	top: 1300px;
 	left: 830px;
 	/*background-color:white;*/
 }
@@ -606,33 +609,28 @@ input:checked + .slider:before {
 	text-align: left;
 	position: relative;
 }
-
-.tooltip {
-	position: relative;
-	display: inline-block;
-  }
   
-  .tooltip .tooltiptext {
+  .texttooltip .tooltiptext {
 	visibility: hidden;
 	width: 120px;
 	background-color: black;
 	color: #fff;
 	text-align: center;
 	border-radius: 6px;
-	padding: 5px 0;
+	padding: 5px 5px;
 	
 	/* Position the tooltip */
 	position: absolute;
 	z-index: 1;
-	top: 100%;
+	top: 90%;
 	left: 50%;
 	margin-left: -60px;
   }
   
-  .tooltip:hover .tooltiptext {
+  .texttooltip:hover .tooltiptext {
 	visibility: visible;
   }
-  .tooltip{
+  .texttooltip{
 	  opacity:1 !important;
   }
 

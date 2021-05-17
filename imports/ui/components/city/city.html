@@ -21,14 +21,14 @@
     <img src = "../img/phase/check.svg" style="width:20px; height:20px">
     <img src = "../img/phase/end_line.svg" style="width:65.22px; height:12px">
   </div>
-    <div class="resLabel" style="display:flex; flex-direction: row;  height: 80px; overflow: auto;"> 
+    <div class="resLabel" style="display:flex; flex-direction: row;  height: 100px; overflow: auto;"> 
       <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px; visibility: {{getLabelVis}}"> 
-        <div style="display:flex; flex: 1; flex-direction: row;  height: 40px; overflow: clip;"> 
+        <div style="display:flex; flex: 1; flex-direction: row;  height: 60px; overflow: clip;"> 
             <div style="display:flex; overflow: clip; flex-direction: column; height:100%;"> 
               <div style="flex:40%; font-size: 90%; font-weight: 400; overflow: clip; text-align: left;">
                 Expected Change
               </div>
-              <div style="flex:50%; font-size: 100%; font-weight: 600; padding-top: 5%; text-align: left; overflow-x: : auto">
+              <div style="flex:50%; font-size: 100%; font-weight: 600; padding-top: 5%; text-align: left; overflow-x: clip; overflow-y: clip"> 
                 Current Amount
               </div>
             </div>
@@ -39,16 +39,16 @@
       </div>
     {{#each cr in cityResources}}
       <div style="flex-direction: column; width: 90px; height: 60px; margin: 5px"> 
-        <div style="display:flex; flex: 1; flex-direction: row;  height: 40px; overflow: clip;"> 
+        <div style="display:flex; flex: 1; flex-direction: row;  height: 60px; overflow: clip;"> 
           <div style="flex:50%; width: 50%; overflow: clip;">
             <img src="{{cr.image}}" style="width:100%; padding: 4%">
           </div>
           <div style="flex:50%; width: 50%; overflow: clip; padding-left: 5px ">
             <div style="display:flex; overflow: clip; flex-direction: column; height:100%;"> 
-              <div style="flex:40%; font-size: 90%; font-weight: 400; overflow: clip; text-align: left;">
+              <div style="flex:40%; font-size: 80%; font-weight: 400; overflow: clip; text-align: left;">
                 {{cr.roundProduction}}
               </div>
-              <div style="flex:50%; font-size: 150%; font-weight: 600; padding-top: 5%; text-align: left; overflow-x: : auto">
+              <div style="flex:50%; font-size: 130%; font-weight: 600; padding-top: 5%; text-align: left; overflow-x: clip">
                 {{cr.amount}}
               </div>
             </div>
@@ -64,166 +64,184 @@
   
   <div>
     {{#each tradeAlerts}}
-    <div class="alert alert-danger fade in">
-      <span class="closebtn readNotif" id = "{{_id}}">&times;</span>
-      {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
-      <br />
-    </div>
-    {{/each}}
-  </div>
-
-  <h3> Trade History </h3>
-  <div>
-    {{#each tradeHistory}}
-    <div class="alert alert-dark fade in">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
       
       {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
-      <br />
+       <button id = "{{_id}}" type="button" class="btn-close readNotif" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {{/each}}
   </div>
-  {{> cityMap}}
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Trade History
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        {{#each tradeHistory}}
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            
+            {{this.from.group}} gave {{this.amount}} {{this.resource}} to {{this.to.group}} 
+            <br />
+          </div>
+        {{/each}}
+
+      </div>
+    </div>
+  </div>
+</div>
+{{> cityMap}}
 </template>
 
 
 <template name="cityMap">
   <div class="after-sticky">
-  <div id = "cell-highlighter" style="background-color: rgba(0, 60, 255, 0.2); z-index: 2">
-
+    <div id = "cell-highlighter" style="background-color: rgba(0, 60, 255, 0.2); z-index: 2">
   </div>
-  <div class="col-md-8" style="overflow-x:auto; width: ">
-    <p></p>
-    <!--   <button type="button" class="btn btn-default disabled small"> Toggle Images </button> <small> Click on a cell you own to see information and place buildings</small> -->
-    <p></p>
-    <table id="smallMap">
-      {{#each mapRows}}
-      <tr>
-          {{#each this}}
-            <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
-              {{#if imageMode}}
-                <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:120px; height:120px; background-color:{{this.bgColor}}">
-              {{else}}
-                {{this.text}}&emsp;
-              {{/if}}
-            </td>
+  <div class="row">
+    <div class="col">
+      <p></p>
+      <!--   <button type="button" class="btn btn-light disabled small"> Toggle Images </button> <small> Click on a cell you own to see information and place buildings</small> -->
+      <p></p>
+      <table id="smallMap">
+        {{#each mapRows}}
+        <tr>
+            {{#each this}}
+              <td class="emptyClass mapCell {{this.loc}}" id="cell-{{this.loc}}">
+                {{#if imageMode}}
+                  <img class="mapTileImage mapCell {{this.loc}}" src = "{{this.image}}" style="width:90px; height:90px; background-color:{{this.bgColor}}">
+                {{else}}
+                  {{this.text}}&emsp;
+                {{/if}}
+              </td>
+            {{/each}}
+        </tr>
+        {{/each}}
+      </table>
+    </div>
+    <div class="col" style="padding-left: 15px;">
+      <div class="top-sidebar" style="padding-top: 2%; padding-bottom: 4%;">
+          <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Buildings</p>
+      <div class="slider-building">
+      
+      {{#each build in boughtBuildings}}
+      <div class="col-md-5 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
+          <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+          <!--{{build.name}}-->
+          <!-- <p>Produce</p>
+          <p>Consume</p> -->
+          <!-- {{build.infoText}} -->
+          Uses: 
+          {{#each p in build.prodCostArr}}
+            {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
           {{/each}}
-      </tr>
-      {{/each}}
-    </table>
-</div>
-<div class="col-md-4" style="padding-left: 15px;">
-  <div class="top-sidebar" style="padding-top: 2%; padding-bottom: 4%;">
-      <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Buildings</p>
-  <div class="slider-building">
-    {{#each build in boughtBuildings}}
-    <div class="col-md-4 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
-        <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
-        <!--{{build.name}}-->
-        <!-- <p>Produce</p>
-        <p>Consume</p> -->
-        <!-- {{build.infoText}} -->
-        Uses: 
-        {{#each p in build.prodCostArr}}
-          {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-        {{/each}}
-        <br />
-        Produces: 
-        {{#each p in build.prodValArr}}
-          {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-        {{/each}}
-        <br />
-        {{build.bonusText}}
-        {{#if buildingPlacable build}}
+          <br />
+          Produces: 
+          {{#each p in build.prodValArr}}
+            {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+          {{/each}}
+          <br />
+          {{build.bonusText}}
+          {{#if buildingPlacable build}}
 
-          <!-- <div class="placementButtons" style="position:absolute"> -->
-          <button id="startPlace-{{build._id}}" class="btn btn-primary startPlace" style=" display: block; margin-top: 4%; margin-left: auto; margin-right: auto; padding-bottom: 4%;"> Place Building </button>
-          <div id="confirmPlace-{{build._id}}" style="display: none">
-            <button class="btn btn-success placeBuilding" id="{{build._id}}" style="display: block; margin-top: 4%; margin-left: auto;margin-right: auto; margin-bottom: 4%;"> Confirm Placement </button>
-            <button id="cancelPlace-{{build._id}}" class="btn btn-default cancelPlace" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Cancel Placement </button>
-            <p>This is permanent. Are you sure?</p>
-          </div>
-        <!-- </div> -->
-            <!-- <button class="btn btn-primary placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Place Building </button> -->
-        {{/if}}
-        <br />
-
-        <!-- {{buildingPlacable build}} -->
-    </div>
-    {{/each}}
-  </div>
-
-  
-</div>
-  <div class = "bottom-sidebar">
-    <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Information Panel</p>
-    <div class = "info-panel" style="border: 1px solid grey; padding: 2%; text-align: center;">
-        <div>
-        <h3> </h3>
-        <h3>
-          <img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
-          {{#if currentBuilding.placedBuilding}}
-            Uses: 
-            {{#each p in currentBuilding.building.prodCostArr}}
-              {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-            {{/each}}
-            <br />
-            Produces: 
-            {{#each p in currentBuilding.building.prodValArr}}
-              {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
-            {{/each}}
-            <br />
-            {{currentBuilding.building.bonusText}}
-          {{else}}
-            {{#each currentBuilding.text}}
-              {{this}} <br />
-            {{/each}}
+            <!-- <div class="placementButtons" style="position:absolute"> -->
+            <button id="startPlace-{{build._id}}" class="btn btn-primary startPlace" style=" display: block; margin-top: 4%; margin-left: auto; margin-right: auto; padding-bottom: 4%;"> Place Building </button>
+            <div id="confirmPlace-{{build._id}}" style="display: none">
+              <button class="btn btn-success placeBuilding" id="{{build._id}}" style="display: block; margin-top: 4%; margin-left: auto;margin-right: auto; margin-bottom: 4%;"> Confirm Placement </button>
+              <button id="cancelPlace-{{build._id}}" class="btn btn-warning cancelPlace" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Cancel Placement </button>
+              <p>This is permanent. Are you sure?</p>
+            </div>
+          <!-- </div> -->
+              <!-- <button class="btn btn-primary placeBuilding" id="{{build._id}}" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 4%;"> Place Building </button> -->
           {{/if}}
-            
-             
-            <!--{{build.name}}-->
-            <!-- <p>Produce</p>
-            <p>Consume</p> -->
-            <!-- {{build.infoText}} -->
+          <br />
 
-            
+          <!-- {{buildingPlacable build}} -->
+      </div>
+      {{/each}}
+      <div class="col-md-5 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
+        <div style="height: 140px">
 
-            {{#if currentBuilding.buildingButtons}}
-            <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
-              <!-- <button class="btn btn-default toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> {{currentBuilding.status}} <small>(Click to toggle) </small> </button> -->
-              <div>Off
-              <label class="switch toggleBuilding" id="{{currentBuilding.mapCell.building._id}}">
-                <input type="checkbox" {{currentBuilding.buttonStatus}}>
-                <span class="slider round"></span>
-              </label>
-              On
-            </div>
-              <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
-              <!-- <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button> -->
-            </div>
-            {{/if}}
-            <!-- {{#else}} -->
         </div>
-        <div id="myModal" tabindex="-1" class="modal fade" role="dialog"  aria-labelledby="deleteBuildingModal">
-          <div class="modal-dialog">
-     
-            <!-- Modal content-->
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Warning</h4>
-              </div>
-              <div class="modal-body">
-                <p>It will disappear permanently, are you sure about that?</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default removeBuilding" data-dismiss="modal" id="remove-{{currentBuilding.mapCell.building._id}}">Destroy It!</button>
-              </div>
-            </div>
-     
-          </div>
-        </div>
+  
+      </div>
     </div>
+
     
+  </div>
+    <div class = "bottom-sidebar">
+      <p style="font-size: 2em; font-size: 30px; font-weight: 500px">Information Panel</p>
+      <div class = "info-panel" style="border: 1px solid grey; padding: 2%; text-align: center;">
+          <div>
+          <h3> {{currentBuilding.heading}} </h3>
+          <h3>
+            <img class="" src = "{{currentBuilding.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+            {{#if currentBuilding.placedBuilding}}
+              Uses: 
+              {{#each p in currentBuilding.building.prodCostArr}}
+                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+              {{/each}}
+              <br />
+              Produces: 
+              {{#each p in currentBuilding.building.prodValArr}}
+                {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+              {{/each}}
+              <br />
+              {{currentBuilding.building.bonusText}}
+            {{else}}
+              {{#each currentBuilding.text}}
+                {{this}} <br />
+              {{/each}}
+            {{/if}}
+              
+              
+              <!--{{build.name}}-->
+              <!-- <p>Produce</p>
+              <p>Consume</p> -->
+              <!-- {{build.infoText}} -->
+
+              
+
+              {{#if currentBuilding.buildingButtons}}
+              <div style="text-align: center; margin-top: 4%;margin-bottom: 4%;">
+                <!-- <button class="btn btn-light toggleBuilding" id="{{currentBuilding.mapCell.building._id}}"> {{currentBuilding.status}} <small>(Click to toggle) </small> </button> -->
+                <div>Off
+                <label class="switch toggleBuilding" id="{{currentBuilding.mapCell.building._id}}">
+                  <input type="checkbox" {{currentBuilding.buttonStatus}}>
+                  <span class="slider round"></span>
+                </label>
+                On
+              </div>
+                <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
+                <!-- <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button> -->
+              </div>
+              {{/if}}
+              <!-- {{#else}} -->
+          </div>
+          <div id="myModal" tabindex="-1" class="modal fade" role="dialog"  aria-labelledby="deleteBuildingModal">
+            <div class="modal-dialog">
+      
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Warning</h4>
+                </div>
+                <div class="modal-body">
+                  <p>It will disappear permanently, are you sure about that?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-light removeBuilding" data-dismiss="modal" id="remove-{{currentBuilding.mapCell.building._id}}">Destroy It!</button>
+                </div>
+              </div>
+      
+            </div>
+          </div>
+      </div>
+      
+      </div>
     </div>
   </div>
   </div>
@@ -239,7 +257,7 @@
       <!-- {{> factory}} -->
       <br />
 
-      <button type="button" class="btn btn-default toggleRunning" data-toggle="button" aria-pressed="false" autocomplete="off">
+      <button type="button" class="btn btn-light toggleRunning" data-toggle="button" aria-pressed="false" autocomplete="off">
         {{runningStatus}}
       </button>        
       
