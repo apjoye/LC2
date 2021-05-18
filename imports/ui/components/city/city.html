@@ -9,6 +9,43 @@
 </template>
 
 <template name="city">
+  <div class="container" style="padding: 15px 0px;">
+    <div class="row g-1 row-cols-auto">
+      <div class="col-sm-1">
+        <span class="ready-city-active">Round {{phaseBar.year}}</span>
+      </div>
+      <!-- Will always be active -->
+      <div class="col-xs-1">
+        <img src = "../img/phase/trade-active.svg" style="width:30px; height:30px;">
+      </div>
+      <div class="col-xs-1">
+        <img src = "../img/phase/phase-transition-active.svg" style="width:60.2px;">
+      </div>
+      <div class="col-xs-1">
+        <img src = "../img/phase/check-active.svg" style="width:20px; height:20px">
+        <span class="ready-city-active position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPreBid}} / 5</span>
+      </div>
+      <!-- Will always be active -->
+      <div class="col-xs">
+        <img src = "../img/phase/phase-transition-{{phaseBar.phaseIndication}}.svg" style="width:60.2px;">
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/build-{{phaseBar.phaseIndication}}.svg" style="width:30px; height:30px">
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/phase-transition-{{phaseBar.phaseIndication}}.svg" style="width:60.2px;">
+      </div>
+      <div class="col-xs">
+        <img src = "../img/phase/check-{{phaseBar.phaseIndication}}.svg" style="width:20px; height:20px">
+        <span class="ready-city-{{phaseBar.phaseIndication}} position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPostBid}} / 5</span>
+      </div>
+      <!-- Will always be inactive -->
+      <div class="col-xs">
+        <img src = "../img/phase/end-phase-inactive.svg" style="width:65.22px; height:12px">
+      </div>
+      <!-- Will always be inactive -->
+    </div>
+  </div>
     <div class="resLabel" style="display:flex; flex-direction: row;  height: 100px; overflow: auto;"> 
       <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px; visibility: {{getLabelVis}}"> 
         <div style="display:flex; flex: 1; flex-direction: row;  height: 60px; overflow: clip;"> 
@@ -80,10 +117,7 @@
     </div>
   </div>
 </div>
-
-
-    
-  {{> cityMap}}
+{{> cityMap}}
 </template>
 
 

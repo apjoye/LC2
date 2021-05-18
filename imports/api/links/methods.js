@@ -158,7 +158,13 @@ export const CommitBids = new ValidatedMethod({
   run ({baseId, gameCode, commitState}) {
     if (!this.isSimulation) {
       console.log("changing bid commit state");
-      Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerId": baseId}]}, {$set: {"bidCommit": commitState}});
+      // readyCities
+      Games.update(
+        {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$addToSet: {"readyCities": baseId}}, {multi: true}
+      );
+      Games.update(
+        {$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerId": baseId}]}, {$set: {"bidCommit": commitState}}
+      );
     }
   }
 });

@@ -662,4 +662,17 @@ input:checked + .slider:before {
 }
 .closebtn:hover {
 	color: black;
-  }
+}
+
+span[class*='ready-city-'] {
+	font-family: 'Roboto', sans-serif;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 18px;
+	line-height: 21px;
+	color: #ffa233;
+}
+
+.ready-city-inactive {
+	color: #E0E0E0 !important;
+}

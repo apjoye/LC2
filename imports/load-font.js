@@ -6,6 +6,7 @@ WebFont.load({
       // 'Nunito:regular,bold',
       // 'Lato:regular,bold,italic',
       // 'Londrina Solid: light,regular, bold'
+      'Roboto: light, regular, medium',
       'Solway: light, regular, medium'
     ],
   },
