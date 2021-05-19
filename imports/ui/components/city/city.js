@@ -149,24 +149,27 @@ Template.city.helpers({
   },
 
   phaseBar() {
-    game = Template.instance().gameInfo.get()
-    // if ("year" in game) {
-    //   year = game["year"];
-    // }
-    // if ("phase" in game) {
-    //   if (game["phase"] == "pre-bid") {
-    //     phase = "Bidding!";
-    //   }
-    //   else if (game["phase"] == "post-bid") {
-    //     phase = "Choose and run your buildings!"
-    //   }
-    // }
-    return {
+    game = Template.instance().gameInfo.get();
+    // needed for total player amount
+    // NOTE:needed once, need to move somewhere
+    admin = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
+    
+    barStats = {
       'readyCitiesPreBid': game.readyCities.length,
-      'readyCitiesPostBid': game.readyCities.length,
+      'readyCitiesPostBid': 0,
       'year': game.year,
-      'phaseIndication': (game.phase == 'pre-bid') ? 'inactive' : 'active'
+      'phaseIndication': 'inactive',
+      'numberOfCities': admin.groupList.length
     };
+    
+    if (game.phase === 'post-bid') {
+      // faking this, will always be max player post-bid
+      barStats['readyCitiesPreBid'] = admin.groupList.length;
+      barStats['readyCitiesPostBid'] = game.readyCities.length
+      barStats['phaseIndication'] = 'active';
+    }
+    
+    return barStats;
   },
 
   tradeAlerts() {

@@ -23,7 +23,7 @@
       </div>
       <div class="col-xs-1">
         <img src = "../img/phase/check-active.svg" style="width:20px; height:20px">
-        <span class="ready-city-active position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPreBid}} / 5</span>
+        <span class="ready-city-active position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPreBid}} / {{phaseBar.numberOfCities}}</span>
       </div>
       <!-- Will always be active -->
       <div class="col-xs">
@@ -37,7 +37,7 @@
       </div>
       <div class="col-xs">
         <img src = "../img/phase/check-{{phaseBar.phaseIndication}}.svg" style="width:20px; height:20px">
-        <span class="ready-city-{{phaseBar.phaseIndication}} position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPostBid}} / 5</span>
+        <span class="ready-city-{{phaseBar.phaseIndication}} position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPostBid}} / {{phaseBar.numberOfCities}}</span>
       </div>
       <!-- Will always be inactive -->
       <div class="col-xs">

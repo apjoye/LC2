@@ -197,7 +197,7 @@ export const RunBids2 = new ValidatedMethod({
         // return await Bids.
         // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
         Bids.update({$and: [{"gameCode": gameCode}]}, {$set: {"bidVal": 0}}, {multi: true});
-        Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"bidCommit": false}}, {multi: true});
+        Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"bidCommit": false, "readyCities": []}}, {multi: true});
       }
 
       async function commitBid (bid, teams, resources) {
@@ -750,6 +750,9 @@ export const RunBuildings = new ValidatedMethod({
   // run({gameCode, group}) {
   run({gameCode, group = ""}) {
     if (!this.isSimulation) {
+      Games.update(
+        {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"readyCities": []}}, {multi: true}
+      )
       // buildings = Buildings.find({$and:[{"gameCode": gameCode}, {"owner": group}]}).fetch();
       
       // console.log("runnning buildings");
