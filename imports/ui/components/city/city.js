@@ -629,7 +629,7 @@ Template.cityMap.helpers({
           // console.log("owned cell, looking into neighbors");
           boxContent["image"] = "../img/buildings/construction.png";
           
-          boxContent.text.push("Your cell!");
+          boxContent.text.push("Your cell! Place buildings here");
           resTexts = {
             "water": "Water nearby! Supports fishing. Also, farms produce 2 extra food, but pollute the water.",
             "lumber": "Woods nearby! You can hunt and collect lumber here.",
@@ -658,7 +658,7 @@ Template.cityMap.helpers({
           if ("resource" in mapSelect) {
             boxContent["heading"] = Template.instance().tnt[mapSelect["resource"]["kind"]];
             resTexts2 = {
-              "water": "This cell has water! Farms in adjacent squares produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well. You can also collect available fish for food from this!",
+              "water": "This cell has water! Pollution from the water can spread to your city. Fishing camps can be placed nearby, and farms nearby receive a bonus.",
               "lumber": "Woods nearby! You can hunt and collect lumber here.",
               "clay": "Clay ore here! Clay mines placed nearby produce extra clay and extra pollution.",
               "copper": "Copper ore here! Copper mines placed nearby produce extra clay and extra pollution.",
