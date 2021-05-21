@@ -1715,7 +1715,7 @@ export const JoinGame = new ValidatedMethod({
         else if (role == "base") {
           // deets["res"] = {"m1": 2, "m2": 2, "f1": 2, "f2": 2};
           deets["res"] = {"lumber": 2, "clay": 2, "copper": 2, "food": 2}
-          deets["pollution"] = 2;
+          deets["pollution"] = 0;
           deets["population"] = 5;
           deets["happiness"] = 5;
           deets["neighbors"] = neighbors;
