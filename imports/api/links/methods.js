@@ -159,9 +159,17 @@ export const CommitBids = new ValidatedMethod({
     if (!this.isSimulation) {
       console.log("changing bid commit state");
       // readyCities
-      Games.update(
-        {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$addToSet: {"readyCities": baseId}}, {multi: true}
-      );
+      if (commitState == true) {
+        console.log("truing ready");
+        Games.update(
+          {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$addToSet: {"readyCities": baseId}}, {multi: true}
+        );
+      }
+      else {
+        Games.update(
+          {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$pull: {"readyCities": baseId}}, {multi: true}
+        ); 
+      }
       Games.update(
         {$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerId": baseId}]}, {$set: {"bidCommit": commitState}}
       );
@@ -197,7 +205,7 @@ export const RunBids2 = new ValidatedMethod({
         // return await Bids.
         // >> currently these bids are zeroed out, they could be altogether removed, they could also be left alone
         Bids.update({$and: [{"gameCode": gameCode}]}, {$set: {"bidVal": 0}}, {multi: true});
-        Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"bidCommit": false}}, {multi: true});
+        Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"bidCommit": false, "readyCities": []}}, {multi: true});
       }
 
       async function commitBid (bid, teams, resources) {
@@ -984,7 +992,7 @@ export const RunBuildings = new ValidatedMethod({
       else {thisyear = 1;}
       Games.update(
         {"gameCode": gameCode}, 
-        {$set: {"year": thisyear, "phase": "pre-bid", "bidCommit": false, "info": {}}},
+        {$set: {"year": thisyear, "readyCities": [], "phase": "pre-bid", "bidCommit": false, "info": {}}},
         {multi: true});
       // console.log(Games.find({"gameCode": gameCode}).fetch());
     }
@@ -1555,7 +1563,7 @@ export const StartGame = new ValidatedMethod({
         // "groupList":  baseList.slice(0,cityCount),
         "groupList":  baseList,
         "year": year,
-        "phase": "pre-bid"
+        "phase": "pre-bid",
       });
       for (var i = 0; i < cityCount; i++) {
         // console.log(baseList[i]);
@@ -1686,7 +1694,8 @@ export const JoinGame = new ValidatedMethod({
           "playerName": playerName,
           "playerId": playerId,
           "role": role,
-          "status": "running",  
+          "status": "running", 
+          "readyCities": []  
         };
         if (role == "player"){
           //see which city has fewer players, and add to one of those cities.

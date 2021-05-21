@@ -161,9 +161,10 @@ Template.city.helpers({
     //     phase = "Choose and run your buildings!"
     //   }
     // }
+
     return {
-      'readyCitiesPreBid': game.readyCities.length,
-      'readyCitiesPostBid': game.readyCities.length,
+      'readyCitiesPreBid': (game.phase == 'pre-bid') ? game.readyCities.length : 5,
+      'readyCitiesPostBid': (game.phase == 'pre-bid') ? 5: game.readyCities.length,
       'year': game.year,
       'phaseIndication': (game.phase == 'pre-bid') ? 'inactive' : 'active'
     };
