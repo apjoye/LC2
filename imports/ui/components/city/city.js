@@ -629,12 +629,12 @@ Template.cityMap.helpers({
           // console.log("owned cell, looking into neighbors");
           boxContent["image"] = "../img/buildings/construction.png";
           
-          boxContent.text.push("You own this cell! Place some buildings here!");
+          boxContent.text.push("Your cell!");
           resTexts = {
-            "water": "Water nearby! You can fish here. Also, farms produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well",
+            "water": "Water nearby! Supports fishing. Also, farms produce 2 extra food, but pollute the water.",
             "lumber": "Woods nearby! You can hunt and collect lumber here.",
-            "clay": "Clay ore nearby! Mines work extra here! They produce more pollution, and also collect bonus clay if there are deposits in the ores.",
-            "copper": "Copper ore nearby! Mines work extra here! They produce more pollution, and also collect bonus copper if there are deposits in the ores."
+            "clay": "Clay ore nearby! Mines here produce more pollution, and collect bonus clay if ores haven't run out.",
+            "copper": "Copper ore nearby! Mines here produce more pollution, and collect bonus copper if ores haven't run out."
           }
           neighbs = mapSelect.neighbors;
           found = [];
@@ -651,7 +651,7 @@ Template.cityMap.helpers({
         }
         else {
           boxContent["image"] = "../img/buildings/no-construction.png";
-          boxContent.text.push("You don't own this cell! Place buildings on cells you own.");
+          boxContent.text.push("You don't own this cell!");
           // 
           // console.log(Template.instance().tnt)
           // console.log(mapSelect["resource"]["kind"])
@@ -660,8 +660,8 @@ Template.cityMap.helpers({
             resTexts2 = {
               "water": "This cell has water! Farms in adjacent squares produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well. You can also collect available fish for food from this!",
               "lumber": "Woods nearby! You can hunt and collect lumber here.",
-              "clay": "Clay ore here! Clay mines placed adjacently use the ore, produce extra clay, and also extra pollution.",
-              "copper": "Copper ore here! Copper mines placed adjacently use the ore, produce extra clay, and also extra pollution.",
+              "clay": "Clay ore here! Clay mines placed nearby produce extra clay and extra pollution.",
+              "copper": "Copper ore here! Copper mines placed nearby produce extra clay and extra pollution.",
             }
             boxContent.text.push(resTexts2[mapSelect["resource"]["kind"]]);
           }
