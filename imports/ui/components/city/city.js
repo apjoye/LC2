@@ -754,7 +754,7 @@ Template.cityMap.events({
   },
 
   'click .toggleBuilding': function (event, instance) {
-    // event.preventDefault();
+    event.preventDefault();
     console.log(event.target)
     bb = Template.instance().data.map[Template.instance().selectedLoc.get()]["building"];
     bs = instance.buildings.get();
