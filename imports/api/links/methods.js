@@ -1073,6 +1073,20 @@ const buildImages = {
   "lumbercamp": "../img/buildings/lumbercamp.png"
 }
 
+const buildNames = {
+  "claymine": "Clay Mine",
+  "coppermine": "Copper Mine",
+  "foodfarm": "Farm",
+  "foodfishing": "Fishing Camp",
+  "foodhunting": "Hunting Camp",
+  "lumbercamp": "Lumber Camp",
+  "background": "Empty",
+  "water": "River",
+  "woods": "Woods",
+  "lumber": "Lumber",
+  "copper": "Copper Ore",
+  "clay": "Clay Ore"
+}
 
 const resImages = {
   "m1": "../img/icons/gold_sml.png",
@@ -1194,6 +1208,9 @@ export const AddBuilding = new ValidatedMethod({
       if (buildingName in buildImages) {
         buildObj["image"] = buildImages[buildingName];
       }
+      if (buildingName in buildNames) {
+        buildObj["displayName"] = buildNames[buildingName];
+      }
       if (buildingName in neighborNeeds) {
         buildObj["neighborNeed"] = neighborNeeds[buildingName];
       }
@@ -1209,6 +1226,7 @@ export const AddBuilding = new ValidatedMethod({
       if (buildingName in bonusProds) {
         buildObj["bonusProd"] = bonusProds[buildingName];
       }
+      
 
       mapPlaced = false;
       if (groupName == "auctions") {

@@ -149,7 +149,7 @@ Template.city.helpers({
   },
 
   phaseBar() {
-    game = Template.instance().gameInfo.get()
+    game = Template.instance().gameInfo.get();
     // if ("year" in game) {
     //   year = game["year"];
     // }
@@ -161,13 +161,23 @@ Template.city.helpers({
     //     phase = "Choose and run your buildings!"
     //   }
     // }
-
-    return {
-      'readyCitiesPreBid': (game.phase == 'pre-bid') ? game.readyCities.length : 5,
-      'readyCitiesPostBid': (game.phase == 'pre-bid') ? 5: game.readyCities.length,
+    
+    retObj = {
+      'readyCitiesPreBid': 5,
+      'readyCitiesPostBid': 5,
       'year': game.year,
       'phaseIndication': (game.phase == 'pre-bid') ? 'inactive' : 'active'
-    };
+    }
+    if (game.readyCities){
+      if (game.phase == 'pre-bid') {
+        retObj["readyCitiesPreBid"] = game.readyCities.length;
+      }
+      else {
+        retObj["readyCitiesPostBid"] = game.readyCities.length;
+      }
+    }
+
+    return retObj;
   },
 
   tradeAlerts() {
