@@ -1073,7 +1073,7 @@ const buildImages = {
   "lumbercamp": "../img/buildings/lumbercamp.png"
 }
 
-const buildNames = {
+const buildDisplayNames = {
   "claymine": "Clay Mine",
   "coppermine": "Copper Mine",
   "foodfarm": "Farm",
@@ -1172,8 +1172,8 @@ const infoTexts = {
   "coppermine": "Produces: 5 copper, 2 pollution (or 8 copper and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
   "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 1 lumber, 1 clay. ",
   "foodfishing": "Produces: 5 food, Uses: 1 copper, and 2 fish from nearby water. Can only be placed next to water.",
-  "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest). Needs forest nearby.",
-  "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest). Needs forest nearby."
+  "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest nearby). Needs forest nearby.",
+  "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest nearby). Needs forest nearby."
 };
 
 const bonusTexts = {
@@ -1181,8 +1181,8 @@ const bonusTexts = {
   "coppermine": "+3 copper, +1 pollution if ore nearby",
   "foodfarm": "+3 food, 2 water pollution if river nearby",
   "foodfishing": "Also uses: 2 fish from nearby water. Can only be placed next to water.",
-  "foodhunting": "Also uses: 2 animals (from the forest). Needs forest nearby.",
-  "lumbercamp": "Uses: 3 lumber (from the forest). Needs forest nearby."
+  "foodhunting": "Also uses: 2 animals (from the forest nearby). Needs forest nearby.",
+  "lumbercamp": "Uses: 3 lumber (from the forest nearby). Needs forest nearby."
 };
 
 export const AddBuilding = new ValidatedMethod({
@@ -1209,8 +1209,8 @@ export const AddBuilding = new ValidatedMethod({
       if (buildingName in buildImages) {
         buildObj["image"] = buildImages[buildingName];
       }
-      if (buildingName in buildNames) {
-        buildObj["displayName"] = buildNames[buildingName];
+      if (buildingName in buildDisplayNames) {
+        buildObj["displayName"] = buildDisplayNames[buildingName];
       }
       if (buildingName in neighborNeeds) {
         buildObj["neighborNeed"] = neighborNeeds[buildingName];
