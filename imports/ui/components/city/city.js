@@ -20,6 +20,8 @@ import { RemoveBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
 import { ReadNotif }  from '/imports/api/links/methods.js';
 import 'animate.css/animate.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 // import { NewRound } from '/imports/api/links/methods.js';
 
@@ -192,7 +194,7 @@ Template.city.helpers({
         {"success": true}
       ]});
     // console.log(Template.instance().gameInfo.get().group);
-    console.log(ts.fetch());
+    // console.log(ts.fetch());
     return ts;
   },
 
@@ -208,7 +210,7 @@ Template.city.helpers({
         {"success": true}
       ]});
     // console.log(Template.instance().gameInfo.get().group);
-    console.log(ts.fetch());
+    // console.log(ts.fetch());
     return ts;
   },
 
@@ -608,7 +610,7 @@ Template.cityMap.helpers({
         boxContent["building"] = mapSelect["building"];
         boxContent["heading"] = Template.instance().tnt[mapSelect["building"]["name"]];
         boxContent["image"] = Template.instance().mapTiles[mapSelect["building"]["name"]];
-        console.log(boxContent);
+        // console.log(boxContent);
         boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
         pcs = mapSelect["building"]["prodCost"];
         pcText = [];
@@ -778,12 +780,12 @@ Template.cityMap.events({
   },
 
   'click .startRemoval': function (event, instance) {
-    event.preventDefault();
+    // event.preventDefault();
     // console.log(event.target.id);
     // console.log("removing building client " + (event.target.id).substr(7));
     // RemoveBuilding.call({"buildingId": (event.target.id).substr(7)});
-    document.getElementById("startRemoval").style.display = "none";
-    document.getElementById("finalRemoval").style.display = "block";
+    // document.getElementById("startRemoval").style.display = "none";
+    // document.getElementById("buildingRemoveModal").style.display = "block";
   },
 
   'click .removeBuilding': function (event, instance) {
@@ -796,7 +798,7 @@ Template.cityMap.events({
   'click .cancelRemoval': function (event, instance) {
     event.preventDefault();
     document.getElementById("startRemoval").style.display = "block";
-    document.getElementById("finalRemoval").style.display = "none";
+    document.getElementById("buildingRemoveModal").style.display = "none";
   },
 
 });

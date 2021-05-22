@@ -1153,7 +1153,8 @@ const neighborUses = {
   "coppermine": {"res": "copper", "amount": 2},
   "foodfishing": {"res": "fish", "amount": 2},
   "foodhunting": {"res": "animals", "amount": 2},
-  "lumbercamp": {"res": "lumber", "amount": 3}
+  "lumbercamp": {"res": "lumber", "amount": 3},
+  "foodfarm": {"res": "fish", "amount": 0}
 };
 
 const neighborAffects = {
