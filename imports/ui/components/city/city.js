@@ -19,8 +19,9 @@ import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
 import { ReadNotif }  from '/imports/api/links/methods.js';
-import 'animate.css/animate.css';
-import 'bootstrap/dist/css/bootstrap.css';
+import { CommitBids } from '/imports/api/links/methods.js';
+// import 'animate.css/animate.css';
+// import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 
 // import { NewRound } from '/imports/api/links/methods.js';
@@ -61,7 +62,7 @@ Template.city.onCreated(function helloOnCreated() {
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('trades.city', FlowRouter.getParam('gameCode'));
   this.gameInfo = new ReactiveVar({});
-  this.labelVisibility = new ReactiveVar({"index": 1, "list": ["visibile", "hidden"]});
+  this.labelVisibility = new ReactiveVar({"index": 0, "list": ["visible", "hidden"]});
   // this.roundProduction = new ReactiveVar({});
 });
 
@@ -168,7 +169,8 @@ Template.city.helpers({
       'readyCitiesPreBid': 5,
       'readyCitiesPostBid': 5,
       'year': game.year,
-      'phaseIndication': (game.phase == 'pre-bid') ? 'inactive' : 'active'
+      'phaseIndication': (game.phase == 'pre-bid') ? 'inactive' : 'active',
+      'phaseLabel': "Bidding"
     }
     if (game.readyCities){
       if (game.phase == 'pre-bid') {
@@ -176,10 +178,21 @@ Template.city.helpers({
       }
       else {
         retObj["readyCitiesPostBid"] = game.readyCities.length;
+        retObj["phaseLabel"] = "Building"
       }
     }
 
     return retObj;
+  },
+
+  checkedStatus() {
+    var gbc = Template.instance().gameInfo.get().bidCommit;
+    if (gbc == true) {
+      return "checked";
+    }
+    else {
+      return "";
+    }
   },
 
   tradeAlerts() {
@@ -282,6 +295,13 @@ Template.city.events ({
     lv = instance.labelVisibility.get();
 
     instance.labelVisibility.set({"index": (1 - lv.index), "list": lv.list});
+  },
+
+  'click #bidToggle' (event, instance) {
+    // event.preventDefault()
+    console.log(`bid toggle ${event.target.checked}`);
+    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
+
   }
 })
 

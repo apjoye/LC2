@@ -18,11 +18,11 @@ TODOS
 
 4. transition to add auction builds one by one was nice
 
-5. turn off i'm ready at every new round
+// 5. turn off i'm ready at every new round
 
-6. If next to ore, produces:
+// 6. If next to ore, produces:
 
-7. (bid information) sold out = someone else got it
+// 7. (bid information) sold out = someone else got it
 tied = no one got this yet
   provide information of bought for <5 gold> or whatever
 

@@ -39,7 +39,7 @@ Template.factoryList.helpers({
   },
 
   checkedStatus() {
-    console.log(Template.instance().gameStats.get().bidCommit);
+    // console.log(Template.instance().gameStats.get().bidCommit);
     if ((Template.instance().gameStats.get()).bidCommit == true) {
       return "checked";
     }
