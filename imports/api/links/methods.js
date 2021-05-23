@@ -177,6 +177,32 @@ export const CommitBids = new ValidatedMethod({
   }
 });
 
+// export const ReassignWorkers = new ValidatedMethod({
+//   name: 'reassign.buildings',
+//   validate ({}) {},
+//   run ({baseId, gameCode, commitState}) {
+//     if (!this.isSimulation) {
+//       console.log("changing bid commit state");
+//       // readyCities
+//       if (commitState == true) {
+//         console.log("truing ready");
+//         Games.update(
+//           {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$addToSet: {"readyCities": baseId}}, {multi: true}
+//         );
+//       }
+//       else {
+//         Games.update(
+//           {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$pull: {"readyCities": baseId}}, {multi: true}
+//         ); 
+//       }
+//       Games.update(
+//         {$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerId": baseId}]}, {$set: {"bidCommit": commitState}}
+//       );
+//     }
+//   }
+// });
+
+
 export const ClearBids = new ValidatedMethod({
   name: 'bids.clear',
   validate ({}) {},
@@ -796,7 +822,7 @@ export const RunBuildings = new ValidatedMethod({
           if ("neighborNeed" in building) {
             if ("neighboringResource" in building) {
               nres =  Resources.findOne({"_id": building["neighboringResource"]});
-              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
+              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"] && affordable == true) {
                 affordable = true;
                 nresuse = true;
               }
@@ -1076,6 +1102,20 @@ const buildImages = {
   "lumbercamp": "../img/buildings/lumbercamp.png"
 }
 
+const buildDisplayNames = {
+  "claymine": "Clay Mine",
+  "coppermine": "Copper Mine",
+  "foodfarm": "Farm",
+  "foodfishing": "Fishing Camp",
+  "foodhunting": "Hunting Camp",
+  "lumbercamp": "Lumber Camp",
+  "background": "Empty",
+  "water": "River",
+  "woods": "Woods",
+  "lumber": "Lumber",
+  "copper": "Copper Ore",
+  "clay": "Clay Ore"
+}
 
 const resImages = {
   "m1": "../img/icons/gold_sml.png",
@@ -1142,7 +1182,8 @@ const neighborUses = {
   "coppermine": {"res": "copper", "amount": 2},
   "foodfishing": {"res": "fish", "amount": 2},
   "foodhunting": {"res": "animals", "amount": 2},
-  "lumbercamp": {"res": "lumber", "amount": 3}
+  "lumbercamp": {"res": "lumber", "amount": 3},
+  "foodfarm": {"res": "fish", "amount": 0}
 };
 
 const neighborAffects = {
@@ -1160,8 +1201,8 @@ const infoTexts = {
   "coppermine": "Produces: 5 copper, 2 pollution (or 8 copper and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
   "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 1 lumber, 1 clay. ",
   "foodfishing": "Produces: 5 food, Uses: 1 copper, and 2 fish from nearby water. Can only be placed next to water.",
-  "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest). Needs forest nearby.",
-  "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest). Needs forest nearby."
+  "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest nearby). Needs forest nearby.",
+  "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest nearby). Needs forest nearby."
 };
 
 const bonusTexts = {
@@ -1169,8 +1210,8 @@ const bonusTexts = {
   "coppermine": "+3 copper, +1 pollution if ore nearby",
   "foodfarm": "+3 food, 2 water pollution if river nearby",
   "foodfishing": "Also uses: 2 fish from nearby water. Can only be placed next to water.",
-  "foodhunting": "Also uses: 2 animals (from the forest). Needs forest nearby.",
-  "lumbercamp": "Uses: 3 lumber (from the forest). Needs forest nearby."
+  "foodhunting": "Also uses: 2 animals (from the forest nearby). Needs forest nearby.",
+  "lumbercamp": "Uses: 3 lumber (from the forest nearby). Needs forest nearby."
 };
 
 export const AddBuilding = new ValidatedMethod({
@@ -1197,6 +1238,9 @@ export const AddBuilding = new ValidatedMethod({
       if (buildingName in buildImages) {
         buildObj["image"] = buildImages[buildingName];
       }
+      if (buildingName in buildDisplayNames) {
+        buildObj["displayName"] = buildDisplayNames[buildingName];
+      }
       if (buildingName in neighborNeeds) {
         buildObj["neighborNeed"] = neighborNeeds[buildingName];
       }
@@ -1212,6 +1256,7 @@ export const AddBuilding = new ValidatedMethod({
       if (buildingName in bonusProds) {
         buildObj["bonusProd"] = bonusProds[buildingName];
       }
+      
 
       mapPlaced = false;
       if (groupName == "auctions") {

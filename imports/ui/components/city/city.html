@@ -9,83 +9,108 @@
 </template>
 
 <template name="city">
-  <div class="container" style="padding: 15px 0px;">
-    <div class="row g-1 row-cols-auto">
-      <div class="col-sm-1">
-        <span class="ready-city-active">Round {{phaseBar.year}}</span>
+  <div class="container border sticky-top shadow p-3 mb-5 bg-body rounded" style="background-color: white; padding: 10px 0px; margin-bottom: 10px;">
+    <div class="row row-gx-0 row-cols-auto" style="align-items: flex-end; padding: 0px 5px">
+      <div class="col-xs">
+        <div class="form-check form-switch">
+          <label class="form-check-label" for="bidToggle">I'm ready for Year {{phaseBar.year}}'s {{phaseBar.phaseLabel}}</label>
+          <input class="form-check-input" type="checkbox" id="bidToggle" {{checkedStatus}}>
+        </div>
       </div>
       <!-- Will always be active -->
-      <div class="col-xs-1">
-        <img src = "../img/phase/trade-active.svg" style="width:30px; height:30px;">
+      <div class="col-xs-1 px-0">
+        <img src = "../img/phase/trade-active.svg" style="width:30px; height:30px">
       </div>
-      <div class="col-xs-1">
+      <div class="col-xs-1 px-0">
         <img src = "../img/phase/phase-transition-active.svg" style="width:60.2px;">
       </div>
-      <div class="col-xs-1">
-        <img src = "../img/phase/check-active.svg" style="width:20px; height:20px">
-        <span class="ready-city-active position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPreBid}} / {{phaseBar.numberOfCities}}</span>
+      <div class="col-xs-1 px-0">
+        <div class="row">
+          <span class="ready-city-active">{{phaseBar.readyCitiesPreBid}} / 5</span>
+        </div>
+        <div class="row"    style="justify-content: center;" >
+          <img src = "../img/phase/check-active.svg" style="width:80%">
+        </div>
+        <!-- <div class="row">
+          <img src = "../img/phase/check-active.svg" style="width:20px; height:20px">
+          <span class="ready-city-active position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPreBid}} / 5</span>
+        </div> -->
       </div>
       <!-- Will always be active -->
-      <div class="col-xs">
+      <div class="col-xs px-0">
         <img src = "../img/phase/phase-transition-{{phaseBar.phaseIndication}}.svg" style="width:60.2px;">
       </div>
-      <div class="col-xs">
+      <div class="col-xs px-0">
         <img src = "../img/phase/build-{{phaseBar.phaseIndication}}.svg" style="width:30px; height:30px">
       </div>
-      <div class="col-xs">
+      <div class="col-xs px-0">
         <img src = "../img/phase/phase-transition-{{phaseBar.phaseIndication}}.svg" style="width:60.2px;">
       </div>
-      <div class="col-xs">
-        <img src = "../img/phase/check-{{phaseBar.phaseIndication}}.svg" style="width:20px; height:20px">
-        <span class="ready-city-{{phaseBar.phaseIndication}} position-absolute translate-middle" style="padding-right: 15px; padding-bottom: 20px;">{{phaseBar.readyCitiesPostBid}} / {{phaseBar.numberOfCities}}</span>
+      <div class="col-xs px-0">
+        <div class="row">
+          <span class="ready-city-{{phaseBar.phaseIndication}}">{{phaseBar.readyCitiesPostBid}} / 5</span>
+        </div>
+        <div class="row"    style="justify-content: center;" >
+          <img src = "../img/phase/check-{{phaseBar.phaseIndication}}.svg" style="width:80%">
+        </div>
       </div>
-      <!-- Will always be inactive -->
-      <div class="col-xs">
+      <div class="col-xs px-0">
         <img src = "../img/phase/end-phase-inactive.svg" style="width:65.22px; height:12px">
       </div>
-      <!-- Will always be inactive -->
+      <div class="col-xs">
+        <div class="container" style="padding-top: 25px">
+          <div class="resLabel" style="display:flex; flex-direction: row;  height: 80px; overflow: auto;"> 
+            <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px; visibility: {{getLabelVis}}"> 
+              <div style="display:flex; flex: 1; flex-direction: row;  height: 40px; overflow: clip;"> 
+                  <div style="display:flex; overflow: clip; flex-direction: column; height:100%;"> 
+                    <div style="flex:40%; font-size: 90%; font-weight: 400; overflow: clip; text-align: left;">
+                      Expected Change
+                    </div>
+                    <div style="flex:50%; font-size: 100%; font-weight: 600;  text-align: left; overflow-x: clip; overflow-y: clip"> 
+                      Current Amount
+                    </div>
+                  </div>
+              </div>
+              <div style="display:flex; flex-direction: row; height: 10px; justify-content: left; padding-left: 50%; padding-top: 4px">
+                Name
+              </div>
+            </div>
+          {{#each cr in cityResources}}
+            <div style="flex-direction: column; width: 90px; height: 60px; margin: 0px"> 
+              <div style="display:flex; flex: 1; flex-direction: row;  height: 40px; overflow: clip;"> 
+                <div style="flex:50%; width: 50%; overflow: clip;">
+                  <img src="{{cr.image}}" style="width:100%; padding: 4%">
+                </div>
+                <div style="flex:50%; width: 50%; overflow: clip; padding-left: 5px ">
+                  <div style="display:flex; overflow: clip; flex-direction: column; height:100%;"> 
+                    <div style="flex:40%; font-size: 80%; font-weight: 400; overflow: clip; text-align: left;">
+                      {{cr.roundProduction}}
+                    </div>
+                    <div style="flex:50%; font-size: 130%; font-weight: 600; text-align: left; overflow-x: clip">
+                      {{cr.amount}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction: row; height: 10px; justify-content: left; padding-top: 4px; visibility: {{getLabelVis}}">
+                {{cr.res}}
+              </div>
+            </div>
+          {{/each}}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-    <div class="resLabel" style="display:flex; flex-direction: row;  height: 100px; overflow: auto;"> 
-      <div style="flex-direction: column; width: 150px; height: 60px; margin: 5px; visibility: {{getLabelVis}}"> 
-        <div style="display:flex; flex: 1; flex-direction: row;  height: 60px; overflow: clip;"> 
-            <div style="display:flex; overflow: clip; flex-direction: column; height:100%;"> 
-              <div style="flex:40%; font-size: 90%; font-weight: 400; overflow: clip; text-align: left;">
-                Expected Change
-              </div>
-              <div style="flex:50%; font-size: 100%; font-weight: 600; padding-top: 5%; text-align: left; overflow-x: clip; overflow-y: clip"> 
-                Current Amount
-              </div>
-            </div>
-        </div>
-        <div style="display:flex; flex-direction: row; height: 10px; justify-content: left; padding-left: 50%; padding-top: 4px">
-          Name
-        </div>
-      </div>
-    {{#each cr in cityResources}}
-      <div style="flex-direction: column; width: 90px; height: 60px; margin: 5px"> 
-        <div style="display:flex; flex: 1; flex-direction: row;  height: 60px; overflow: clip;"> 
-          <div style="flex:50%; width: 50%; overflow: clip;">
-            <img src="{{cr.image}}" style="width:100%; padding: 4%">
-          </div>
-          <div style="flex:50%; width: 50%; overflow: clip; padding-left: 5px ">
-            <div style="display:flex; overflow: clip; flex-direction: column; height:100%;"> 
-              <div style="flex:40%; font-size: 80%; font-weight: 400; overflow: clip; text-align: left;">
-                {{cr.roundProduction}}
-              </div>
-              <div style="flex:50%; font-size: 130%; font-weight: 600; padding-top: 5%; text-align: left; overflow-x: clip">
-                {{cr.amount}}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex; flex-direction: row; height: 10px; justify-content: left; padding-left: 30%; padding-top: 4px; visibility: {{getLabelVis}}">
-          {{cr.res}}
-        </div>
-      </div>
-    {{/each}}
-  </div>
 
+  <!-- <div class = "switch-button" style="margin-top: 3%;">
+    <h3>I'm ready!</h3>
+    <div class="checkbox-container">
+      <input type="checkbox" id="bidToggle" {{checkedStatus}}/>
+      <label for="bidToggle"></label>
+      <div class="active-circle"></div>
+    </div>
+  </div> -->
   
   <div>
     {{#each tradeAlerts}}
@@ -99,11 +124,11 @@
 <div class="accordion" id="accordionExample">
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingOne">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
         Trade History
       </button>
     </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
       <div class="accordion-body">
         {{#each tradeHistory}}
           <div class="alert alert-dark alert-dismissible fade show" role="alert">
@@ -153,7 +178,7 @@
       
       {{#each build in boughtBuildings}}
       <div class="col-md-5 boughtBuilding" style="border-style: outset; margin-right: 4%;padding-bottom: 2%; text-align: center;">
-          <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
+          <h5>{{build.displayName}}<img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h5> 
           <!--{{build.name}}-->
           <!-- <p>Produce</p>
           <p>Consume</p> -->
@@ -239,35 +264,40 @@
                 </label>
                 On
               </div>
-                <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button>
+                <button class="btn btn-danger startRemoval" id="startRemoval" data-bs-toggle="modal" data-bs-target="#buildingRemoveModal" data-backdrop="false"> Remove Building </button>
                 <!-- <button class="btn btn-danger"  data-toggle="modal" data-target="#myModal" data-backdrop="false"> Remove Building </button> -->
+
+                 <div id="buildingRemoveModal" tabindex="-1" class="modal fade" role="dialog"  aria-labelledby="deleteBuildingModal" aria-hidden="true">
+                  <div class="modal-dialog">
+            
+                    <!-- Modal content-->
+                    <div class="modal-content" >
+                      <div class="modal-header">
+                        <h5 class="modal-title" style="align-items: flex-start;">Warning</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p>It will disappear permanently, are you sure about that?</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary removeBuilding" data-bs-dismiss="modal" id="remove-{{currentBuilding.mapCell.building._id}}">Destroy It!</button>
+                      </div>
+                    </div>
+            
+                  </div>
+                </div>
+
               </div>
               {{/if}}
               <!-- {{#else}} -->
           </div>
-          <div id="myModal" tabindex="-1" class="modal fade" role="dialog"  aria-labelledby="deleteBuildingModal">
-            <div class="modal-dialog">
-      
-              <!-- Modal content-->
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">Warning</h4>
-                </div>
-                <div class="modal-body">
-                  <p>It will disappear permanently, are you sure about that?</p>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-light removeBuilding" data-dismiss="modal" id="remove-{{currentBuilding.mapCell.building._id}}">Destroy It!</button>
-                </div>
-              </div>
-      
-            </div>
-          </div>
+         
+
       </div>
       
       </div>
     </div>
+
   </div>
   </div>
 </template>

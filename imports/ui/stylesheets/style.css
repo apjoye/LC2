@@ -496,7 +496,7 @@ input:checked + .slider:before {
 	position: relative;
 	transition: all 0.3s ease-out;
 	width: 45px;
-	height: 25px;
+	height: 15px;
 	z-index: 2;
 }
 
@@ -509,8 +509,8 @@ input:checked + .slider:before {
 	left: 1px;
 	transform: translateX(0);
 	transition: transform 0.3s linear;
-	width: 20px;
-	height: 20px;
+	width: 10px;
+	height: 10px;
 	z-index: 3;
 }
 
@@ -663,6 +663,16 @@ input:checked + .slider:before {
 .closebtn:hover {
 	color: black;
 }
+
+.yearLabel {
+	font-family: 'Roboto', sans-serif;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 13px;
+	line-height: 16=8px;
+	color: #ffa233;
+}
+
 
 span[class*='ready-city-'] {
 	font-family: 'Roboto', sans-serif;

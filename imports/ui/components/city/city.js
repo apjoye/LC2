@@ -19,7 +19,12 @@ import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
 import { ReadNotif }  from '/imports/api/links/methods.js';
-import 'animate.css/animate.css';
+import { CommitBids } from '/imports/api/links/methods.js';
+// import { ReassignWorkers } from '/imports/api/links/methods.js';
+
+// import 'animate.css/animate.css';
+// import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 // import { NewRound } from '/imports/api/links/methods.js';
 
@@ -59,7 +64,8 @@ Template.city.onCreated(function helloOnCreated() {
   Meteor.subscribe('buildings.city', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('trades.city', FlowRouter.getParam('gameCode'));
   this.gameInfo = new ReactiveVar({});
-  this.labelVisibility = new ReactiveVar({"index": 1, "list": ["visibile", "hidden"]});
+  this.labelVisibility = new ReactiveVar({"index": 0, "list": ["visible", "hidden"]});
+  this.population = new ReactiveVar(0);
   // this.roundProduction = new ReactiveVar({});
 });
 
@@ -90,20 +96,46 @@ Template.city.helpers({
 
     thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode"), "playerId": Meteor.userId()}]})
     Template.instance().gameInfo.set(thisGame);
+    // console.log(thisGame);
+    // console.log(thisGame.population);
+    // console.log(Template.instance().population.get());
+    // if (thisGame.role == "base" && thisGame.population != Template.instance().population.get()) {
+    //   console.log("see population change");
+    //   if (thisGame.population < Template.instance().population.get()) {
+
+    //     // ReassignWorkers.call();
+    //   } 
+    //   Template.instance().population.set(thisGame.population);
+    // }
 
 
     // ROUND PRODUCTION INFORMATION SET UP HERE
     runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
+    rbArr = runningBuilds.fetch(); 
+    var stopBuildings = [];
+    // console.log(rbArr);
+    // console.log(thisGame.population);
+    // REASSIGNING WORKERS IF POPULATION AND BUILDING RUNNINGS DONT MATCH
+    if (rbArr.length >= thisGame.population)  {
+      stopBuildings = rbArr.slice(thisGame.population);
+      // rbArr = rbArr.slice(0, thisGame.population);
+      console.log(stopBuildings);
+    }
+      stopBuildings.forEach(function (sb) {
+        ToggleBuilding.call({"buildingId": sb["_id"], "currentStatus": sb["running"], "gameCode": sb["gameCode"], "ownerId": sb["ownerId"]});
+      });
+    // }
 
-    runningBuilds.forEach(function (build) {
-      for (r in build.prodVal) {        prodOutput[r] += build.prodVal[r];      }
-      for (r in build.prodCost) {        prodOutput[r] = prodOutput[r] - build.prodCost[r];      }
-    });
+    // runningBuilds.forEach(function (build) {
+    //   for (r in build.prodVal) {        prodOutput[r] += build.prodVal[r];      }
+    //   for (r in build.prodCost) {        prodOutput[r] = prodOutput[r] - build.prodCost[r];      }
+    // });
 
     for (k in prodOutput) {
       if (prodOutput[k] >= 0) {        prodOutStr[k] = "+" + prodOutput[k].toString();      }
       else {       prodOutStr[k] = prodOutput[k].toString();       }
     }
+
 
 
     //GETTING OTHER CITY STATS INFO IN HERE
@@ -154,7 +186,7 @@ Template.city.helpers({
     // NOTE:needed once, need to move somewhere
     admin = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
     
-    barStats = {
+    retObj = {
       'readyCitiesPreBid': game.readyCities.length,
       'readyCitiesPostBid': 0,
       'year': game.year,
@@ -164,12 +196,22 @@ Template.city.helpers({
     
     if (game.phase === 'post-bid') {
       // faking this, will always be max player post-bid
-      barStats['readyCitiesPreBid'] = admin.groupList.length;
-      barStats['readyCitiesPostBid'] = game.readyCities.length
-      barStats['phaseIndication'] = 'active';
+      retObj['readyCitiesPreBid'] = admin.groupList.length;
+      retObj['readyCitiesPostBid'] = game.readyCities.length
+      retObj['phaseIndication'] = 'active';
     }
     
-    return barStats;
+    return retObj;
+  },
+
+  checkedStatus() {
+    var gbc = Template.instance().gameInfo.get().bidCommit;
+    if (gbc == true) {
+      return "checked";
+    }
+    else {
+      return "";
+    }
   },
 
   tradeAlerts() {
@@ -184,7 +226,7 @@ Template.city.helpers({
         {"success": true}
       ]});
     // console.log(Template.instance().gameInfo.get().group);
-    console.log(ts.fetch());
+    // console.log(ts.fetch());
     return ts;
   },
 
@@ -200,7 +242,7 @@ Template.city.helpers({
         {"success": true}
       ]});
     // console.log(Template.instance().gameInfo.get().group);
-    console.log(ts.fetch());
+    // console.log(ts.fetch());
     return ts;
   },
 
@@ -272,6 +314,13 @@ Template.city.events ({
     lv = instance.labelVisibility.get();
 
     instance.labelVisibility.set({"index": (1 - lv.index), "list": lv.list});
+  },
+
+  'click #bidToggle' (event, instance) {
+    // event.preventDefault()
+    console.log(`bid toggle ${event.target.checked}`);
+    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
+
   }
 })
 
@@ -600,7 +649,7 @@ Template.cityMap.helpers({
         boxContent["building"] = mapSelect["building"];
         boxContent["heading"] = Template.instance().tnt[mapSelect["building"]["name"]];
         boxContent["image"] = Template.instance().mapTiles[mapSelect["building"]["name"]];
-        console.log(boxContent);
+        // console.log(boxContent);
         boxContent["text"].push(JSON.stringify(mapSelect["building"]["name"]));
         pcs = mapSelect["building"]["prodCost"];
         pcText = [];
@@ -631,12 +680,12 @@ Template.cityMap.helpers({
           // console.log("owned cell, looking into neighbors");
           boxContent["image"] = "../img/buildings/construction.png";
           
-          boxContent.text.push("You own this cell! Place some buildings here!");
+          boxContent.text.push("Your cell! Place buildings here");
           resTexts = {
-            "water": "Water nearby! You can fish here. Also, farms produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well",
+            "water": "Water nearby! Supports fishing. Also, farms produce 2 extra food, but pollute the water.",
             "lumber": "Woods nearby! You can hunt and collect lumber here.",
-            "clay": "Clay ore nearby! Mines work extra here! They produce more pollution, and also collect bonus clay if there are deposits in the ores.",
-            "copper": "Copper ore nearby! Mines work extra here! They produce more pollution, and also collect bonus copper if there are deposits in the ores."
+            "clay": "Clay ore nearby! Mines here produce more pollution, and collect bonus clay if ores haven't run out.",
+            "copper": "Copper ore nearby! Mines here produce more pollution, and collect bonus copper if ores haven't run out."
           }
           neighbs = mapSelect.neighbors;
           found = [];
@@ -653,17 +702,17 @@ Template.cityMap.helpers({
         }
         else {
           boxContent["image"] = "../img/buildings/no-construction.png";
-          boxContent.text.push("You don't own this cell! Place buildings on cells you own.");
+          boxContent.text.push("You don't own this cell!");
           // 
           // console.log(Template.instance().tnt)
           // console.log(mapSelect["resource"]["kind"])
           if ("resource" in mapSelect) {
             boxContent["heading"] = Template.instance().tnt[mapSelect["resource"]["kind"]];
             resTexts2 = {
-              "water": "This cell has water! Farms in adjacent squares produce 2 extra food, but pollute the water. Pollution from the water seeps into your city as well. You can also collect available fish for food from this!",
+              "water": "This cell has water! Pollution from the water can spread to your city. Fishing camps can be placed nearby, and farms nearby receive a bonus.",
               "lumber": "Woods nearby! You can hunt and collect lumber here.",
-              "clay": "Clay ore here! Clay mines placed adjacently use the ore, produce extra clay, and also extra pollution.",
-              "copper": "Copper ore here! Copper mines placed adjacently use the ore, produce extra clay, and also extra pollution.",
+              "clay": "Clay ore here! Clay mines placed nearby produce extra clay and extra pollution.",
+              "copper": "Copper ore here! Copper mines placed nearby produce extra clay and extra pollution.",
             }
             boxContent.text.push(resTexts2[mapSelect["resource"]["kind"]]);
           }
@@ -746,7 +795,7 @@ Template.cityMap.events({
   },
 
   'click .toggleBuilding': function (event, instance) {
-    // event.preventDefault();
+    event.preventDefault();
     console.log(event.target)
     bb = Template.instance().data.map[Template.instance().selectedLoc.get()]["building"];
     bs = instance.buildings.get();
@@ -770,12 +819,12 @@ Template.cityMap.events({
   },
 
   'click .startRemoval': function (event, instance) {
-    event.preventDefault();
+    // event.preventDefault();
     // console.log(event.target.id);
     // console.log("removing building client " + (event.target.id).substr(7));
     // RemoveBuilding.call({"buildingId": (event.target.id).substr(7)});
-    document.getElementById("startRemoval").style.display = "none";
-    document.getElementById("finalRemoval").style.display = "block";
+    // document.getElementById("startRemoval").style.display = "none";
+    // document.getElementById("buildingRemoveModal").style.display = "block";
   },
 
   'click .removeBuilding': function (event, instance) {
@@ -788,7 +837,7 @@ Template.cityMap.events({
   'click .cancelRemoval': function (event, instance) {
     event.preventDefault();
     document.getElementById("startRemoval").style.display = "block";
-    document.getElementById("finalRemoval").style.display = "none";
+    document.getElementById("buildingRemoveModal").style.display = "none";
   },
 
 });
