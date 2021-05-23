@@ -20,6 +20,8 @@ import { RemoveBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
 import { ReadNotif }  from '/imports/api/links/methods.js';
 import { CommitBids } from '/imports/api/links/methods.js';
+// import { ReassignWorkers } from '/imports/api/links/methods.js';
+
 // import 'animate.css/animate.css';
 // import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
@@ -63,6 +65,7 @@ Template.city.onCreated(function helloOnCreated() {
   Meteor.subscribe('trades.city', FlowRouter.getParam('gameCode'));
   this.gameInfo = new ReactiveVar({});
   this.labelVisibility = new ReactiveVar({"index": 0, "list": ["visible", "hidden"]});
+  this.population = new ReactiveVar(0);
   // this.roundProduction = new ReactiveVar({});
 });
 
@@ -93,20 +96,46 @@ Template.city.helpers({
 
     thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode"), "playerId": Meteor.userId()}]})
     Template.instance().gameInfo.set(thisGame);
+    console.log(thisGame);
+    // console.log(thisGame.population);
+    // console.log(Template.instance().population.get());
+    // if (thisGame.role == "base" && thisGame.population != Template.instance().population.get()) {
+    //   console.log("see population change");
+    //   if (thisGame.population < Template.instance().population.get()) {
+
+    //     // ReassignWorkers.call();
+    //   } 
+    //   Template.instance().population.set(thisGame.population);
+    // }
 
 
     // ROUND PRODUCTION INFORMATION SET UP HERE
     runningBuilds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"running": true}, {"owned": true}, {"ownerId": Meteor.userId()}]});
+    rbArr = runningBuilds.fetch(); 
+    var stopBuildings = [];
+    // console.log(rbArr);
+    // console.log(thisGame.population);
+    // REASSIGNING WORKERS IF POPULATION AND BUILDING RUNNINGS DONT MATCH
+    if (rbArr.length >= thisGame.population)  {
+      stopBuildings = rbArr.slice(thisGame.population);
+      // rbArr = rbArr.slice(0, thisGame.population);
+      console.log(stopBuildings);
+    }
+      stopBuildings.forEach(function (sb) {
+        ToggleBuilding.call({"buildingId": sb["_id"], "currentStatus": sb["running"], "gameCode": sb["gameCode"], "ownerId": sb["ownerId"]});
+      });
+    // }
 
-    runningBuilds.forEach(function (build) {
-      for (r in build.prodVal) {        prodOutput[r] += build.prodVal[r];      }
-      for (r in build.prodCost) {        prodOutput[r] = prodOutput[r] - build.prodCost[r];      }
-    });
+    // runningBuilds.forEach(function (build) {
+    //   for (r in build.prodVal) {        prodOutput[r] += build.prodVal[r];      }
+    //   for (r in build.prodCost) {        prodOutput[r] = prodOutput[r] - build.prodCost[r];      }
+    // });
 
     for (k in prodOutput) {
       if (prodOutput[k] >= 0) {        prodOutStr[k] = "+" + prodOutput[k].toString();      }
       else {       prodOutStr[k] = prodOutput[k].toString();       }
     }
+
 
 
     //GETTING OTHER CITY STATS INFO IN HERE

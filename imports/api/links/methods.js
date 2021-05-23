@@ -177,6 +177,32 @@ export const CommitBids = new ValidatedMethod({
   }
 });
 
+// export const ReassignWorkers = new ValidatedMethod({
+//   name: 'reassign.buildings',
+//   validate ({}) {},
+//   run ({baseId, gameCode, commitState}) {
+//     if (!this.isSimulation) {
+//       console.log("changing bid commit state");
+//       // readyCities
+//       if (commitState == true) {
+//         console.log("truing ready");
+//         Games.update(
+//           {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$addToSet: {"readyCities": baseId}}, {multi: true}
+//         );
+//       }
+//       else {
+//         Games.update(
+//           {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$pull: {"readyCities": baseId}}, {multi: true}
+//         ); 
+//       }
+//       Games.update(
+//         {$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerId": baseId}]}, {$set: {"bidCommit": commitState}}
+//       );
+//     }
+//   }
+// });
+
+
 export const ClearBids = new ValidatedMethod({
   name: 'bids.clear',
   validate ({}) {},
