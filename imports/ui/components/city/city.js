@@ -96,7 +96,7 @@ Template.city.helpers({
 
     thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode"), "playerId": Meteor.userId()}]})
     Template.instance().gameInfo.set(thisGame);
-    console.log(thisGame);
+    // console.log(thisGame);
     // console.log(thisGame.population);
     // console.log(Template.instance().population.get());
     // if (thisGame.role == "base" && thisGame.population != Template.instance().population.get()) {

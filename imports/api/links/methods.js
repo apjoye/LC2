@@ -819,7 +819,7 @@ export const RunBuildings = new ValidatedMethod({
           if ("neighborNeed" in building) {
             if ("neighboringResource" in building) {
               nres =  Resources.findOne({"_id": building["neighboringResource"]});
-              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
+              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"] && affordable == true) {
                 affordable = true;
                 nresuse = true;
               }
