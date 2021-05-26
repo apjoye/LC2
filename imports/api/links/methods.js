@@ -977,6 +977,36 @@ export const RunBuildings = new ValidatedMethod({
         
       }
 
+      async function natureNeighborSpread(gameCode, resList) {
+        for (r in resList) {
+          res = resList[r];
+          //water specific neighbor effects
+          if (res["kind"] == "water") {
+            if (res["stats"]["pollution"] > 6) {
+              //add 1 pollution to neighboring cities
+              for (rn in res["neighbors"]) [
+                //check if this object is a city
+                //currently i'm assuming it's a city
+                neighb = res["neighbors"][rn];
+                Games.update({"_id": neighb["_id"]}, {$inc: {"pollution": 1}});
+            }
+          }
+
+          //mine specific neighbor effects
+
+          //other kinds
+        }
+      }
+
+      async function natureEffects(gameCode) {
+        res = await Resources.find({"gameCode": gameCode}).fetch();
+        //nature replenishment
+
+        //nature pollution spread
+        await natureNeighborSpread(gameCode, res);
+        return true;
+      }
+
       async function runThroughBuilds(buildings) {
         // gameTeams = {};
 
@@ -989,7 +1019,7 @@ export const RunBuildings = new ValidatedMethod({
             if (bb["running"] == true) {
               // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
               try {
-                console.log("calling eat and make");
+                // console.log("calling eat and make");
                 // console.log(bb);
                 await EatAndMake(bb["ownerGame"], bb);
               }
@@ -1002,7 +1032,8 @@ export const RunBuildings = new ValidatedMethod({
           // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
           // console.log(bb["kind"]);
         }
-        console.log("updating happiness etc");
+        // console.log("updating happiness etc");
+        await natureEffects(gameCode);
         await updateStats(gameCode);
       }
 
@@ -1012,7 +1043,7 @@ export const RunBuildings = new ValidatedMethod({
         runThroughBuilds(buildings);
       }
 
-      console.log("trying to update year");
+      // console.log("trying to update year");
       thisyear = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
       if ("year" in thisyear) {thisyear = thisyear.year + 1;}
       else {thisyear = 1;}
@@ -1030,11 +1061,11 @@ export const BuildingNeighbors = new ValidatedMethod ({
   validate ({}) {},
   run({gameCode, building}) { 
     neighbors = CellNeighbor.call({"gameCode": gameCode, "location": building["location"]});
-    console.log(building);
-    console.log("trying to add building neighbors");
+    // console.log(building);
+    // console.log("trying to add building neighbors");
     // neighborBonus
     if ("neighborBonus" in building || "neighborNeed" in building) {
-      console.log("looking to add neighbors info");
+      // console.log("looking to add neighbors info");
       if ("neighborBonus" in building){
         nres = building["neighborBonus"]["resources"];
       }
@@ -1045,11 +1076,11 @@ export const BuildingNeighbors = new ValidatedMethod ({
         if (neighbors[n] != undefined) {
           if ("resId" in neighbors[n]) {
             res = Resources.findOne({"_id": neighbors[n]["resId"]});
-            console.log(res["stats"]);
-            console.log(nres);
+            // console.log(res["stats"]);
+            // console.log(nres);
             // if (Object.keys(res["stats"]).indexOf(nres) > -1 || res["kind"] == nres) {
             if (res["kind"] == nres) { 
-              console.log("ore found!");
+              // console.log("ore found!");
               // add bonus resource output here;
               Buildings.update(
                 {"_id": building["_id"]}, 
@@ -1326,7 +1357,7 @@ export const PlaceBuilding = new ValidatedMethod({
     else {
       return "you don't own this spot!!!";
     }
-    console.log("setting up building neighbors");
+    // console.log("setting up building neighbors");
     BuildingNeighbors.call({"gameCode": gameCode, "building": building});
     
   }
@@ -1455,7 +1486,7 @@ export const MakeMap = new ValidatedMethod({
     */
 
 
-    async function seedResources (gameCode) {
+    async function seedResources (gameCode, teamDict) {
       resLocs = {
         "woods1": [[0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [0, 10], [0, 11], [0, 12], [0, 13], [0, 14], [0, 15], 
         [1, 5], [1, 6], [1, 7], [1, 8], [1, 9], [1, 10], [1, 11], [1, 12], [1, 13], [1, 14], [1, 15], 
@@ -1487,16 +1518,32 @@ export const MakeMap = new ValidatedMethod({
         "mine2": "copper"
       }
 
+      /* TODO: make a function which calculates resource neighbors by scanning through edges and seeing neighboring resources and cities 
+        Needed for when cities or resources can move/change on the map
+      */
 
-      teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
-      teams = teams.fetch();
+      function getTeamList(tl) { return tl.map(t => {return teamDict[t];})}
+      resNeighbors = {};
+      rnn = {
+        "woods1": ["red-city", "yellow-city"],
+        "woods2": ["green-city", 'pink-city'],
+        "lake": ["green-city", "blue-city", 'yellow-city'],
+        "mine1": ["red-city"],
+        "mine2": ["pink-city", "blue-city"]
+      }
+
+      for (rn in rnn) {resNeighbors[rn] = getTeamList(rnn[rn]);}
+
+
+      // teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
+      // teams = teams.fetch();
 
       for (res in resLocs) {
-        resObj = {"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res]};
+        resObj = {"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res], "neighbors": resNeighbors[res]};
         await Resources.insert(resObj);
         thisRes = await Resources.findOne(resObj);
         for (l in resLocs[res]) {
-          console.log(thisRes._id);
+          // console.log(thisRes._id);
           await Maps.update (
             {$and: [{"x": resLocs[res][l][0]}, {"y": resLocs[res][l][1]}, {"gameCode": gameCode}]}, 
             {$set: {"resource": thisRes, "resId": thisRes["_id"]}}, 
@@ -1516,11 +1563,11 @@ export const MakeMap = new ValidatedMethod({
       var height = dims[1];
       var endX = thisX + width;
       var endY = thisY + height;
-      console.log(thisX + " " + thisY + " " + endX + " " + endY);
+      // console.log(thisX + " " + thisY + " " + endX + " " + endY);
 
       for (thisX; thisX < endX; thisX += 1){
         for (thisY = corner[1]; thisY < endY; thisY += 1) {
-          console.log(thisX + " " + thisY);
+          // console.log(thisX + " " + thisY);
           // mapid = "";
           // mapobj = await Maps.findOne({$and: [{"x": thisX}, {"y": thisY}, {"gameCode": gameCode}]})
           // if (mapobj != undefined){
@@ -1533,7 +1580,7 @@ export const MakeMap = new ValidatedMethod({
             {upsert: true}
           );
         }
-        console.log(thisX);
+        // console.log(thisX);
       }
       return true;
 
@@ -1558,9 +1605,11 @@ export const MakeMap = new ValidatedMethod({
       }
 
       teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]}).fetch();
+      teamDict = {};
       // teams = teams.fetch();
       for (t in teams) {
         tn = teams[t]["playerName"];
+        teamDict[tn] = teams[t];
         tmi = teamMapInfo[tn];
         if (t < corners.length){
           await makeTeamCells(tmi["corners"], tmi["dims"], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
@@ -1577,7 +1626,7 @@ export const MakeMap = new ValidatedMethod({
         
 
 
-      await seedResources (gameCode);
+      await seedResources (gameCode, teamDict);
       // SetTheme.call({"gameCode": gameCode});
     }
 
@@ -1606,7 +1655,7 @@ export const StartGame = new ValidatedMethod({
       gameCodes = [];
       allGames.forEach(function (game) {gameCodes.push(game.gameCode);});
       // console.log(baseList);
-      console.log(gameCodes);
+      // console.log(gameCodes);
       newgc = parseInt(Math.random()*100000).toString();
       while (newgc in gameCodes) {
         newgc = parseInt(Math.random()*100000).toString();;
@@ -1627,7 +1676,7 @@ export const StartGame = new ValidatedMethod({
       });
       for (var i = 0; i < cityCount; i++) {
         // console.log(baseList[i]);
-        console.log(Meteor.users.find({}).fetch());
+        // console.log(Meteor.users.find({}).fetch());
         neighbors = [];
         // if (i == 0) {
         //   neighbors.push(baseList[cityCount - 1]);
@@ -1703,14 +1752,14 @@ export const AddNeighbor = new ValidatedMethod({
   validate({}) {},
   run({gameCode, cityName, neighbor}) {
     if (!this.isSimulation) {
-      console.log(neighbor);
+      // console.log(neighbor);
       if (neighbor != "empty") {
         if (Games.findOne({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": neighbor}]}) != undefined){
           Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": cityName}]}, {$addToSet: {"neighbors": neighbor}});
         }
       }
       else {
-        console.log("emptying neighbors");
+        // console.log("emptying neighbors");
         Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerName": cityName}]}, {$set: {"neighbors": []}}); 
       }
     }
@@ -1740,11 +1789,11 @@ export const JoinGame = new ValidatedMethod({
   validate({}) {},
   run({playerName, playerId, gameCode, role, year = 0, neighbors = []}) {
     if (!this.isSimulation) {
-      console.log(gameCode);
+      // console.log(gameCode);
       gameCode = gameCode.toLowerCase();
       gameCode = gameCode.trim();
       gameAdmin = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
-      console.log(gameAdmin);
+      // console.log(gameAdmin);
 
       if (gameAdmin != undefined) {
 
@@ -1768,7 +1817,7 @@ export const JoinGame = new ValidatedMethod({
             return (a.groupSize - b.groupSize);
           });
           grp = sortedGroups[0].groupIndex;
-          console.log("group is " + grp);
+          // console.log("group is " + grp);
           group = grp;
 
         }
