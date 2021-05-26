@@ -974,36 +974,68 @@ export const RunBuildings = new ValidatedMethod({
             }
           });
         }
-        
+        return true;
       }
 
-      async function natureNeighborSpread(gameCode, resList) {
+      async function natureReplenish(resList) {
+        for (r in resList) {
+          res = resList[r];
+
+          if (res["kind"] == "water") {
+            s = res["stats"];
+            if ("pollution" in s && "fish" in s) {
+              fishRep = 1.2 - 0.2*s["pollution"];   //fish reproduction factor
+              newFish = parseInt(fishRep * s["fish"]);
+              await Resources.update({"_id": res["_id"]}, {$set: {"stats.fish": newFish}});
+            }
+            else {
+              console.log("water resource didn't have pollution or fish????")
+              console.log(res);
+            }
+          }
+
+          if (res["kind"] == "lumber") {
+            if ("lumber" in res["stats"] && "animals" in res["stats"]) {
+
+            }
+            else {
+              console.log("lumbers resource didn't have lumber or animals????")
+              console.log(res);
+            }
+          }
+        }
+        return true;
+      }
+
+      async function natureNeighborSpread(resList) {
         for (r in resList) {
           res = resList[r];
           //water specific neighbor effects
           if (res["kind"] == "water") {
             if (res["stats"]["pollution"] > 6) {
               //add 1 pollution to neighboring cities
-              for (rn in res["neighbors"]) [
+              for (rn in res["neighbors"]) {
                 //check if this object is a city
                 //currently i'm assuming it's a city
                 neighb = res["neighbors"][rn];
                 Games.update({"_id": neighb["_id"]}, {$inc: {"pollution": 1}});
+              }
             }
+
+            //mine specific neighbor effects
+
+            //other kinds
           }
-
-          //mine specific neighbor effects
-
-          //other kinds
         }
+        return true;
       }
 
       async function natureEffects(gameCode) {
         res = await Resources.find({"gameCode": gameCode}).fetch();
         //nature replenishment
-
+        await natureReplenish(res);
         //nature pollution spread
-        await natureNeighborSpread(gameCode, res);
+        await natureNeighborSpread(res);
         return true;
       }
 
