@@ -1487,6 +1487,7 @@ export const MakeMap = new ValidatedMethod({
         "mine2": "copper"
       }
 
+
       teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]});
       teams = teams.fetch();
 
@@ -1544,15 +1545,29 @@ export const MakeMap = new ValidatedMethod({
       mapDims = [16, 16];
       visCorners = [[0, 0], [8, 0], [11, 5], [11, 11], [1, 11]];
       visDims = [[6, 6], [6, 5], [5, 6], [5, 5], [6, 5]];
+      // teamNames = ["red-city", "green-city", "pink-city", "blue-city", "yellow-city"];
+      teamNames = baseUsers.slice(0, 5);
+      teamMapInfo = {};
+      for (tn in teamNames) {
+        teamMapInfo[teamNames[tn]] = {
+          "visDims": visDims[tn],
+          "visCorners": visCorners[tn],
+          "dims": dims[tn],
+          "corners": corners[tn]
+        }
+      }
+
       teams = await Games.find({$and: [{"role": "base"}, {"gameCode": gameCode}]}).fetch();
       // teams = teams.fetch();
       for (t in teams) {
+        tn = teams[t]["playerName"];
+        tmi = teamMapInfo[tn];
         if (t < corners.length){
-          await makeTeamCells(corners[t], dims[t], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
+          await makeTeamCells(tmi["corners"], tmi["dims"], gameCode, teams[t]["playerId"], teams[t]["group"], teams[t]["_id"]);
         }
         await Games.update(
           {"_id": teams[t]["_id"]}, 
-          {$set: {"visibleCorner": visCorners[t], "visibleDimensions": visDims[t]} }
+          {$set: {"visibleCorner": tmi["visCorners"], "visibleDimensions": tmi["visDims"]} }
         );
       }
 
@@ -1614,14 +1629,14 @@ export const StartGame = new ValidatedMethod({
         // console.log(baseList[i]);
         console.log(Meteor.users.find({}).fetch());
         neighbors = [];
-        if (i == 0) {
-          neighbors.push(baseList[cityCount - 1]);
-          neighbors.push(baseList[i + 1]);
-        }
-        else {
-          neighbors.push(baseList[i - 1]);
-          neighbors.push(baseList[((i + 1) % cityCount)]);
-        }
+        // if (i == 0) {
+        //   neighbors.push(baseList[cityCount - 1]);
+        //   neighbors.push(baseList[i + 1]);
+        // }
+        // else {
+        //   neighbors.push(baseList[i - 1]);
+        //   neighbors.push(baseList[((i + 1) % cityCount)]);
+        // }
         // neighbors = baseList[i - 1];
         JoinGame.call({"playerName": baseList[i], "playerId": Meteor.users.findOne({"profile.name": baseList[i]})._id, "gameCode": newgc, "role": "base", "year": year, "neighbors": neighbors}, (err, res) => {
           if (err) {
