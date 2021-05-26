@@ -816,10 +816,10 @@ export const RunBuildings = new ValidatedMethod({
             newRes[r] = newRes[r] - building["prodCost"][r];
           }
           //neighborNeeds specifies requirement which restricts  placement
-          if ("neighborNeed" in building) {
+          if ("neighborNeed" in building && affordable == true) {
             if ("neighboringResource" in building) {
               nres =  Resources.findOne({"_id": building["neighboringResource"]});
-              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"] && affordable == true) {
+              if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
                 affordable = true;
                 nresuse = true;
               }
@@ -862,6 +862,8 @@ export const RunBuildings = new ValidatedMethod({
                 if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
                   console.log("neighboring resource available")
                   neighbUse = true;
+                  /// Andrew? TODO: check that city resource is not becoming negative here - if it is, abort building use and log a BIG BUG in affordable check
+
                   newnres[building["neighborUse"]["res"]] -= building["neighborUse"]["amount"];
                 }
                 else {
@@ -1338,7 +1340,7 @@ export const AddBuilding = new ValidatedMethod({
         }
       }
       Buildings.insert(buildObj);
-      //*** TODO: POSSIBLY FORCE building Id (and resource Id) to be epoch+gameCode+building+kind so that this find query doesn't return empty and leave buildingId undefined
+      //*** vishesh next TODO: POSSIBLY FORCE building Id (and resource Id) to be epoch+gameCode+building+kind so that this find query doesn't return empty and leave buildingId undefined
       if (mapPlaced == true) {
         thisBuild = Buildings.findOne(buildObj);
         Maps.update(
