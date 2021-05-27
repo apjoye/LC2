@@ -235,7 +235,7 @@ Template.gameMap.helpers({
   },
 
   cityStats() {
-    topMargin = 1335;
+    topMargin = 950;
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
     // console.log(cities);
@@ -244,7 +244,7 @@ Template.gameMap.helpers({
       loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
       // console.log(loc);
       xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
-      yloc = topMargin + 80 + (60 * cities[c]["visibleCorner"][1]);
+      yloc = topMargin + 80 + (63 * cities[c]["visibleCorner"][1]);
       if (cities[c]["playerName"] == "green-city") {
         // xloc -= 50;
         yloc -= 50;
@@ -282,8 +282,19 @@ Template.gameMap.helpers({
     }
     res = Resources.find({"gameCode": FlowRouter.getParam('gameCode')}).fetch();
     stats = [];
+    topMargin = 950;
+    leftMargin = 20;
+    locs = {
+      "woods1": {"x": 10, "y": 300},
+      "lake": {"x": 310, "y": 360},
+      "woods2": {"x": 870, "y": 100},
+      "mine1": {"x": 160, "y": 230},
+      "mine2": {"x": 870, "y": 600},
+    }
     for (r in res) {
       res[r]["className"] = res[r]["name"] + "-status";
+      console.log(res[r]["name"])
+      res[r]["locStyle"] = "top:" + (topMargin + locs[res[r]["name"]]["y"]) + "px; left: " + (leftMargin + locs[res[r]["name"]]["x"]) + "px;";
       res[r]["statList"] = [];
       for (s in res[r]["stats"]) {
         res[r]["statList"].push({"name": s, "amount": res[r]["stats"][s], "img": resourceMapImg[s]});

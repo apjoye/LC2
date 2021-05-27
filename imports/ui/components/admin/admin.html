@@ -261,7 +261,8 @@
         {{/each}}
 
         {{#each resStats}}
-          <div class="{{this.className}} resStatBox">
+          <!-- <div class="{{this.className}} resStatBox"> -->
+          <div class="resStatBox" style="position: absolute; {{this.locStyle}}">
             {{#each s in this.statList}}
               
                 <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; margin-top: 5px; z-index: 4">
