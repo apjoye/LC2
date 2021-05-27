@@ -800,9 +800,9 @@ export const RunBuildings = new ValidatedMethod({
         newPoll = thisGame["pollution"];
         roundEmployed = 0;
         running = false
-        console.log("are we here?");
+        // console.log("are we here?");
         if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
-        console.log("employed " + roundEmployed);
+        // console.log("employed " + roundEmployed);
         if (!("notes" in thisGame)) {
           thisGame["notes"] = [];
         }
@@ -846,7 +846,7 @@ export const RunBuildings = new ValidatedMethod({
             thisGame["pollution"] = newPoll;
             thisGame["notes"].push(building.name + " ran successfully!")
             usingResource = false;
-            console.log("consumed stuff, checking out neighboring resources");
+            // console.log("consumed stuff, checking out neighboring resources");
 
             //neighborUses gets used, if neighboring resource is present. Either by neighborneed or bonus mode
               //bonusProds is the extra production that happens is neighborUse succeeds
@@ -856,11 +856,11 @@ export const RunBuildings = new ValidatedMethod({
               nres =  Resources.findOne({"_id": building["neighboringResource"]});
               newnres = nres["stats"];
               neighbUse = false;
-              console.log("found a neighboring resource");
+              // console.log("found a neighboring resource");
               if ("neighborUse" in building) {
-                console.log("gonna use a neighboring resource " + JSON.stringify(nres) + " " + JSON.stringify(building["neighborUse"]));
+                // console.log("gonna use a neighboring resource " + JSON.stringify(nres) + " " + JSON.stringify(building["neighborUse"]));
                 if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
-                  console.log("neighboring resource available")
+                  // console.log("neighboring resource available")
                   neighbUse = true;
                   /// Andrew? TODO: check that city resource is not becoming negative here - if it is, abort building use and log a BIG BUG in affordable check
 
@@ -876,22 +876,22 @@ export const RunBuildings = new ValidatedMethod({
                   newnres["pollution"] += building["neighborAffect"]["pollution"];
                 }
                 else {
-                  console.log("this neighboring affect was gonna receive some pollution but it doesn't have the pollution stat? ugh");
+                  // console.log("this neighboring affect was gonna receive some pollution but it doesn't have the pollution stat? ugh");
                 }
               }
 
               if ("neighborBonus" in building) {
-                console.log("bonus mode attempt");
+                // console.log("bonus mode attempt");
                 if ("pollution" in building["bonusProd"]){
                   newPoll += building["bonusProd"]["pollution"];
                 }
                 if (neighbUse == true) {
-                  console.log("bonus mode resource use was affordable!")
+                  // console.log("bonus mode resource use was affordable!")
                   newRes[building["bonusProd"]["res"]] += building["bonusProd"]["amount"];
                 } 
               }
-              console.log(building["neighboringResource"]);
-              console.log(newnres);
+              // console.log(building["neighboringResource"]);
+              // console.log(newnres);
               await Resources.update({"_id": building["neighboringResource"]}, {$set: {stats: newnres}});
             }
             console.log("making the worth");
@@ -917,7 +917,7 @@ export const RunBuildings = new ValidatedMethod({
           // newHapp = thisGame["happiness"] + deltaHapp;
           // newPop = thisGame["population"] + parseInt(((0.5 * newRes["food"]) - (0.5 * newPoll)  + (2 * newHapp)) / thisGame["population"]);
           
-          console.log("trying to update game");
+          // console.log("trying to update game");
           return Games.update(
             {"_id": thisGame._id}, 
             {$set: {
@@ -951,13 +951,13 @@ export const RunBuildings = new ValidatedMethod({
           thisGame = gg[g];
           newRes = thisGame["res"];
           newPoll = thisGame["pollution"]; newPop = thisGame["population"]; newHapp = thisGame["happiness"];
-          console.log("what the what, employing " + thisGame["roundEmployed"]);
+          // console.log("what the what, employing " + thisGame["roundEmployed"]);
           newHapp = thisGame["happiness"];
           newPop = thisGame["population"];
           wealth = newRes["clay"] + newRes["lumber"] + newRes["copper"];
           pollHere = thisGame["pollution"] == 0 ? 1: newPoll;
           happFactor = ((newRes["food"] / thisGame["population"]) + wealth) / ( + pollHere);
-          console.log("trying to update happiness " + thisGame["group"] + " " + happFactor);
+          // console.log("trying to update happiness " + thisGame["group"] + " " + happFactor);
           if (happFactor > 1) { newHapp +=  1; }
           else if (happFactor < 0.5) { newHapp -= 1; }
           
@@ -986,7 +986,7 @@ export const RunBuildings = new ValidatedMethod({
           if (res["kind"] == "water") {
             s = res["stats"];
             if ("pollution" in s && "fish" in s) {
-              fishRep = 1.2 - 0.2*s["pollution"];   //fish reproduction factor
+              fishRep = 1.2 - 0.2*s["fish"];   //fish reproduction factor
               newFish = parseInt(fishRep * s["fish"]);
               await Resources.update({"_id": res["_id"]}, {$set: {"stats.fish": newFish}});
             }
@@ -1010,17 +1010,21 @@ export const RunBuildings = new ValidatedMethod({
       }
 
       async function natureNeighborSpread(resList) {
+        // console.log("neighbor spread res list");
+        // console.log(resList);
         for (r in resList) {
           res = resList[r];
           //water specific neighbor effects
           if (res["kind"] == "water") {
+            // console.log("water neighbor spread called");
             if (res["stats"]["pollution"] > 6) {
+              // console.log(res)
               //add 1 pollution to neighboring cities
               for (rn in res["neighbors"]) {
                 //check if this object is a city
                 //currently i'm assuming it's a city
                 neighb = res["neighbors"][rn];
-                Games.update({"_id": neighb["_id"]}, {$inc: {"pollution": 1}});
+                Games.update({"_id": neighb["_id"]}, {$inc: {"pollution": parseInt(res["stats"]["pollution"] / 6)}});
               }
             }
 
@@ -1033,11 +1037,13 @@ export const RunBuildings = new ValidatedMethod({
       }
 
       async function natureEffects(gameCode) {
-        res = await Resources.find({"gameCode": gameCode}).fetch();
+        // console.log("nature effects");
+        resList = await Resources.find({"gameCode": gameCode}).fetch();
+        // console.log(res);
         //nature replenishment
-        await natureReplenish(res);
+        await natureReplenish(resList);
         //nature pollution spread
-        await natureNeighborSpread(res);
+        await natureNeighborSpread(resList);
         return true;
       }
 

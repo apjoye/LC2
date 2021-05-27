@@ -256,7 +256,7 @@ Template.gameMap.helpers({
       cities[c]["className"] = cities[c]["group"] + "-status";
       // console.log(cities[c]["className"]);
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
-      console.log(cities[c]);
+      // console.log(cities[c]);
       res = cities[c]["res"];
       cities[c]["wealth"] = res["lumber"] + res["food"] + res["clay"] + res["copper"]
       // console.log(loc);
@@ -267,7 +267,7 @@ Template.gameMap.helpers({
       // stats[cities[c]["group"]] = cities[c];
       // stats[cities[c]["group"]]["className"] = cities[c]["group"] + "-status";
     }
-    console.log(stats);
+    // console.log(stats);
     return stats;
   },
 
@@ -293,7 +293,7 @@ Template.gameMap.helpers({
     }
     for (r in res) {
       res[r]["className"] = res[r]["name"] + "-status";
-      console.log(res[r]["name"])
+      // console.log(res[r]["name"])
       res[r]["locStyle"] = "top:" + (topMargin + locs[res[r]["name"]]["y"]) + "px; left: " + (leftMargin + locs[res[r]["name"]]["x"]) + "px;";
       res[r]["statList"] = [];
       for (s in res[r]["stats"]) {
