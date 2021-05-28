@@ -1,9 +1,7 @@
 import './card.html';
 import { ReactiveVar } from 'meteor/reactive-var';
 
-import { Producers } from '/imports/api/links/links.js';
-import { Bids } from '/imports/api/links/links.js';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 // import { Assets } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
 
@@ -13,7 +11,6 @@ import { MakeBid2 } from '/imports/api/links/methods.js';
 
 import { BuyProducer } from '/imports/api/links/methods.js';
 import { MakeBid } from '/imports/api/links/methods.js';
-import { UpdateBid } from '/imports/api/links/methods.js';
 import { CommitBids } from '/imports/api/links/methods.js';
 
 Template.factoryList.onCreated(function helloOnCreated() {
@@ -129,13 +126,7 @@ Template.factoryList.helpers({
   },
 
   CityBids() {
-    bids = Bids.find(
-      {$and: [
-        {"gameCode": FlowRouter.getParam("gameCode")}, 
-        {"baseId": Meteor.userId()}, 
-        // {"groupGame"}
-      ]}
-    ).fetch();
+    bids = Meteor.call('bids.city', FlowRouter.getParam('gameCode'));
     bbs = {};     //bids grouped by building 
     rbs = {};    //bids grouped by resource kind
     // console.log(bids);
@@ -301,7 +292,6 @@ Template.factoryList.events({
 Template.factoryList.onCreated(function helloOnCreated() {
   Meteor.subscribe('bids.local');
   Meteor.subscribe('games.minerunning');
-
 });
 
 Template.factory.onRendered(function () {
@@ -365,7 +355,8 @@ Template.factory.helpers({
   FactoryBid() {
    // console.log(Bids.findOne({}));
    // console.log(this._id);
-   bid = Bids.findOne({"producer": this._id});
+  //  bid = Bids.findOne({"producer": this._id});
+    bid = Meteor.call('bids.producer', this._id);
    // console.log(Bids.findOne());
 
    thisGame = Games.findOne({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"playerId": Meteor.userId()}]});

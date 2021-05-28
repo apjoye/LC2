@@ -34,7 +34,7 @@ import { AsyncTest } from '/imports/api/links/methods.js';
 import { Maps } from '/imports/api/links/links.js';
 import { Resources } from '/imports/api/links/links.js';
 import { Buildings } from '/imports/api/links/links.js';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 
 
 

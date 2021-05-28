@@ -15,10 +15,6 @@ export const Cities = new Mongo.Collection('cities');
 
 export const History = new Mongo.Collection('history');
 
-export const Games = new Mongo.Collection('games');
-
-export const Bids = new Mongo.Collection('bids');
-
 export const Acts = new Mongo.Collection('acts');
 
 

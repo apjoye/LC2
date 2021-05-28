@@ -4,7 +4,7 @@ import { Producers } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
 // import { NewRound } from '/imports/api/links/methods.js';
 // import { StartGame } from '/imports/api/links/methods.js';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 
 Template.gameList.onCreated(function helloOnCreated() {
   Meteor.subscribe('games.minerunning');

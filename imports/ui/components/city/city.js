@@ -9,7 +9,7 @@ import { Buildings } from '/imports/api/links/links.js';
 import { Acts } from '/imports/api/links/links.js';
 
 import { Producers } from '/imports/api/links/links.js';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import '/imports/ui/stylesheets/style.css';

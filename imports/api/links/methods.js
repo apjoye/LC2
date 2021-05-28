@@ -10,11 +10,11 @@ import { Resources } from './links.js';
 import { Buildings } from './links.js';
 
 import { Links } from './links.js';
-import { Games } from './links.js';
+import { Games } from '../games/games.js';
 
 import { Producers } from './links.js';
 import { Cities } from './links.js';
-import { Bids } from './links.js';
+import { Bids } from '../bids/bids.js';
 import { History } from './links.js';
 import { Acts } from './links.js';
 
@@ -130,25 +130,6 @@ export const RandomProducer = new ValidatedMethod({
         }
     }
     return true;
-  }
-});
-
-export const UpdateBid = new ValidatedMethod({
-  name: 'bids.afford',
-  validate ({}) {},
-  run ({bidId, affordability}) {
-    if (!this.isSimulation){
-      // console.log(bidId + " " + affordability);
-      if (affordability!= undefined){
-        Bids.update(
-          {"_id": bidId}, 
-          {$set: {
-            "affordability": affordability
-            }
-          });
-      }
-      return true;
-    }
   }
 });
 

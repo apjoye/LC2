@@ -1,7 +1,7 @@
 import './central.html';
 import { Meteor } from 'meteor/meteor';
 // import { Cities } from '/imports/api/links/links.js';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 import { Acts } from '/imports/api/links/links.js';
 // import d3 from 'd3';
 

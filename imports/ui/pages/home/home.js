@@ -1,6 +1,6 @@
 // import { Meteor } from 'meteor/meteor';
 import './home.html';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import '../../components/navbar/navbar.js';

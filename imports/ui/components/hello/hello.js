@@ -1,7 +1,6 @@
 import './hello.html';
 import '../gameList/gameList.js';
 import { JoinGame } from '/imports/api/links/methods.js';
-import { Games } from '/imports/api/links/links.js';
 
 Template.gameStart.onCreated(function helloOnCreated() {
   // counter starts at 0

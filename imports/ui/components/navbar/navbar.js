@@ -2,7 +2,7 @@ import './navbar.html';
 // import { Producers } from '/imports/api/links/links.js';
 // import { Assets } from '/imports/api/links/links.js';
 import { Meteor } from 'meteor/meteor';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 // import { NewRound } from '/imports/api/links/methods.js';
 // import { BuyProducer } from '/imports/api/links/methods.js';
 

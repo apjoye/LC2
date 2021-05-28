@@ -1,7 +1,7 @@
 import './trade.html';
 import { Meteor } from 'meteor/meteor';
 // import { Cities } from '/imports/api/links/links.js';
-import { Games } from '/imports/api/links/links.js';
+import { Games } from '/imports/api/games/games.js';
 import { TradeResources } from '/imports/api/links/methods.js';
 import { ResetAll } from '/imports/api/links/methods.js';
 

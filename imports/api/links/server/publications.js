@@ -4,8 +4,6 @@ import { Meteor } from 'meteor/meteor';
 import { Links } from '../links.js';
 import { Producers } from '../links.js';
 import { Cities } from '../links.js';
-import { Games } from '../links.js';
-import { Bids } from '../links.js';
 import { Acts } from '../links.js';
 import { Maps } from '../links.js';
 import { Resources } from '../links.js';
@@ -73,52 +71,6 @@ Meteor.publish('resources.thisGame', function (gameCode) {
 Meteor.publish('maps.thisGame', function (gameCode) {
   // console.log(this.users());
   return Maps.find({$and: [{"gameCode": gameCode }]});
-});
-
-
-Meteor.publish('games.minerunning', function () {
-  // console.log(this.users());
-  return Games.find({$and: [{"playerId": Meteor.userId()}, {"status": "running"}]});
-});
-
-Meteor.publish('games.minepaused', function () {
-  // console.log(this.users());
-  return Games.find({$and: [{"playerId": Meteor.userId()}, {"status": "paused"}]});
-});
-
-Meteor.publish('games.mine', function () {
-  // console.log(this.users());
-  return Games.find({$and: [{"playerId": Meteor.userId()}]});
-});
-
-Meteor.publish('games.paused', function () {
-  // console.log(this.users());
-  return Games.find({$and: [{"status": "paused"}]});
-});
-
-Meteor.publish('games.running', function () {
-  // console.log(this.users());
-  return Games.find({$and: [{"status": "running"}]});
-});
-
-Meteor.publish('games.all', function () {
-  // console.log(this.users());
-  return Games.find({$and: [{"status": "running"}]});
-});
-
-Meteor.publish('games.users', function (gameCode) {
-  // console.log(this.users());
-  return Games.find({$and: [{"status": "running"}, {"gameCode": gameCode}]});
-});
-
-Meteor.publish('bids.all', function () {
-  // console.log(this.users());
-  return Bids.find({});
-});
-
-Meteor.publish('bids.local', function () {
-  // console.log(this.users());
-  return Bids.find({"baseId": Meteor.userId()});
 });
 
 Meteor.publish('acts.game', function (gameCode) {
