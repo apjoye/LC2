@@ -19,7 +19,6 @@ import { ToggleBuilding } from '/imports/api/links/methods.js';
 import { RemoveBuilding } from '/imports/api/links/methods.js';
 import { ToggleFactory } from '/imports/api/links/methods.js';
 import { ReadNotif }  from '/imports/api/links/methods.js';
-import { CommitBids } from '/imports/api/links/methods.js';
 // import { ReassignWorkers } from '/imports/api/links/methods.js';
 
 // import 'animate.css/animate.css';
@@ -329,8 +328,7 @@ Template.city.events ({
   'click #bidToggle' (event, instance) {
     // event.preventDefault()
     console.log(`bid toggle ${event.target.checked}`);
-    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
-
+    Meteor.call('games.bids.update', FlowRouter.getParam("gameCode"), event.target.checked)
   }
 })
 

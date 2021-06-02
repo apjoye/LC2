@@ -133,31 +133,6 @@ export const RandomProducer = new ValidatedMethod({
   }
 });
 
-export const CommitBids = new ValidatedMethod({
-  name: 'bids.commit',
-  validate ({}) {},
-  run ({baseId, gameCode, commitState}) {
-    if (!this.isSimulation) {
-      console.log("changing bid commit state");
-      // readyCities
-      if (commitState == true) {
-        console.log("truing ready");
-        Games.update(
-          {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$addToSet: {"readyCities": baseId}}, {multi: true}
-        );
-      }
-      else {
-        Games.update(
-          {$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$pull: {"readyCities": baseId}}, {multi: true}
-        ); 
-      }
-      Games.update(
-        {$and: [{"gameCode": gameCode}, {"role": "base"}, {"playerId": baseId}]}, {$set: {"bidCommit": commitState}}
-      );
-    }
-  }
-});
-
 // export const ReassignWorkers = new ValidatedMethod({
 //   name: 'reassign.buildings',
 //   validate ({}) {},
@@ -780,7 +755,6 @@ export const RunBuildings = new ValidatedMethod({
         newRes = thisGame["res"];
         newPoll = thisGame["pollution"];
         roundEmployed = 0;
-        running = false
         // console.log("are we here?");
         if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
         // console.log("employed " + roundEmployed);
@@ -788,6 +762,9 @@ export const RunBuildings = new ValidatedMethod({
           thisGame["notes"] = [];
         }
 
+        console.log('building', building)
+        console.log('building prod cost', building["prodCost"])
+        console.log('new res', newRes)
         if (roundEmployed < thisGame["population"]) {
           // console.log("we have employees!");
           for (r in building["prodCost"]) {
@@ -802,7 +779,6 @@ export const RunBuildings = new ValidatedMethod({
               nres =  Resources.findOne({"_id": building["neighboringResource"]});
               if (nres["stats"][building["neighborUse"]["res"]] >= building["neighborUse"]["amount"]) {
                 affordable = true;
-                nresuse = true;
               }
               else {
                 affordable = false;
@@ -815,13 +791,13 @@ export const RunBuildings = new ValidatedMethod({
             }
           }
           if (affordable == false) {
+            console.log("was unaffordable", newRes);
             newRes[r] = thisGame["res"];
+            console.log("was unaffordable", newRes[r]);
             // console.log(thisGame["res"]);
-            console.log("was unaffordable");
             thisGame["notes"].push(building.name + " was unaffordable and did not run");
             return true;
-          }
-          else {
+          } else {
             roundEmployed += 1;
             thisGame["res"] = newRes;
             thisGame["pollution"] = newPoll;
@@ -907,7 +883,7 @@ export const RunBuildings = new ValidatedMethod({
               // "happiness": newHapp, 
               "pollution": newPoll, 
               "roundEmployed": roundEmployed, 
-              "running": running
+              "running": false
             }} );
             // return true;
           }
@@ -1040,8 +1016,8 @@ export const RunBuildings = new ValidatedMethod({
             if (bb["running"] == true) {
               // gameTeams[bb["ownerGame"]] = await EatAndMake(gameTeams[bb["ownerGame"]], bb);
               try {
-                // console.log("calling eat and make");
-                // console.log(bb);
+                console.log("calling eat and make");
+                console.log(bb);
                 await EatAndMake(bb["ownerGame"], bb);
               }
               catch (err) {

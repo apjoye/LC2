@@ -11,7 +11,6 @@ import { MakeBid2 } from '/imports/api/links/methods.js';
 
 import { BuyProducer } from '/imports/api/links/methods.js';
 import { MakeBid } from '/imports/api/links/methods.js';
-import { CommitBids } from '/imports/api/links/methods.js';
 
 Template.factoryList.onCreated(function helloOnCreated() {
   // counter starts at 0
@@ -284,8 +283,7 @@ Template.factoryList.events({
   'click #bidToggle' (event, instance) {
     // event.preventDefault()
     console.log(`bid toggle ${event.target.checked}`);
-    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
-
+    Meteor.call('games.bids.update', FlowRouter.getParam("gameCode"), event.target.checked)
   }
 });
 
