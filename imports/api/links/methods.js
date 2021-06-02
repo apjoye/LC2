@@ -937,14 +937,18 @@ export const RunBuildings = new ValidatedMethod({
       }
 
       async function natureReplenish(resList) {
+        console.log("nature replenish called");
+        // console.log(resList);
         for (r in resList) {
           res = resList[r];
 
           if (res["kind"] == "water") {
             s = res["stats"];
             if ("pollution" in s && "fish" in s) {
-              fishRep = 1.2 - 0.2*s["fish"];   //fish reproduction factor
+              console.log("repleneshing water");
+              fishRep = 1.2 - 0.03*s["pollution"];   //fish reproduction factor
               newFish = parseInt(fishRep * s["fish"]);
+              console.log(fishRep + " " + newFish);
               await Resources.update({"_id": res["_id"]}, {$set: {"stats.fish": newFish}});
             }
             else {
@@ -999,15 +1003,16 @@ export const RunBuildings = new ValidatedMethod({
         // console.log(res);
         //nature replenishment
         await natureReplenish(resList);
+
         //nature pollution spread
         await natureNeighborSpread(resList);
         return true;
       }
 
-      async function runThroughBuilds(buildings) {
+      async function runThroughBuilds(buildings, gameCode) {
         // gameTeams = {};
 
-        await Games.update({$and: [{"gameCode": buildings[0].gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
+        await Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
 
         for (b in buildings) {
           bb = buildings[b];
@@ -1027,18 +1032,20 @@ export const RunBuildings = new ValidatedMethod({
             }
           }
           // Buildings.update({"_id": bb["_id"]}, {$set: {"running": false}});
-          // console.log(bb["kind"]);
+          console.log(bb["kind"]);
         }
-        // console.log("updating happiness etc");
+
         await natureEffects(gameCode);
+        // console.log("updating happiness etc");
         await updateStats(gameCode);
       }
 
+
       Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
       buildings = Buildings.find({$and:[{"gameCode": gameCode}]}).fetch();
-      if (buildings.length > 0){
-        runThroughBuilds(buildings);
-      }
+      // if (buildings.length > 0){
+        runThroughBuilds(buildings, gameCode);
+      // }
 
       // console.log("trying to update year");
       thisyear = Games.findOne({$and: [{"gameCode": gameCode}, {"role": "admin"}]});
