@@ -10,17 +10,17 @@
         
         <div class="col-md-3 buildingbid {{build.classes}} equal-height" style="">
             <!-- {{buildingText build}} -->
-            {{#if build.gamePhase}}
-          <div class = "cover-the-market"></div>
+          {{#if build.gamePhase}}
+            <div class = "cover-the-market"></div>
           {{/if}}
-            <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-left: auto; margin-right: auto;"></h3> 
-              <h4>{{build.name}}</h4>
+            <h3><img class="" src = "{{build.image}}" style="width:80px; height:80px; display: block; margin-top: 30px; margin-left: auto; margin-right: auto;"></h3> 
+              <h4>{{build.displayName}}</h4>
               <div class="adjust">
               <div class="overlay-img">
                 <div class="usage">
                   Uses: 
                   {{#each p in build.prodCostArr}}
-                    {{p.amount}} <img style="width:30px; height:30px" src="{{p.image}}" title="{{p.res}}"/>
+                    {{p.amount}} <img style="width:30px; height:30px;" src="{{p.image}}" title="{{p.res}}"/>
                   {{/each}}
                   <br />
                   Produces: 
@@ -89,6 +89,19 @@
           </div>
           </div>
         {{/each}}
+        <div class="position-fixed bottom-0 start-50 p-3" style="z-index: 5">
+          <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+              <!-- <img src="..." class="rounded me-2" alt="..."> -->
+              <strong class="me-auto">Bid Alert</strong>
+              <!-- <small>11 mins ago</small> -->
+              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              You don't have enough resource to bid more!
+            </div>
+          </div>
+        </div>
       </div>
 
 

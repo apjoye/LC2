@@ -15,9 +15,11 @@ import { BuyProducer } from '/imports/api/links/methods.js';
 import { MakeBid } from '/imports/api/links/methods.js';
 import { UpdateBid } from '/imports/api/links/methods.js';
 import { CommitBids } from '/imports/api/links/methods.js';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 Template.factoryList.onCreated(function helloOnCreated() {
   // counter starts at 0
+  $("#liveToast").toast();
   Meteor.subscribe('producers.public');
   Meteor.subscribe('games.minerunning');
   // Meteor.subscribe('buildings.auction', FlowRouter.getParam('gameCode'));
@@ -64,7 +66,8 @@ Template.factoryList.helpers({
     builds = Buildings.find({$and: [
         {"gameCode": FlowRouter.getParam("gameCode")}, 
         {"visible": true}, 
-        {$or: [{"state": "auction"}, {"roundAcquired": thisGame.year}]}] }).fetch();
+        {$or: [{"state": "auction"}, {"roundAcquired": thisGame.year}]}
+    ] }).fetch();
 
     if (thisGame.phase == "pre-bid"){
       builds = builds.map(x => {x["buttonClasses"] = ""; x["classes"] = ""; return x});
@@ -129,9 +132,10 @@ Template.factoryList.helpers({
   },
 
   CityBids() {
+    gc = FlowRouter.getParam("gameCode");
     bids = Bids.find(
       {$and: [
-        {"gameCode": FlowRouter.getParam("gameCode")}, 
+        {"gameCode": gc}, 
         {"baseId": Meteor.userId()}, 
         // {"groupGame"}
       ]}
@@ -140,15 +144,31 @@ Template.factoryList.helpers({
     rbs = {};    //bids grouped by resource kind
     // console.log(bids);
     for (b in bids) {
-      bbs[bids[b]["buildingId"]] = {"bidVal": bids[b]["bidVal"], "bidKind": bids[b]["bidKind"]};
+      
       if (!(bids[b]["bidKind"] in rbs)) {
         rbs[bids[b]["bidKind"]] = 0;
       }
-      rbs[bids[b]["kind"]] += bids[b]["bidVal"];
+      //if the  the bid of <<food>> on this building + amount of <<food>> already bid exceed game state's resources of <<food>>, then set the bid on this building to 0
+      if ((rbs[bids[b]["bidKind"]] + bids[b]["bidVal"]) > thisGame["res"][bids[b]["bidKind"]]) {
+        MakeBid2.call({
+          "baseId": Meteor.userId(), 
+          "building": bids[b]["buildingId"], 
+          // "group": thisGroup.group, 
+          "gameCode": gc, 
+          "change": "res change - auto reset", 
+          "oldVal": bids[b]["bidVal"],
+          "newVal": 0,
+          "bidKind": bids[b]["bidKind"]
+        });
+        bids[b]["bidVal"] = 0;
+      }
+      rbs[bids[b]["bidKind"]] += bids[b]["bidVal"];
+      bbs[bids[b]["buildingId"]] = {"bidVal": bids[b]["bidVal"], "bidKind": bids[b]["bidKind"]};
     }
+
     // console.log(bbs);
     // console.log(rbs);
-    thisGame = Games.findOne({ $and: [ {"gameCode":  FlowRouter.getParam('gameCode')}, {"role": "base"}, {"playerId": Meteor.userId()} ] } );
+    thisGame = Games.findOne({ $and: [ {"gameCode":  gc}, {"role": "base"}, {"playerId": Meteor.userId()} ] } );
     
     Template.instance().buildingBids.set(bbs);
     Template.instance().resBids.set(rbs);
@@ -263,6 +283,12 @@ Template.factoryList.events({
     //event.target.classList[3]   event.target.name
     // console.log(event.target);
     // console.log(event.target.classList);
+    gs = Template.instance().gameStats.get();
+
+    // btn btn-light changeBid {{build._id}} {{build.bidKind}} {{bidValue build._id}} {{build.phase}} {{build.buttonClasses}}
+    // 0   1         2         3              4                5                       6                7                      
+    bks = Template.instance().resBids.get();
+    bk = event.target.classList[4];
     if (!(event.target.classList).contains("disabled")) {
       oldVal = parseInt(event.target.classList[5]);
       change = parseInt(event.target.name);
@@ -273,6 +299,11 @@ Template.factoryList.events({
 
       if (oldVal == 0 && change == -1) {
         console.log("no negative bids");
+      }
+      else if (change == 1 && bks[bk] == gs["res"][bk]) {
+        console.log("you don't have enough resource to bid more!");
+        $("#liveToast").toast('show');
+
       }
       else {
         newVal = oldVal + change;
