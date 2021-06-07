@@ -7,6 +7,7 @@ import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var'
 
 import { ChangeStat } from '/imports/api/links/methods.js';
+import { ChangePassword } from '/imports/api/links/methods.js';
 import { NewRound } from '/imports/api/links/methods.js';
 import { StartGame } from '/imports/api/links/methods.js';
 import { ToggleGameRunning } from '/imports/api/links/methods.js';
@@ -235,7 +236,7 @@ Template.gameMap.helpers({
   },
 
   cityStats() {
-    topMargin = 950;
+    topMargin = 570;
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
     // console.log(cities);
@@ -282,7 +283,7 @@ Template.gameMap.helpers({
     }
     res = Resources.find({"gameCode": FlowRouter.getParam('gameCode')}).fetch();
     stats = [];
-    topMargin = 950;
+    topMargin = 50;
     leftMargin = 20;
     locs = {
       "woods1": {"x": 10, "y": 300},
@@ -337,12 +338,17 @@ Template.adminGame.onCreated(function helloOnCreated() {
 });
 
 Template.adminGame.helpers({
-  allPlayers() {
+  allBases() {
     disgame = Games.findOne({"gameCode": FlowRouter.getParam("gameCode")});
     // console.log( disgame.groupList);
     return disgame.groupList;
   },
-
+  allPlayers() {
+    players = Games.find({"gameCode": FlowRouter.getParam("gameCode")});
+    // console.log( disgame.groupList);
+    console.log(players);
+    return players;
+  },
   gameResource() {
     return ["res.clay", "res.copper", "res.lumber", "res.food", "pollution", "population", "happiness"];
     // return ["res.m1", "res.m2", "res.f1", "res.f2", "pollution", "population", "happiness"];
@@ -408,11 +414,23 @@ Template.adminGame.helpers({
 Template.adminGame.events({
   'submit .changeStat' (event, instance) {
     event.preventDefault();
-    console.log(event.target.amount.value);
-    console.log(event.target.resource.name);
-    console.log(event.target.resource.value);
+    // console.log(event.target)
+    // console.log(event.target.amount.value);
+    // console.log(event.target.group.value);
+    // console.log(event.target.resource.value);
 
-    ChangeStat.call({"gameCode": FlowRouter.getParam("gameCode"), "group": event.target.resource.name, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
+    ChangeStat.call({"gameCode": FlowRouter.getParam("gameCode"), "group": event.target.group.value, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
+  },
+
+  'submit .changePassword' (event, instance) {
+    event.preventDefault();
+    // console.log(event.target)
+    // console.log(event.target.playerName)
+    pn = event.target.playerName;
+    playerId = pn[pn.selectedIndex].id;
+    ChangePassword.call({"playerId": playerId, "newPassword": event.target.newPassword.value});
+    // console.log(event.target.playerName.id);
+    // console.log(event.target.newPassword.value);
   },
 
   'submit .changeTeam' (event, instance) {

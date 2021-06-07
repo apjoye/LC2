@@ -31,21 +31,39 @@
 <template name="adminGame">
   <div class="container">
     <div class="row">
-      {{#each allPlayers}}
-      <form class="row g-9 changeStat">
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="resourceAmount">{{this}}</span>
-          <input class="form-control" type="number" name="amount" id="resourceAmount" placeholder="value" />
-          <label for="resource" class="form-label visually-hidden">Resource</label>
-          <select class="form-select" id="resource" name={{this}}>
-            {{#each gameResource}}
-              <option value={{this}}>{{this}}</option>
-            {{/each}}
-          </select>
-          <button class="btn btn-outline-secondary" type="submit" value="submit">Submit</button>
-        </div>
-      </form>
-      {{/each}}
+      <div class="col-6">
+        <form class="row g-9 changeStat">
+          <div class="input-group mb-3">
+            <select class="form-select" id="group">
+              {{#each allBases}}
+                <option value={{this}}>{{this}}</option>
+              {{/each}}
+            </select>
+            <span class="input-group-text" id="resourceAmount"></span>
+            <input class="form-control" type="number" name="amount" id="resourceAmount" placeholder="value" />
+            <label for="resource" class="form-label visually-hidden">Resource</label>
+            <select class="form-select" id="resource" >
+              {{#each gameResource}}
+                <option value={{this}}>{{this}}</option>
+              {{/each}}
+            </select>
+            <button class="btn btn-outline-secondary" type="submit" value="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-6">
+        <form class="row g-9 changePassword">
+          <div class="input-group mb-3">
+            <select class="form-select" id="playerName" >
+              {{#each allPlayers}}
+                <option id={{this.playerId}} value={{this.playerName}}>{{this.playerName}}</option>
+              {{/each}}
+            </select>
+            <input class="form-control" type="text" name="password" id="newPassword" placeholder="value" />
+            <button class="btn btn-outline-secondary" type="submit" value="submit">Change Password</button>
+          </div>
+        </form>
+      </div>
     </div>
   <!--   <div class="btn-group" role="group" aria-label="Basic example">
       <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
@@ -85,20 +103,21 @@
       <button type="button" class="resetTeamResources btn btn-outline-secondary"> Reset Team Resources </button>
       <button type="button" class="makeMap btn btn-outline-secondary"> Make Map </button>
     </div>
-    <p> </p>
-    <div class="btn-group" role="group" aria-label="Basic example">
-      <button type="button" class="addAuction btn btn-outline-secondary"> Add Auction Build </button>
-      <!-- <button type="button" class="runBuildings btn btn-default"> Run Builds </button> -->
-      <button type="button" class="removeBuildings btn btn-outline-secondary"> Remove Builds </button>
-      <!-- <button type="button" class="btn btn-primary seeScore">See scoreboard</button>  -->
 
-    </div>
+    <hr />
 
-    <p> </p>
+
+    <div class="btn-toolbar" role="toolbar">
+      <div class="btn-group me-2" role="group" aria-label="Basic example">
+        <button type="button" class="addAuction btn btn-outline-secondary"> Add Auction Build </button>
+        <button type="button" class="removeBuildings btn btn-outline-secondary"> Remove Builds </button>
+      </div>
+
       <div class="btn-group" role="group" aria-label="Basic example">
-      <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
-      <button type="button" class="runBuildings btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
-  </div>
+        <button type="button" class="runBids btn {{gamePhaseClass.bids}}">Run Bids</button>
+        <button type="button" class="runBuildings btn {{gamePhaseClass.builds}}">Run Buildings & End Round</button>
+      </div>
+    </div>
     
     <p> </p>
     
@@ -121,17 +140,18 @@
     </form>
   -->
   <p>
+     Status: {{status}}
+      <button class="btn btn-light toggleGameState">Toggle</button>
     Bid commits: {{#each committedBids}} {{playerName}}, {{/each}}
   </p>
 
     <p>
-      Status: {{status}}
-      <button class="btn btn-light toggleGameState">Toggle</button>
+     
     </p>
     <!--  Change people's teams-->
 
     <form class="changeTeam row row-cols-lg-auto g-3 mb-3 align-items-end">
-      <div class="col-12">
+      <div class="col-xs-12">
         <label class="" for="player">Player Name</label>
         <select class = "form-select form-control" id="player" name="player">
           {{#each gamePlayers}}
@@ -140,7 +160,7 @@
         </select>
       </div>
 
-      <div class="col-12">
+      <div class="col-xs-12">
         <label class="" for="team">Team</label>
         <select class = "form-select form-control" id="team" name="team">
           {{#each gameTeams}}
@@ -149,31 +169,31 @@
         </select>
       </div>
 
-      <div class="col-12">
+      <div class="col-xs-12">
         <button type="submit" class="btn btn-primary">Change Team</button>
       </div>
     </form>
     
 
     <form class="addBuilding row row-cols-lg-auto g-3 mb-3 align-items-end">
-      <div class="col-12">
+      <div class="col-xs-12">
         <label class="" for="bidResource"> Bid Resource</label>
-        <select class = "custom-select form-control" id="bidKind" name="bidKind">
+        <select class = "form-select form-control" id="bidKind" name="bidKind">
           {{#each bidKinds}}
             <option value = {{this}}>{{this}}</option>
           {{/each}}
         </select>
       </div>
       
-      <div class="col-12">
+      <div class="col-xs-4">
         <input class = "form-control" type="number" name="x" aria-label="x location" placeholder="x-loc" />
       </div>
 
-      <div class="col-12">
+      <div class="col-xs-12">
         <input class = "form-control" type="number" name="y" aria-label="y location" placeholder="y-loc" />
       </div>
 
-      <div class="col-12">
+      <div class="col-xs-12">
         <select class = "form-select form-control" id="buildingName" name="buildingName">
           {{#each buildingNames}}
             <option value = {{this}}>{{this}}</option>
@@ -181,7 +201,7 @@
         </select>
       </div>
 
-      <div class="col-12">
+      <div class="col-xs-12">
         <select class = "form-select form-control" id="groupName" name="groupName">
           {{#each gameTeams}}
             <option value = {{playerName}}>{{playerName}}</option>
@@ -190,7 +210,7 @@
         </select>
       </div>
 
-      <div class="col-12">
+      <div class="col-xs-12">
         <button type="submit" class="btn btn-primary">Add Building</button>
       </div>
 
@@ -198,16 +218,15 @@
 
     <!-- remove specific buildings -->
     <p>
-    <form class="removeBuilding form-inline">
-      <div class="form-group">
-        <select class = "custom-select form-control" id="presentBuilding" name="presentBuilding">
+    <form class="removeBuilding row row-cols-lg-auto g-3 mb-3 align-items-end">
+      <div class="col-xs-12">
+        <select class = "form-select form-control" id="presentBuilding" name="presentBuilding">
           {{#each pb in presentBuildings}}
             <option value = {{pb._id}}>{{pb.location}} {{pb.owner}} {{pb.name}}</option>
           {{/each}}
         </select>
       </div>
-
-      <div class="form-group">
+      <div class="col-xs-12">
         <input class="form-control" type="submit" value="Remove Building"/>
       </div>
     </form>
@@ -219,7 +238,7 @@
 
 <template name="gameMap">
   <div class="container">
-    <button type="button" class="toggleImages btn btn-light"> Toggle Images </button>
+    
     <p></p>
     <div gameMapchart-table>
       <img src="../img/map/mapbase.png" style="position: absolute; width:993px; z-index: 1">

@@ -2006,6 +2006,30 @@ export const ChangeStat = new ValidatedMethod({
   }
 });
 
+export const ChangePassword = new ValidatedMethod({
+  name: 'password.admin',
+  validate({}) {},
+  run({playerId, newPassword}) {
+    if (!this.isSimulation) {
+      console.log(playerId + " " + newPassword);
+      Accounts.setPassword(playerId, newPassword);
+      /*
+      setObj = {};
+      setObj[resource] = amount;
+      Games.update({$and: [{"gameCode": gameCode}, {"group": group}, {"role": "base"}]}, {$set: setObj} , {multi: false}, (err, res) => {
+        if (err) {
+          // console.log(err);
+        }
+        else {
+          // console.log(res);
+        }
+      });
+      */
+    }
+  }
+});
+
+
 export const userExists = new ValidatedMethod({
   name: 'user.exists',
   validate({}) {},
