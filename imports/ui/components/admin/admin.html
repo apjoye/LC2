@@ -285,13 +285,18 @@
             <div class="resStatBox" style="position: absolute; {{this.locStyle}}">
               {{#each s in this.statList}}
                 <div class="row" style="width: 100%;margin-left: -8px;">
-                  <div class="col-6">
+                  <div class="col-5">
                     <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; margin-top: 5px; z-index: 4">
                   </div>
-                  <div class="col-6">
+                  <div class="col-5">
                     <p class="mapinfo">
                     {{s.amount}}</p>
                   </div>
+                  <!-- <div class="col-2">
+                    <small>
+                      {{s.amount}}
+                    </small>
+                  </div> -->
                 </div>
               {{/each}}
             </div>
