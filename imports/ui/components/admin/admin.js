@@ -245,7 +245,7 @@ Template.gameMap.helpers({
       loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
       // console.log(loc);
       xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
-      yloc = topMargin + 80 + (63 * cities[c]["visibleCorner"][1]);
+      yloc = topMargin + 80 + (62 * cities[c]["visibleCorner"][1]);
       if (cities[c]["playerName"] == "green-city") {
         // xloc -= 50;
         yloc -= 50;
