@@ -354,6 +354,81 @@ export const RunBids2 = new ValidatedMethod({
         }
       }
 
+
+      async function natureReplenish(resList) {
+        console.log("nature replenish called");
+        // console.log(resList);
+        for (r in resList) {
+          res = resList[r];
+
+          if (res["kind"] == "water") {
+            s = res["stats"];
+            if ("pollution" in s && "fish" in s) {
+              console.log("repleneshing water");
+              fishRep = 1.2 - 0.03*s["pollution"];   //fish reproduction factor
+              newFish = parseInt(fishRep * s["fish"]);
+              console.log(fishRep + " " + newFish);
+              await Resources.update({"_id": res["_id"]}, {$set: {"stats.fish": newFish}});
+            }
+            else {
+              console.log("water resource didn't have pollution or fish????")
+              console.log(res);
+            }
+          }
+
+          if (res["kind"] == "lumber") {
+            if ("lumber" in res["stats"] && "animals" in res["stats"]) {
+
+            }
+            else {
+              console.log("lumbers resource didn't have lumber or animals????")
+              console.log(res);
+            }
+          }
+        }
+        return true;
+      }
+
+      async function natureNeighborSpread(resList) {
+        // console.log("neighbor spread res list");
+        // console.log(resList);
+        for (r in resList) {
+          res = resList[r];
+          //water specific neighbor effects
+          if (res["kind"] == "water") {
+            // console.log("water neighbor spread called");
+            if (res["stats"]["pollution"] > 6) {
+              // console.log(res)
+              //add 1 pollution to neighboring cities
+              for (rn in res["neighbors"]) {
+                //TODO: check if this object is a city
+                //currently i'm assuming it's a city
+                neighb = res["neighbors"][rn];
+                Games.update({"_id": neighb["_id"]}, {$inc: {"pollution": parseInt(res["stats"]["pollution"] / 6)}});
+              }
+            }
+
+            //mine specific neighbor effects
+
+            //other kinds
+          }
+        }
+        return true;
+      }
+
+      async function natureEffects(gameCode) {
+        // console.log("nature effects");
+        resList = await Resources.find({"gameCode": gameCode}).fetch();
+        // console.log(res);
+        //nature replenishment
+        await natureReplenish(resList);
+
+        //nature pollution spread
+        await natureNeighborSpread(resList);
+        return true;
+      }
+
+
       async function runThroughBids(gameCode) {
         allProds = await Buildings.find({$and: [{"gameCode": gameCode}, {"owned": false}, {"state": "auction"}]});
         allProducers = allProds.fetch();
@@ -364,6 +439,8 @@ export const RunBids2 = new ValidatedMethod({
         // await Games.update({$and: [{"role": "admin"}, {"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}}, {$inc: {"year": 1}})
         await Games.update({$and: [{"gameCode": gameCode}]}, {$set: {"phase": "post-bid"}}, {multi: true});
         await clearBids(allProducers[ap], gameCode);
+
+        await natureEffects(gameCode);
       }
       
       runThroughBids(gameCode);
@@ -976,23 +1053,21 @@ export const RunBuildings = new ValidatedMethod({
             }
           });
         }
-        return true;
-      }
+        gr = Resources.find({"gameCode": gameCode}).fetch();
 
-      async function natureReplenish(resList) {
-        console.log("nature replenish called");
-        // console.log(resList);
-        for (r in resList) {
-          res = resList[r];
-
+        for (r in gr) {
+          res = gr[r];
+          
           if (res["kind"] == "water") {
             s = res["stats"];
             if ("pollution" in s && "fish" in s) {
               console.log("repleneshing water");
               fishRep = 1.2 - 0.03*s["pollution"];   //fish reproduction factor
-              newFish = parseInt(fishRep * s["fish"]);
-              console.log(fishRep + " " + newFish);
-              await Resources.update({"_id": res["_id"]}, {$set: {"stats.fish": newFish}});
+
+              // newFish = parseInt(fishRep * s["fish"]);
+              // console.log(fishRep + " " + newFish);
+              await Resources.update({"_id": res["_id"]}, {$set: {"replenishFactors.fish": fishRep}});
+
             }
             else {
               console.log("water resource didn't have pollution or fish????")
@@ -1002,7 +1077,7 @@ export const RunBuildings = new ValidatedMethod({
 
           if (res["kind"] == "lumber") {
             if ("lumber" in res["stats"] && "animals" in res["stats"]) {
-
+              sadas
             }
             else {
               console.log("lumbers resource didn't have lumber or animals????")
@@ -1013,45 +1088,7 @@ export const RunBuildings = new ValidatedMethod({
         return true;
       }
 
-      async function natureNeighborSpread(resList) {
-        // console.log("neighbor spread res list");
-        // console.log(resList);
-        for (r in resList) {
-          res = resList[r];
-          //water specific neighbor effects
-          if (res["kind"] == "water") {
-            // console.log("water neighbor spread called");
-            if (res["stats"]["pollution"] > 6) {
-              // console.log(res)
-              //add 1 pollution to neighboring cities
-              for (rn in res["neighbors"]) {
-                //check if this object is a city
-                //currently i'm assuming it's a city
-                neighb = res["neighbors"][rn];
-                Games.update({"_id": neighb["_id"]}, {$inc: {"pollution": parseInt(res["stats"]["pollution"] / 6)}});
-              }
-            }
-
-            //mine specific neighbor effects
-
-            //other kinds
-          }
-        }
-        return true;
-      }
-
-      async function natureEffects(gameCode) {
-        // console.log("nature effects");
-        resList = await Resources.find({"gameCode": gameCode}).fetch();
-        // console.log(res);
-        //nature replenishment
-        await natureReplenish(resList);
-
-        //nature pollution spread
-        await natureNeighborSpread(resList);
-        return true;
-      }
-
+      
       async function runThroughBuilds(buildings, gameCode) {
         // gameTeams = {};
 
@@ -1078,7 +1115,7 @@ export const RunBuildings = new ValidatedMethod({
           console.log(bb["kind"]);
         }
 
-        await natureEffects(gameCode);
+        
         // console.log("updating happiness etc");
         await updateStats(gameCode);
       }
@@ -1557,6 +1594,14 @@ export const MakeMap = new ValidatedMethod({
         "mine2": {"copper": 30}
       }
 
+      resReplenish = {
+        "woods1": {"lumber": 1.1, "animals": 1.1},
+        "woods2": {"lumber": 1.1, "animals": 1.1},
+        "lake": {"pollution": 0, "fish": 1.2},
+        "mine1": {"clay": 1},
+        "mine2": {"copper": 1}
+      }
+
       resKinds = {
         "woods1": "lumber",
         "woods2": "lumber",
@@ -1586,7 +1631,15 @@ export const MakeMap = new ValidatedMethod({
       // teams = teams.fetch();
 
       for (res in resLocs) {
-        resObj = {"gameCode": gameCode, "name": res, "kind": resKinds[res], "stats": resAmounts[res], "locations": resLocs[res], "neighbors": resNeighbors[res]};
+        resObj = {
+          "gameCode": gameCode, 
+          "name": res, 
+          "kind": resKinds[res], 
+          "stats": resAmounts[res], 
+          "locations": resLocs[res], 
+          "neighbors": resNeighbors[res],
+          "replenishFactors": resReplenish[res]
+        };
         await Resources.insert(resObj);
         thisRes = await Resources.findOne(resObj);
         for (l in resLocs[res]) {

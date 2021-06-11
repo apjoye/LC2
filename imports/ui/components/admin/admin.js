@@ -283,7 +283,7 @@ Template.gameMap.helpers({
     }
     res = Resources.find({"gameCode": FlowRouter.getParam('gameCode')}).fetch();
     stats = [];
-    topMargin = 50;
+    topMargin = 570;
     leftMargin = 20;
     locs = {
       "woods1": {"x": 10, "y": 300},
