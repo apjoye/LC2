@@ -363,12 +363,17 @@ export const RunBids2 = new ValidatedMethod({
 
           if (res["kind"] == "water") {
             s = res["stats"];
+            rrf = res["replenishFactors"];  //should we add a check for the existence of these fields?
             if ("pollution" in s && "fish" in s) {
-              console.log("repleneshing water");
-              fishRep = 1.2 - 0.03*s["pollution"];   //fish reproduction factor
-              newFish = parseInt(fishRep * s["fish"]);
-              console.log(fishRep + " " + newFish);
-              await Resources.update({"_id": res["_id"]}, {$set: {"stats.fish": newFish}});
+              if ("fish" in rrf && "pollution" in rrf) {
+                console.log("replenishing water");
+                newFish = parseInt(res["replenishFactors"].fish * s["fish"]);
+                newPoll = parseInt(res["replenishFactors"].pollution * s["pollution"]);
+                await Resources.update({"_id": res["_id"]}, {$set: {"stats.fish": newFish}});  
+              }
+              else {
+
+              }
             }
             else {
               console.log("water resource didn't have pollution or fish????")
@@ -378,7 +383,7 @@ export const RunBids2 = new ValidatedMethod({
 
           if (res["kind"] == "lumber") {
             if ("lumber" in res["stats"] && "animals" in res["stats"]) {
-
+              newLumber = parseInt(res["reple"])
             }
             else {
               console.log("lumbers resource didn't have lumber or animals????")
@@ -390,15 +395,11 @@ export const RunBids2 = new ValidatedMethod({
       }
 
       async function natureNeighborSpread(resList) {
-        // console.log("neighbor spread res list");
-        // console.log(resList);
         for (r in resList) {
           res = resList[r];
           //water specific neighbor effects
           if (res["kind"] == "water") {
-            // console.log("water neighbor spread called");
             if (res["stats"]["pollution"] > 6) {
-              // console.log(res)
               //add 1 pollution to neighboring cities
               for (rn in res["neighbors"]) {
                 //TODO: check if this object is a city
@@ -419,7 +420,6 @@ export const RunBids2 = new ValidatedMethod({
       async function natureEffects(gameCode) {
         // console.log("nature effects");
         resList = await Resources.find({"gameCode": gameCode}).fetch();
-        // console.log(res);
         //nature replenishment
         await natureReplenish(resList);
 
@@ -1053,7 +1053,12 @@ export const RunBuildings = new ValidatedMethod({
             }
           });
         }
+
+        newgg = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch();
         gr = Resources.find({"gameCode": gameCode}).fetch();
+        function getCities(cs, ggs) {return (ggs.filter(g => c.indexOf(g.playerName) > -1))};
+        // function addPollutions(cs, ggs) {return (ggs.reduce((a,b) => a.pollution + b.pollution))[0]};
+        function addPollutions(cs) {return cs.reduce((a,b) => a.pollution + b.pollution)};
 
         for (r in gr) {
           res = gr[r];
@@ -1063,11 +1068,12 @@ export const RunBuildings = new ValidatedMethod({
             if ("pollution" in s && "fish" in s) {
               console.log("repleneshing water");
               fishRep = 1.2 - 0.03*s["pollution"];   //fish reproduction factor
-
-              // newFish = parseInt(fishRep * s["fish"]);
-              // console.log(fishRep + " " + newFish);
-              await Resources.update({"_id": res["_id"]}, {$set: {"replenishFactors.fish": fishRep}});
-
+              if ("replenishFactors" in res) {
+                await Resources.update({"_id": res["_id"]}, {$set: {"replenishFactors.fish": fishRep}});
+              }
+              else {
+                await Resources.update({"_id": res["_id"]}, {$set: {"replenishFactors": {"fish": fishRep}}}); 
+              }
             }
             else {
               console.log("water resource didn't have pollution or fish????")
@@ -1077,7 +1083,12 @@ export const RunBuildings = new ValidatedMethod({
 
           if (res["kind"] == "lumber") {
             if ("lumber" in res["stats"] && "animals" in res["stats"]) {
-              sadas
+              // look at neighboring cities
+              woodsPollution  = addPollutions(getCities(res["neighbors"].map(c => c.playerName), newgg), newgg);
+              if (woodsPollution > 5) {
+                lumberFactor = 0.7;
+              }
+              //next todo : make animal factor also low
             }
             else {
               console.log("lumbers resource didn't have lumber or animals????")
@@ -1597,7 +1608,7 @@ export const MakeMap = new ValidatedMethod({
       resReplenish = {
         "woods1": {"lumber": 1.1, "animals": 1.1},
         "woods2": {"lumber": 1.1, "animals": 1.1},
-        "lake": {"pollution": 0, "fish": 1.2},
+        "lake": {"pollution": 0.8, "fish": 1.2},
         "mine1": {"clay": 1},
         "mine2": {"copper": 1}
       }
