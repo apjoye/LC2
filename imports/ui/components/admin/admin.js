@@ -240,35 +240,25 @@ Template.gameMap.helpers({
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
     // console.log(cities);
+    cityLocs = [
+      {}
+    ];
     for (c in cities) {
-
       loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
-      // console.log(loc);
       xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
       yloc = topMargin + 80 + (62 * cities[c]["visibleCorner"][1]);
       if (cities[c]["playerName"] == "green-city") {
-        // xloc -= 50;
         yloc -= 50;
       }
       if (cities[c]["playerName"] == "blue-city" || cities[c]["playerName"] == "pink-city") {
-        // xloc -= 50;
         xloc += 20;
       }
       cities[c]["className"] = cities[c]["group"] + "-status";
-      // console.log(cities[c]["className"]);
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
-      // console.log(cities[c]);
       res = cities[c]["res"];
       cities[c]["wealth"] = res["lumber"] + res["food"] + res["clay"] + res["copper"]
-      // console.log(loc);
-      // console.log(document.getElementById(loc));
-      // console.log(document.getElementById("cell-x0y0"));
-      // cell = document.getElementById(loc).getBoundingClientRect();
       stats.push(cities[c]);
-      // stats[cities[c]["group"]] = cities[c];
-      // stats[cities[c]["group"]]["className"] = cities[c]["group"] + "-status";
     }
-    // console.log(stats);
     return stats;
   },
 
