@@ -7,6 +7,7 @@ import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var'
 
 import { ChangeStat } from '/imports/api/links/methods.js';
+import { ChangeResource } from '/imports/api/links/methods.js';
 import { ChangePassword } from '/imports/api/links/methods.js';
 import { NewRound } from '/imports/api/links/methods.js';
 import { StartGame } from '/imports/api/links/methods.js';
@@ -22,6 +23,7 @@ import { ConsumeResources } from '/imports/api/links/methods.js';
 import { SpawnFactories } from '/imports/api/links/methods.js';
 
 import { MakeMap } from '/imports/api/links/methods.js';
+import { RefreshReplenishments } from '/imports/api/links/methods.js';
 import { BuildingToAuction } from '/imports/api/links/methods.js';
 import { RunBids2 } from '/imports/api/links/methods.js';
 import { RunBuildings } from '/imports/api/links/methods.js';
@@ -298,7 +300,14 @@ Template.gameMap.helpers({
       res[r]["locStyle"] = "top:" + (topMargin + locs[res[r]["name"]]["y"]) + "px; left: " + (leftMargin + locs[res[r]["name"]]["x"]) + "px;";
       res[r]["statList"] = [];
       for (s in res[r]["stats"]) {
-        res[r]["statList"].push({"name": s, "amount": res[r]["stats"][s], "img": resourceMapImg[s]});
+        resObj = {"name": s, "amount": res[r]["stats"][s], "img": resourceMapImg[s]};
+        if (["lumber", "water"].indexOf(res[r].kind) > -1) {
+          if (s in res[r]["replenishFactors"]) {
+            resObj["replenish"] = true;
+            resObj["replenishAmount"] = res[r]["replenishFactors"][s];
+          }
+         }
+        res[r]["statList"].push(resObj);
       }
       stats.push(res[r]);
     }
@@ -332,6 +341,8 @@ Template.gameMap.events({
 
 Template.adminGame.onCreated(function helloOnCreated() {
   Meteor.subscribe('games.users', FlowRouter.getParam('gameCode'));
+  Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
+  this.gameCode = new ReactiveVar(FlowRouter.getParam("gameCode"));
   // Meteor.subscribe('maps.thisGame', FlowRouter.getParam('gameCode'));
   // Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   // Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
@@ -339,14 +350,15 @@ Template.adminGame.onCreated(function helloOnCreated() {
 
 Template.adminGame.helpers({
   allBases() {
-    disgame = Games.findOne({"gameCode": FlowRouter.getParam("gameCode")});
+    // disgame = Games.findOne({"gameCode": FlowRouter.getParam("gameCode")});
+    disgame = Games.findOne({"gameCode": Template.instance().gameCode.get()});
     // console.log( disgame.groupList);
     return disgame.groupList;
   },
   allPlayers() {
-    players = Games.find({"gameCode": FlowRouter.getParam("gameCode")});
+    players = Games.find({"gameCode": Template.instance().gameCode.get()});
     // console.log( disgame.groupList);
-    console.log(players);
+    // console.log(players);
     return players;
   },
   gameResource() {
@@ -355,23 +367,23 @@ Template.adminGame.helpers({
   },
 
   committedBids() {
-    return Games.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}, {"bidCommit": true}]});
+    return Games.find({$and: [{"gameCode": Template.instance().gameCode.get()}, {"bidCommit": true}]});
   },
 
   status() {
-    return Games.findOne({"gameCode": FlowRouter.getParam("gameCode")}).status;
+    return Games.findOne({"gameCode": Template.instance().gameCode.get()}).status;
   },
 
   gamePlayers() {
-    return Games.find({$and: [{"role": "player"}, {"gameCode": FlowRouter.getParam("gameCode")}]});
+    return Games.find({$and: [{"role": "player"}, {"gameCode": Template.instance().gameCode.get()}]});
   },
 
   gameTeams() {
-    return Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam("gameCode")}]});
+    return Games.find({$and: [{"role": "base"}, {"gameCode": Template.instance().gameCode.get()}]});
   },
 
   gamePhaseClass() {
-    phase = Games.findOne({"gameCode": FlowRouter.getParam("gameCode")}).phase;
+    phase = Games.findOne({"gameCode": Template.instance().gameCode.get()}).phase;
     if (phase == "post-bid") {
       return {"bids": "btn-warning", "builds": "btn-primary"};
     }
@@ -381,7 +393,7 @@ Template.adminGame.helpers({
   },
   
   presentBuildings() {
-    builds = Buildings.find({$and: [{"gameCode": FlowRouter.getParam("gameCode")}]}).fetch();
+    builds = Buildings.find({$and: [{"gameCode": Template.instance().gameCode.get()}]}).fetch();
     bb = [];
     for (b in builds) {
       // console.log("location" in builds[b]);
@@ -408,6 +420,25 @@ Template.adminGame.helpers({
 
   buildingNames() {
     return ["claymine", "coppermine", "foodfarm", "foodfishing", "foodhunting", "lumbercamp"];
+  },
+
+  resourceList() {
+    //TODO: generate this dictionary from resources.find({"gameCode": gameCode});
+    res = Resources.find({"gameCode": Template.instance().gameCode.get()}).fetch();
+    rl = [];
+    for (r in res) {
+      for (s in res[r]["stats"]) {
+        rlObj = {}
+        rlObj["id"] = res[r]["name"] + "-stats-" + s;
+        rl.push(rlObj);
+      }
+      for (s in res[r]["replenishFactors"]) {
+        rlObj = {}
+        rlObj["id"] = res[r]["name"] + "-replenish-" + s;
+        rl.push(rlObj);
+      }
+    }
+    return rl;
   }
 });
 
@@ -419,35 +450,58 @@ Template.adminGame.events({
     // console.log(event.target.group.value);
     // console.log(event.target.resource.value);
 
-    ChangeStat.call({"gameCode": FlowRouter.getParam("gameCode"), "group": event.target.group.value, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
+    ChangeStat.call({"gameCode": Template.instance().gameCode.get(), "group": event.target.group.value, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
+  },
+
+  'submit .changeStat' (event, instance) {
+    event.preventDefault();
+    // console.log(event.target)
+    // console.log(event.target.amount.value);
+    // console.log(event.target.group.value);
+    // console.log(event.target.resource.value);
+    //get reosurce name and kind
+    ChangeStat.call({"gameCode": Template.instance().gameCode.get(), "group": event.target.group.value, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
   },
 
   'submit .changePassword' (event, instance) {
     event.preventDefault();
-    // console.log(event.target)
-    // console.log(event.target.playerName)
     pn = event.target.playerName;
     playerId = pn[pn.selectedIndex].id;
-    ChangePassword.call({"playerId": playerId, "newPassword": event.target.newPassword.value});
-    // console.log(event.target.playerName.id);
-    // console.log(event.target.newPassword.value);
+    np = event.target.newPassword.value;
+    if (np.length > 2){
+      ChangePassword.call({"playerId": playerId, "newPassword": event.target.newPassword.value});
+    }
+  },
+
+  'submit .setMapResources' (event, instance) {
+    event.preventDefault();
+    pn = event.target.resSelect;
+    rid = pn[pn.selectedIndex].id;
+    rl = rid.split("-");
+    // console.log(rl);
+    val = event.target.resValue.value;
+    console.log(val);
+    if (val){
+      ChangeResource.call({"gameCode": Template.instance().gameCode.get(), "name": rl[0], "kind": rl[2], "type": rl[1], "value": parseInt(val)});
+    }
+    // ResourceValue.call({"playerId": playerId, "newPassword": event.target.newPassword.value});
   },
 
   'submit .changeTeam' (event, instance) {
     event.preventDefault();
     console.log(event.target.team.value);
-    ChangeTeam.call({"gameCode": FlowRouter.getParam("gameCode"), "player": event.target.player.value, "group": event.target.team.value});
+    ChangeTeam.call({"gameCode": Template.instance().gameCode.get(), "player": event.target.player.value, "group": event.target.team.value});
   },
 
   'submit .makeBase' (event, instance) {
     event.preventDefault();
     console.log(event.target.playerName.value);
-    MakeBase.call({"gameCode": FlowRouter.getParam("gameCode"), "playerName": event.target.playerName.value});
+    MakeBase.call({"gameCode": Template.instance().gameCode.get(), "playerName": event.target.playerName.value});
   },
 
   'submit .setNeighbors' (event, instance) {
     event.preventDefault();
-    AddNeighbor.call({"gameCode": FlowRouter.getParam("gameCode"), "cityName": event.target.cityName.value, "neighbor": event.target.neighborName.value});
+    AddNeighbor.call({"gameCode": Template.instance().gameCode.get(), "cityName": event.target.cityName.value, "neighbor": event.target.neighborName.value});
   },
 
   'submit .addBuilding' (event, instance) {
@@ -461,7 +515,7 @@ Template.adminGame.events({
     
     if (tx >= -1 && ty >= 0) {
       console.log(tx + " " + ty + event.target.bidKind.value + event.target.buildingName.value + event.target.groupName.value);
-      AddBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "locx": tx, "locy": ty, "bidKind": event.target.bidKind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});    
+      AddBuilding.call({"gameCode": Template.instance().gameCode.get(), "locx": tx, "locy": ty, "bidKind": event.target.bidKind.value, "buildingName": event.target.buildingName.value, "groupName": event.target.groupName.value});    
     }
     else {
       console.log(tx + " " + ty + "broken locs");
@@ -471,7 +525,7 @@ Template.adminGame.events({
 
   'submit .removeBuilding'(event, instance) {
     event.preventDefault();
-    RemoveBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "buildingId": event.target.presentBuilding.value}, (err, res) => {
+    RemoveBuilding.call({"gameCode": Template.instance().gameCode.get(), "buildingId": event.target.presentBuilding.value}, (err, res) => {
       if (err) { console.log(err); }
       else {
         console.log("removing one building!");
@@ -487,7 +541,7 @@ Template.adminGame.events({
     if (facts == "") {
       facts = -1;
     }
-    SpawnFactories.call({"gameCode": FlowRouter.getParam("gameCode"), "producerCount": facts});
+    SpawnFactories.call({"gameCode": Template.instance().gameCode.get(), "producerCount": facts});
   },
 
   'submit .newCustomRound' (event, instance) {
@@ -497,19 +551,19 @@ Template.adminGame.events({
     if (facts == "") {
       facts = -1;
     }
-    NewRound.call({"gameCode": FlowRouter.getParam("gameCode"), "producerCount": facts});
+    NewRound.call({"gameCode": Template.instance().gameCode.get(), "producerCount": facts});
 
   },
 
   'click .reset' (event, instance) {
-    ResetAll.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    ResetAll.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) {console.log(err);}
     });
   },
 
   'click .addAuction'(event, instance) {
     console.log("adding building to auction");
-    BuildingToAuction.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    BuildingToAuction.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) { console.log(err); }
       else {
         console.log("buildings run!");
@@ -520,7 +574,7 @@ Template.adminGame.events({
   'click .runBids'(event, instance) {
     // increment the counter when button is clicked
     // instance.counter.set(instance.counter.get() + 1);
-    RunBids2.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    RunBids2.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("bids run!");
@@ -530,7 +584,7 @@ Template.adminGame.events({
 
   'click .runBuildings'(event, instance) {
     console.log("run buildings");
-    RunBuildings.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    RunBuildings.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) { console.log(err); }
       else {
         console.log("buildings run!");
@@ -539,7 +593,7 @@ Template.adminGame.events({
   },
 
   'click .asyncTest'(event, instance) {
-    AsyncTest.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    AsyncTest.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("round run!");
@@ -548,7 +602,7 @@ Template.adminGame.events({
   },
 
   'click .resetRes'(event, instance) {
-    ResetResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    ResetResources.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("resources reset!");
@@ -557,7 +611,7 @@ Template.adminGame.events({
   },
 
   'click .resetMap'(event, instance) {
-    // ResetResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    // ResetResources.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
     //   if (err) {console.log(err);}
     //   else {
     //     console.log("resources reset!");
@@ -567,7 +621,7 @@ Template.adminGame.events({
 
   'click .resetTeamResources'(event, instance) {
     
-    ResetTeamResources.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    ResetTeamResources.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("resources reset!");
@@ -577,7 +631,7 @@ Template.adminGame.events({
 
   'click .makeMap'(event, instance) {
     
-    MakeMap.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    MakeMap.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("map made!");
@@ -585,9 +639,19 @@ Template.adminGame.events({
     })
   },
 
+  'click .refreshReplenishes'(event, instance) {
+    
+    RefreshReplenishments.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
+      if (err) {console.log(err);}
+      else {
+        console.log("resources' replneishments refreshed!");
+      }
+    })
+  },
+
   // 'click .runBuildings'(event, instance) {
   //   console.log("run buildings");
-  //   RunBuildings.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+  //   RunBuildings.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
   //     if (err) { console.log(err); }
   //     else {
   //       console.log("buildings run!");
@@ -598,7 +662,7 @@ Template.adminGame.events({
   'click .removeBuildings'(event, instance) {
     // increment the counter when button is clicked
     // instance.counter.set(instance.counter.get() + 1);
-    RemoveBuilds.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    RemoveBuilds.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) { console.log(err); }
       else {
         console.log("removing all buildings!");
@@ -609,7 +673,7 @@ Template.adminGame.events({
   'click .newRound'(event, instance) {
     // increment the counter when button is clicked
     // instance.counter.set(instance.counter.get() + 1);
-    NewRound.call({"gameCode": FlowRouter.getParam("gameCode")}, (err, res) => {
+    NewRound.call({"gameCode": Template.instance().gameCode.get()}, (err, res) => {
       if (err) {console.log(err);}
       else {
         console.log("round run!");
@@ -618,13 +682,13 @@ Template.adminGame.events({
   },
 
   'click .seeScore' (event, instance) {
-    FlowRouter.go('App.scoreboard', {gameCode: FlowRouter.getParam("gameCode")});
+    FlowRouter.go('App.scoreboard', {gameCode: Template.instance().gameCode.get()});
   },
 
   'click .toggleGameState' (event, instance) {
     // var status = instance;
-    var status = Games.findOne({"gameCode": FlowRouter.getParam("gameCode")}).status;
+    var status = Games.findOne({"gameCode": Template.instance().gameCode.get()}).status;
     // console.log(status);
-    ToggleGameRunning.call({"gameCode": FlowRouter.getParam("gameCode"), "currentState": status});
+    ToggleGameRunning.call({"gameCode": Template.instance().gameCode.get(), "currentState": status});
   }
 });
