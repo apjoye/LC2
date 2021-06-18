@@ -99,7 +99,6 @@
 
     <div class="btn-group" role="group" aria-label="Basic example">
       <button type="button" class="resetRes btn btn-outline-secondary"> Reset Map Resources </button>
-      <button type="button" class="resetMap btn btn-outline-secondary"> Reset Map </button>
       <button type="button" class="resetTeamResources btn btn-outline-secondary"> Reset Team Resources </button>
       <button type="button" class="makeMap btn btn-outline-secondary"> Make Map </button>
     </div>
@@ -176,7 +175,7 @@
     
 
     <form class="addBuilding row row-cols-lg-auto g-3 mb-3 align-items-end">
-      <div class="col-xs-12">
+      <div class="col-xs-2">
         <label class="" for="bidResource"> Bid Resource</label>
         <select class = "form-select form-control" id="bidKind" name="bidKind">
           {{#each bidKinds}}
@@ -185,15 +184,15 @@
         </select>
       </div>
       
-      <div class="col-xs-4">
+      <div class="col-xs-1">
         <input class = "form-control" type="number" name="x" aria-label="x location" placeholder="x-loc" />
       </div>
 
-      <div class="col-xs-12">
+      <div class="col-xs-1">
         <input class = "form-control" type="number" name="y" aria-label="y location" placeholder="y-loc" />
       </div>
 
-      <div class="col-xs-12">
+      <div class="col-xs-2">
         <select class = "form-select form-control" id="buildingName" name="buildingName">
           {{#each buildingNames}}
             <option value = {{this}}>{{this}}</option>
@@ -201,7 +200,7 @@
         </select>
       </div>
 
-      <div class="col-xs-12">
+      <div class="col-xs-2">
         <select class = "form-select form-control" id="groupName" name="groupName">
           {{#each gameTeams}}
             <option value = {{playerName}}>{{playerName}}</option>
@@ -210,7 +209,7 @@
         </select>
       </div>
 
-      <div class="col-xs-12">
+      <div class="col-xs-1">
         <button type="submit" class="btn btn-primary">Add Building</button>
       </div>
 
@@ -241,7 +240,7 @@
     
     <p></p>
     <div gameMapchart-table>
-      <img src="../img/map/mapbase.png" style="position: absolute; width:993px; z-index: 1">
+      <img id="mapBase-image" src="../img/map/mapbase.png" style="position: absolute; width:993px; z-index: 1">
       <table id = "gameMapTable">
         {{#each mapRows}}
         <tr>

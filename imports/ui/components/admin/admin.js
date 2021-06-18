@@ -79,6 +79,7 @@ Template.gameMap.onCreated(function helloOnCreated() {
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
   this.imageMode = new ReactiveVar(true);
+  this.topMargin = new ReactiveVar(570);
 });
 
 Template.gameMap.helpers({
@@ -236,23 +237,31 @@ Template.gameMap.helpers({
   },
 
   cityStats() {
-    topMargin = 570;
+    topMargin = Template.instance().topMargin.get();
     cities = Games.find({$and: [{"role": "base"}, {"gameCode": FlowRouter.getParam('gameCode')}]}).fetch();
     stats = [];
     // console.log(cities);
-    cityLocs = [
-      {}
-    ];
+    cityLocs = {
+      "red-city": {"x": 71, "y": 767},
+      "green-city": {"x": 562, "y": 718},
+      "pink-city": {"x": 746, "y": 1078},
+      "blue-city": {"x": 752, "y": 1450},
+      "yellow-city": {"x": 128, "y": 1450},
+    };
     for (c in cities) {
-      loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
-      xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
-      yloc = topMargin + 80 + (62 * cities[c]["visibleCorner"][1]);
-      if (cities[c]["playerName"] == "green-city") {
-        yloc -= 50;
-      }
-      if (cities[c]["playerName"] == "blue-city" || cities[c]["playerName"] == "pink-city") {
-        xloc += 20;
-      }
+      // loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
+      // xloc = 80 + (60 * cities[c]["visibleCorner"][0]);
+      // yloc = topMargin + 200 + (62 * cities[c]["visibleCorner"][1]);
+      // if (cities[c]["playerName"] == "green-city") {
+      //   yloc -= 50;
+      // }
+      // if (cities[c]["playerName"] == "blue-city" || cities[c]["playerName"] == "pink-city") {
+      //   xloc += 20;
+      // }
+      // console.log(xloc + " " + yloc);
+      xloc = Object.values(cityLocs)[c]["x"];
+      yloc = Object.values(cityLocs)[c]["y"];
+
       cities[c]["className"] = cities[c]["group"] + "-status";
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
       res = cities[c]["res"];
@@ -263,6 +272,7 @@ Template.gameMap.helpers({
   },
 
   resStats() {
+    topMargin = Template.instance().topMargin.get();
     resourceMapImg = {
       "clay": "../img/resources/clay.png",
       "copper": "../img/resources/copper.png",
@@ -273,13 +283,13 @@ Template.gameMap.helpers({
     }
     res = Resources.find({"gameCode": FlowRouter.getParam('gameCode')}).fetch();
     stats = [];
-    topMargin = 570;
+    
     leftMargin = 20;
     locs = {
       "woods1": {"x": 10, "y": 300},
       "lake": {"x": 310, "y": 360},
       "woods2": {"x": 870, "y": 100},
-      "mine1": {"x": 160, "y": 230},
+      "mine1": {"x": 160, "y": 260},
       "mine2": {"x": 870, "y": 600},
     }
     for (r in res) {
