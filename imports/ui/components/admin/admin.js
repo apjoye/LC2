@@ -336,7 +336,15 @@ Template.gameMap.events({
   'click .toggleImages' (event, instance) {
     console.log(Template.instance().imageMode.get());
     Template.instance().imageMode.set(!Template.instance().imageMode.get());
+  },
+
+  'submit .setTopMargin'(event, instance) {
+    event.preventDefault();
+    mv = parseInt(event.target.marginValue.value);
+    console.log(mv);
+    Template.instance().topMargin.set(mv);
   }
+  
 });
 
 Template.adminGame.onCreated(function helloOnCreated() {
