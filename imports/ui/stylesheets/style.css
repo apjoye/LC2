@@ -280,6 +280,9 @@ body {
 .inline-style{
 	display: table-cell;
 	padding-right: 8px;
+  font-family: Nunito;
+  font-weight: 600;
+  
 }
 .resStatBox{
 	min-height: 50px;
