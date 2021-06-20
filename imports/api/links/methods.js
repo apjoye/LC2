@@ -1118,7 +1118,11 @@ export const RefreshReplenishments = new ValidatedMethod ({
   name: 'replenish.resources',
   validate ({}) {},
   run({gameCode}) { 
-    if (!this.isSimulation) {
+    // if (!this.isSimulation) {
+      function round(value, precision) {
+        var multiplier = Math.pow(10, precision || 0);
+        return Math.round(value * multiplier) / multiplier;
+      }
       newgg = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch();
       gr = Resources.find({"gameCode": gameCode}).fetch();
       function getCities(cs, ggs) {return (ggs.filter(g => cs.indexOf(g.playerName) > -1))};
@@ -1148,11 +1152,13 @@ export const RefreshReplenishments = new ValidatedMethod ({
             animalFactor = 1.2;
             woodsPollution  = addPollutions(getCities(res["neighbors"].map(c => c.playerName), newgg), newgg);
             if (woodsPollution > 4) {
-              lumberFactor = lumberFactor - parseInt(woodsPollution/0.4)/10;
-              animalFactor = animalFactor - parseInt(woodsPollution/0.3)/10;
+              lumberFactor = round(lumberFactor - parseInt(woodsPollution/4)/10, 1);
+              animalFactor = round(animalFactor - parseInt(woodsPollution/3)/10, 1);
             }
+            // console.log(res["name"]);
+            // console.log(woodsPollution);
             if (s["lumber"] < 30) {
-              animalFactor = animalFactor - parseInt((40 - s["lumber"])/0.1)/10;
+              animalFactor = animalFactor - parseInt((40 - s["lumber"]))/10;
             }
 
             if (lumberFactor < 0.6) { lumberFactor = 0.6; }
@@ -1168,7 +1174,7 @@ export const RefreshReplenishments = new ValidatedMethod ({
           }
         }
       }
-    }
+    // }
   }
 });
 
@@ -1514,7 +1520,7 @@ export const ResetTeamResources = new ValidatedMethod({
     Games.update(
       {$and: [{"gameCode": gameCode}, {"role": "base"}]},
       {$set: {"res": newres, 
-        "pollution": 2, "population": 5, "happiness": 5, "roundEmployed": 0}},
+        "pollution": 0, "population": 5, "happiness": 5, "roundEmployed": 0}},
       {multi: true});
     Games.update(
       {$and: [{"gameCode": gameCode}]},
