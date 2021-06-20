@@ -9,34 +9,7 @@ basePass = "battery-honey";
 export const cityStart = {"res": {"m1": 2, "m2": 2, "f1": 2, "f2": 2}, "pollution": 0, "population": 5, "happiness": 5};
 
 Meteor.startup(() => {
-  // if the Links collection is empty
-  if (Links.find().count() === 0) {
-    const data = [
-      {
-        title: 'Do the Tutorial',
-        url: 'https://www.meteor.com/try',
-        createdAt: new Date(),
-      },
-      {
-        title: 'Follow the Guide',
-        url: 'http://guide.meteor.com',
-        createdAt: new Date(),
-      },
-      {
-        title: 'Read the Docs',
-        url: 'https://docs.meteor.com',
-        createdAt: new Date(),
-      },
-      {
-        title: 'Discussions',
-        url: 'https://forums.meteor.com',
-        createdAt: new Date(),
-      },
-    ];
-
-    data.forEach(link => Links.insert(link));
-  }
-
+  
   //setup base station users
   // setupBaseUsers: function () {
   if (Meteor.users.findOne({"username": baseUsers[0]}) == undefined) {
@@ -66,6 +39,6 @@ Meteor.startup(() => {
   }
   // }
   // add running field to producer
-  Producers.update({"running": {$exists: false}}, {$set: {"running": true}}, {multi: true});
+  // Producers.update({"running": {$exists: false}}, {$set: {"running": true}}, {multi: true});
 
 });

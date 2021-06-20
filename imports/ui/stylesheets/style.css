@@ -291,9 +291,13 @@ body {
 }
 
 .mapinfo {
-	font-family: 'Solway';
+	font-family: 'Nunito';
 	font-size: 15px;
   margin-top: 10px;
+}
+
+.refresh {
+	font-size: 12px;
 }
 
 

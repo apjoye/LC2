@@ -81,7 +81,7 @@ Template.gameMap.onCreated(function helloOnCreated() {
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
   this.imageMode = new ReactiveVar(true);
-  this.topMargin = new ReactiveVar(570);
+  this.topMargin = new ReactiveVar(420);
 });
 
 Template.gameMap.helpers({
@@ -244,11 +244,11 @@ Template.gameMap.helpers({
     stats = [];
     // console.log(cities);
     cityLocs = {
-      "red-city": {"x": 71, "y": 767},
-      "green-city": {"x": 562, "y": 718},
-      "pink-city": {"x": 746, "y": 1078},
-      "blue-city": {"x": 752, "y": 1450},
-      "yellow-city": {"x": 128, "y": 1450},
+      "red-city": {"x": 71, "y": 207},
+      "green-city": {"x": 562, "y": 158},
+      "pink-city": {"x": 746, "y": 518},
+      "blue-city": {"x": 752, "y": 890},
+      "yellow-city": {"x": 128, "y": 890},
     };
     for (c in cities) {
       // loc = "cell-x" + cities[c]["visibleCorner"][0] + "y" + cities[c]["visibleCorner"][1];
@@ -262,7 +262,7 @@ Template.gameMap.helpers({
       // }
       // console.log(xloc + " " + yloc);
       xloc = Object.values(cityLocs)[c]["x"];
-      yloc = Object.values(cityLocs)[c]["y"];
+      yloc = topMargin + Object.values(cityLocs)[c]["y"];
 
       cities[c]["className"] = cities[c]["group"] + "-status";
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
@@ -344,7 +344,7 @@ Template.gameMap.events({
     console.log(mv);
     Template.instance().topMargin.set(mv);
   }
-  
+
 });
 
 Template.adminGame.onCreated(function helloOnCreated() {
