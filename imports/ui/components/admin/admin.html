@@ -65,8 +65,8 @@
         </form>
       </div>
       <div class="col-4">
-        <form class="changeTeam row row-cols-lg-auto g-3 mb-3 align-items-end">
-          <div class="col-xs-12">
+        <form class="changeTeam row mb-3 align-items-end">
+          <div class="col-md-3">
             <!-- <label class="" for="player">Player Name</label> -->
             <select class = "form-select form-control" id="player" name="player">
               {{#each gamePlayers}}
@@ -75,7 +75,7 @@
             </select>
           </div>
 
-          <div class="col-xs-12">
+          <div class="col-md-3">
             <!-- <label class="" for="team">Team</label> -->
             <select class = "form-select form-control" id="team" name="team">
               {{#each gameTeams}}
@@ -84,7 +84,7 @@
             </select>
           </div>
 
-          <div class="col-xs-12">
+          <div class="col-md-5">
             <button type="submit" class="btn btn-primary">Change Team</button>
           </div>
         </form>
@@ -134,14 +134,14 @@
 
 
       <div class="col-4">
-        <form class="row g-9 setMapResources">
-          <div class="input-group mb-3">
+        <form class="row setMapResources">
+          <div class="input-group">
             <select class="form-select" id="resSelect" >
               {{#each rl in resourceList}}
                 <option id={{rl.id}} value={{rl.id}}>{{rl.id}}</option>
               {{/each}}
             </select>
-            <input class="form-control" type="number" name="value" id="resValue" placeholder="value" />
+            <input class="form-control" type="number" step="any" name="value" id="resValue" placeholder="value" />
             <button class="btn btn-outline-secondary" type="submit" value="submit">Set Value</button>
           </div>
         </form>
@@ -151,13 +151,10 @@
 
     <hr />
     <div class="row g-9 mb-3">
-      <div class="col-2">
-        <button class="btn btn-primary toggleGameState">Status: {{status}}</button>
-      </div>
-
-      <div class="col-6">
+      <div class="col-7">
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group me-2" role="group" aria-label="Basic example">
+            <button class="btn btn-primary toggleGameState">Status: {{status}}</button>
             <button type="button" class="addAuction btn btn-outline-secondary"> Add Auction Build </button>
             <button type="button" class="removeBuildings btn btn-outline-secondary"> Remove Builds </button>
           </div>
@@ -205,6 +202,14 @@
     <div class="row mb-3">
       <div class="col-6">
         <form class="addBuilding row g-1 align-items-end">
+          <div class="col-1">
+            <input class = "form-control" type="number" name="x" aria-label="x location" placeholder="x-loc" />
+          </div>
+
+          <div class="col-1">
+            <input class = "form-control" type="number" name="y" aria-label="y location" placeholder="y-loc" />
+          </div>
+
           <div class="col-2">
             <!-- <label class="" for="bidResource"> Bid Resource</label> -->
             <select class = "form-select form-control" id="bidKind" name="bidKind">
@@ -212,14 +217,6 @@
                 <option value = {{this}}>{{this}}</option>
               {{/each}}
             </select>
-          </div>
-          
-          <div class="col-2">
-            <input class = "form-control" type="number" name="x" aria-label="x location" placeholder="x-loc" />
-          </div>
-
-          <div class="col-2">
-            <input class = "form-control" type="number" name="y" aria-label="y location" placeholder="y-loc" />
           </div>
 
           <div class="col-2">
@@ -324,11 +321,14 @@
         {{#each cityStats}}
           <!-- <div id="cityStat-{{this.className}}" class="{{this.className}} cityStatBox" style="{{this.style}}"> -->
           <div id="cityStat-{{this.className}}" class="cityStatBox" style="position: absolute; {{this.style}}">
-              <div class="inline-style"><img src = "../img/map/city_status/population.png" class="cityStatImage"></div>
+              <!-- <div class="inline-style"><img src = "../img/map/city_status/population.png" class="cityStatImage"></div> -->
+              <div class="inline-style"><img src = "../img/icons/population_sml.png" class="cityStatImage"></div>
               <div class="inline-style">{{this.population}}</div>
-              <div class="inline-style"><img src = "../img/map/city_status/happiness.png" class="cityStatImage"></div>
+              <!-- <div class="inline-style"><img src = "../img/map/city_status/happiness.png" class="cityStatImage"></div> -->
+              <div class="inline-style"><img src = "../img/icons/happiness_sml.png" class="cityStatImage"></div>
               <div class="inline-style">{{this.happiness}}</div>
-              <div class="inline-style"><img src = "../img/map/city_status/pollution.png" class="cityStatImage"></div>
+              <!-- <div class="inline-style"><img src = "../img/map/city_status/pollution.png" class="cityStatImage"></div> -->
+              <div class="inline-style"><img src = "../img/icons/pollution_sml.png" class="cityStatImage"></div>
               <div class="inline-style">{{this.pollution}}</div>
               <div class="inline-style"><img src = "../img/map/city_status/coin.png" class="cityStatImage"></div>
               <div class="inline-style">{{this.wealth}}</div>
@@ -341,12 +341,12 @@
             <div class="resStatBox" style="position: absolute; {{this.locStyle}}">
               {{#each s in this.statList}}
                 <div class="row" style="width: 100%;margin-left: -8px;">
-                  <div class="col-5">
-                    <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; margin-top: 5px; z-index: 4">
+                  <div class="col-5 resStatBoxImage">
+                    <img src = "{{s.img}}" style="width: 30px; height: 30px; margin-right: 10px; z-index: 4">
                   </div>
                   <div class="col-5">
                     <p class="mapinfo">
-                    {{s.amount}} {{#if s.replenish}}<small>x{{s.replenishAmount}}</small> {{/if}}</p>
+                    {{s.amount}} {{#if s.replenish}}<small class="replenishValue">x{{s.replenishAmount}}</small> {{/if}}</p>
                   </div>
                   <!-- <div class="col-2">
                     <small>

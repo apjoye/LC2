@@ -81,7 +81,7 @@ Template.gameMap.onCreated(function helloOnCreated() {
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('buildings.thisGame', FlowRouter.getParam('gameCode'));
   this.imageMode = new ReactiveVar(true);
-  this.topMargin = new ReactiveVar(420);
+  this.topMargin = new ReactiveVar(404);
 });
 
 Template.gameMap.helpers({
@@ -461,15 +461,6 @@ Template.adminGame.events({
     ChangeStat.call({"gameCode": Template.instance().gameCode.get(), "group": event.target.group.value, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
   },
 
-  'submit .changeStat' (event, instance) {
-    event.preventDefault();
-    // console.log(event.target)
-    // console.log(event.target.amount.value);
-    // console.log(event.target.group.value);
-    // console.log(event.target.resource.value);
-    //get reosurce name and kind
-    ChangeStat.call({"gameCode": Template.instance().gameCode.get(), "group": event.target.group.value, "resource": event.target.resource.value, "amount": parseInt(event.target.amount.value)});
-  },
 
   'submit .changePassword' (event, instance) {
     event.preventDefault();
@@ -487,10 +478,14 @@ Template.adminGame.events({
     rid = pn[pn.selectedIndex].id;
     rl = rid.split("-");
     // console.log(rl);
-    val = event.target.resValue.value;
-    console.log(val);
-    if (val){
-      ChangeResource.call({"gameCode": Template.instance().gameCode.get(), "name": rl[0], "kind": rl[2], "type": rl[1], "value": parseInt(val)});
+    val = parseFloat(event.target.resValue.value);
+    if (!isNaN(val)) {
+      if (rl[1] == "stats") {val = parseInt(val);}
+      console.log(val);
+      ChangeResource.call({"gameCode": Template.instance().gameCode.get(), "name": rl[0], "kind": rl[2], "type": rl[1], "value": val});
+    }
+    if (val && !isNaN){
+      
     }
     // ResourceValue.call({"playerId": playerId, "newPassword": event.target.newPassword.value});
   },
