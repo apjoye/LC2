@@ -493,16 +493,25 @@ export const ToggleBuilding = new ValidatedMethod({
     Buildings.update({"_id": buildingId}, {$set: {"running": newStatus}});
     // console.log("building set to " + newStatus);
 
-    Acts.insert({
-      "time": (new Date()).getTime(),
-      "key": "buildingToggle",
+    logObj = {
       "buildingId": buildingId,
       "pastStatus": currentStatus,
       "newStatus": newStatus,
       "gameCode": gameCode,
       "baseId": ownerId,
       "changed": changed
-    });
+    };
+    MakeLog.call({"key": "buildingToggle", "log": logObj})
+    // Acts.insert({
+    //   "time": (new Date()).getTime(),
+    //   "key": "buildingToggle",
+    //   "buildingId": buildingId,
+    //   "pastStatus": currentStatus,
+    //   "newStatus": newStatus,
+    //   "gameCode": gameCode,
+    //   "baseId": ownerId,
+    //   "changed": changed
+    // });
   }
 });
 
