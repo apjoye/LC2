@@ -2,7 +2,7 @@
 
 import { Meteor } from 'meteor/meteor';
 import { Links } from '../../api/links/links.js';
-import { Producers } from '../../api/links/links.js';
+import { Games, Buildings, Acts, Bids, Resources, Maps } from '../../api/links/links.js';
 import { baseUsers } from '../both/index.js';
 
 basePass = "battery-honey";
@@ -35,8 +35,14 @@ Meteor.startup(() => {
           "lastname": "man"
       }
     });
-
   }
+
+  Buildings.rawCollection().createIndex({"gameCode": 1});
+  Buildings.rawCollection().createIndex({"gameCode": 1, "ownerId": 1});
+  Bids.rawCollection().createIndex({"gameCode": 1, "buildingId": 1, "baseId": 1});
+  Bids.rawCollection().createIndex({"gameCode": 1, "buildingId": 1});
+  Games.rawCollection().createIndex({"gameCode": 1});
+  Acts.rawCollection().createIndex({"gameCode": 1, "key": 1});
   // }
   // add running field to producer
   // Producers.update({"running": {$exists: false}}, {$set: {"running": true}}, {multi: true});
