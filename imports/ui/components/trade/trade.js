@@ -9,10 +9,14 @@ Template.trade.onCreated(function helloOnCreated() {
   // counter starts at 0
   // this.counter = new ReactiveVar(0);
   Meteor.subscribe('games.running');
+  this.gameInfo = new ReactiveVar({});
 });
 
 Template.trade.helpers({
   resource() {
+    thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}]});
+    console.log(thisGame);
+    Template.instance().gameInfo.set(thisGame);
     return [
       // {"name": "m1", "displayName": "Gold"}, 
       // {"name": "m2", "displayName": "Steel"}, 
@@ -24,6 +28,31 @@ Template.trade.helpers({
       {"name": "clay", "displayName": "Clay"}];
 
   },
+
+  cityName() {
+    game = Template.instance().gameInfo.get()
+    nameDict = {
+      "red-city": "Red City",
+      "green-city": "Green City",
+      "yellow-city": "Yellow City",
+      "pink-city": "Pink City",
+      "blue-city": "Blue City",
+    }
+    colorDict = {
+      "red-city": "red",
+      "green-city": "green",
+      "yellow-city": "#ffc107",
+      "pink-city": "#ff5cbe",
+      "blue-city": "blue",
+    }
+    retDict = {
+      "name": nameDict[game.group],
+      "color": colorDict[game.group]
+    }
+    console.log(retDict);
+    return retDict;
+  },
+
   otherPlayers() {
     gCode = FlowRouter.getParam("gameCode");
     thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": gCode}]});
