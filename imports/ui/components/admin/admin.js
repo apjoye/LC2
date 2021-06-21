@@ -495,6 +495,7 @@ Template.adminGame.events({
   'submit .changeTeam' (event, instance) {
     event.preventDefault();
     console.log(event.target.team.value);
+    console.log(event.target.player.value);
     ChangeTeam.call({"gameCode": Template.instance().gameCode.get(), "player": event.target.player.value, "group": event.target.team.value});
   },
 

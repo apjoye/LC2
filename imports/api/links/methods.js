@@ -1865,6 +1865,7 @@ export const ToggleGameRunning = new ValidatedMethod({
     if (!this.isSimulation) {
       var newState = "running";
       if (currentState == "running") {newState = "paused";}
+      // if Games.findOne()
       Games.update({"gameCode": gameCode}, {$set: {"status": newState}}, {multi: true});
     }
   }
@@ -1873,9 +1874,18 @@ export const ToggleGameRunning = new ValidatedMethod({
 export const ChangeTeam = new ValidatedMethod({
   name: 'team.change',
   validate({}) {},
-  run({gameCode, player, group}) {
+  run({gameCode, player, group, playerId}) {
     if (!this.isSimulation) {
-      Games.update({$and: [{"gameCode": gameCode}, {"playerName": player}]}, {$set: {"group": group}});
+      console.log(gameCode + " " + player + " " + group);
+      gg= Games.findOne({$and: [{"gameCode": gameCode}, {"playerName": player}]});
+      if (gg) {
+        Games.update({$and: [{"gameCode": gameCode}, {"playerName": player}]}, {$set: {"group": group}});
+      }
+      else {
+        uid = Meteor.users.findOne({"username": player})
+        // playerName, playerId, gameCode, role, year = 0, neighbors = []
+        JoinGame.call({"playerName": player, "playerId": uid._id, "gameCode": gameCode, "role": "player", })
+      }
     }
   }
 });
