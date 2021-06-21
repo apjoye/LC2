@@ -111,6 +111,13 @@ Meteor.publish('games.users', function (gameCode) {
   return Games.find({$and: [{"status": "running"}, {"gameCode": gameCode}]});
 });
 
+Meteor.publish('all.users', function (gameCode) {
+  // console.log(this.users());
+  return Meteor.users.find({});
+  // return Games.find({$and: [{"status": "running"}, {"gameCode": gameCode}]});
+});
+
+
 Meteor.publish('bids.all', function () {
   // console.log(this.users());
   return Bids.find({});

@@ -36,6 +36,7 @@ AccountsTemplates.addField({
 
 AccountsTemplates.addField({
     _id: 'username',
+    displayName: "First Name",
     type: 'text',
     required: true,
     func: function(value){

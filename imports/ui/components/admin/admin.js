@@ -348,6 +348,7 @@ Template.gameMap.events({
 });
 
 Template.adminGame.onCreated(function helloOnCreated() {
+  Meteor.subscribe('all.users');
   Meteor.subscribe('games.users', FlowRouter.getParam('gameCode'));
   Meteor.subscribe('resources.thisGame', FlowRouter.getParam('gameCode'));
   this.gameCode = new ReactiveVar(FlowRouter.getParam("gameCode"));
@@ -383,7 +384,8 @@ Template.adminGame.helpers({
   },
 
   gamePlayers() {
-    return Games.find({$and: [{"role": "player"}, {"gameCode": Template.instance().gameCode.get()}]});
+    // return Games.find({$and: [{"role": "player"}]});
+    return Meteor.users.find();
   },
 
   gameTeams() {

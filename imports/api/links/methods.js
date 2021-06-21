@@ -159,6 +159,8 @@ export const CommitBids = new ValidatedMethod({
     if (!this.isSimulation) {
       console.log("changing bid commit state");
       // readyCities
+      logObj = {"gameCode": gameCode, "baseId": baseId, "commitState": commitState};
+      MakeLog.call({"key": "bidCommit", "log": logObj});
       if (commitState == true) {
         console.log("truing ready");
         Games.update(
@@ -1065,6 +1067,8 @@ export const RunBuildings = new ValidatedMethod({
               // "running": running
             }
           });
+           logObj = {"oldGame": thisGame[g], "newRes": newRes, "newPop": newPop, "happiness": newHapp};
+           MakeLog.call({"key": "cityStatUpdate", "log": logObj});
         }
 
         return true;
@@ -1192,11 +1196,7 @@ export const BuildingNeighbors = new ValidatedMethod ({
   validate ({}) {},
   run({gameCode, building}) { 
     neighbors = CellNeighbor.call({"gameCode": gameCode, "location": building["location"]});
-    // console.log(building);
-    // console.log("trying to add building neighbors");
-    // neighborBonus
-    if ("neighborBonus" in building || "neighborNeed" in building) {
-      // console.log("looking to add neighbors info");
+     if ("neighborBonus" in building || "neighborNeed" in building) {
       if ("neighborBonus" in building){
         nres = building["neighborBonus"]["resources"];
       }
@@ -1479,6 +1479,10 @@ export const PlaceBuilding = new ValidatedMethod({
           building["location"] = location;
           Buildings.update({"_id": buildingId}, {$set: {"location": location}});
           Maps.update({"_id": mapLoc._id}, {$set: {"buildingId": building._id, "building": building}});
+          logObj = {
+            "building": building,
+          }
+          MakeLog.call({"key": "buildingPlace", "log": logObj});
         }
       }
       else {
