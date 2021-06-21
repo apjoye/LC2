@@ -1,3 +1,4 @@
+import '../trade/trade.js';
 import './city.html';
 import { ReactiveVar } from 'meteor/reactive-var';
 
@@ -193,13 +194,15 @@ Template.city.helpers({
     //     phase = "Choose and run your buildings!"
     //   }
     // }
+    var gbc = Template.instance().gameInfo.get().bidCommit;
     
     retObj = {
       'readyCitiesPreBid': 5,
       'readyCitiesPostBid': 5,
       'year': game.year,
       'phaseIndication': (game.phase == 'pre-bid') ? 'inactive' : 'active',
-      'phaseLabel': "Bidding"
+      'phaseButtonClass': gbc ? 'success' : 'warning',
+      'phaseLabel': "Bidding",
     }
     if (game.readyCities){
       if (game.phase == 'pre-bid') {
@@ -326,10 +329,12 @@ Template.city.events ({
     instance.labelVisibility.set({"index": (1 - lv.index), "list": lv.list});
   },
 
-  'click #bidToggle' (event, instance) {
+  'click .bidToggleSwitch' (event, instance) {
     // event.preventDefault()
-    console.log(`bid toggle ${event.target.checked}`);
-    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
+    var gbc = Template.instance().gameInfo.get().bidCommit;
+    // console.log(`bid toggle ${event.target.checked}`);
+    // console.log(gbc);
+    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": !gbc});
 
   }
 })
