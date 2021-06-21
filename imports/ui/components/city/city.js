@@ -127,10 +127,10 @@ Template.city.helpers({
       });
     // }
 
-    // runningBuilds.forEach(function (build) {
-    //   for (r in build.prodVal) {        prodOutput[r] += build.prodVal[r];      }
-    //   for (r in build.prodCost) {        prodOutput[r] = prodOutput[r] - build.prodCost[r];      }
-    // });
+    runningBuilds.forEach(function (build) {
+      for (r in build.prodVal) {        prodOutput[r] += build.prodVal[r];      }
+      for (r in build.prodCost) {        prodOutput[r] = prodOutput[r] - build.prodCost[r];      }
+    });
 
     for (k in prodOutput) {
       if (prodOutput[k] >= 0) {        prodOutStr[k] = "+" + prodOutput[k].toString();      }
@@ -179,6 +179,29 @@ Template.city.helpers({
     }
 
     return resPrint;
+  },
+
+  cityName() {
+    game = Template.instance().gameInfo.get();
+    nameDict = {
+      "red-city": "Red City",
+      "green-city": "Green City",
+      "yellow-city": "Yellow City",
+      "pink-city": "Pink City",
+      "blue-city": "Blue City",
+    }
+    colorDict = {
+      "red-city": "red",
+      "green-city": "green",
+      "yellow-city": "#ffc107",
+      "pink-city": "#ff5cbe",
+      "blue-city": "blue",
+    }
+    retDict = {
+      "name": nameDict[game.playerName],
+      "color": colorDict[game.playerName]
+    }
+    return retDict;
   },
 
   phaseBar() {
@@ -231,6 +254,7 @@ Template.city.helpers({
     ts = Acts.find({
       $and: [
         {"gameCode": FlowRouter.getParam("gameCode")},
+        // {"key": "tradeResource"},    //this subset is already a part of the trades.city subscription
         {"readBy": {$not: Meteor.userId()}},
         {$or: [
           {"from.group": Template.instance().gameInfo.get().group},
@@ -247,6 +271,7 @@ Template.city.helpers({
     ts = Acts.find({
       $and: [
         {"gameCode": FlowRouter.getParam("gameCode")},
+        // {"key": "tradeResource"},   //this subset is already a part of the trades.city subscription
         // {"readBy": {$not: Meteor.userId()}},
         {$or: [
           {"from.group": Template.instance().gameInfo.get().group},
@@ -314,7 +339,20 @@ Template.city.helpers({
     });
 
     return prodOutStr[res];
+  },
+
+  getName() {
+    ln = localStorage.getItem("localName");
+    retObj = {"found": false};
+    if (ln != null) { 
+      retObj = {
+        "name": ln,
+        "found": true  
+      } 
+    }
+    return retObj;
   }
+
 });
 
 Template.city.events ({
@@ -811,11 +849,11 @@ Template.cityMap.events({
 
   'click .toggleBuilding': function (event, instance) {
     event.preventDefault();
-    console.log(event.target)
+    // console.log(event.target)
     bb = Template.instance().data.map[Template.instance().selectedLoc.get()]["building"];
     bs = instance.buildings.get();
     pop = instance.game.get().population;
-    console.log(pop);
+    // console.log(pop);
     workingPop = 0;
     for (b in bs) {
       if (bs[b]["running"] == true) {
