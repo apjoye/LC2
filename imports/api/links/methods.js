@@ -1042,7 +1042,9 @@ export const RunBuildings = new ValidatedMethod({
         for (g in gg) {
           thisGame = gg[g];
           newRes = thisGame["res"];
-          newPoll = thisGame["pollution"]; newPop = thisGame["population"]; newHapp = thisGame["happiness"];
+          newPoll = thisGame["pollution"]; 
+          newPop = thisGame["population"]; newHapp = thisGame["happiness"];
+          newPoll += parseInt((newPop - 6) / 2);
           // console.log("what the what, employing " + thisGame["roundEmployed"]);
           newHapp = thisGame["happiness"];
           newPop = thisGame["population"];
@@ -1078,6 +1080,14 @@ export const RunBuildings = new ValidatedMethod({
         return true;
       }
 
+      async function cityNatureEffects(gameCode) {
+        //NOTE TO FUTURE ME: to make this generic - look for all lakes! and then look for other resources that can be affected too 
+        // r = await Resources.findOne({$and: [{"gameCode": gameCode}, {"name": "lake"}]});
+        // gg = await Games.find({$and: [{"gameCode": gameCode}, {$in: }]})
+
+        // for code ease, we're gonna do this in nature replenish
+      }
+
       
       async function runThroughBuilds(buildings, gameCode) {
         // gameTeams = {};
@@ -1108,6 +1118,7 @@ export const RunBuildings = new ValidatedMethod({
         
         // console.log("updating happiness etc");
         await updateStats(gameCode);
+        await cityNatureEffects(gameCode);
         RefreshReplenishments.call({"gameCode": gameCode});
       }
 
@@ -1189,6 +1200,9 @@ export const RefreshReplenishments = new ValidatedMethod ({
             console.log("lumbers resource didn't have lumber or animals????")
             console.log(res);
           }
+        }
+        else if (res["kind"] == "water") {
+          //TODO : add riverpollution from neighboring cities!!!
         }
       }
     // }
