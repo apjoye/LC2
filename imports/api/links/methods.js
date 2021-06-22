@@ -1046,16 +1046,20 @@ export const RunBuildings = new ValidatedMethod({
           // console.log("what the what, employing " + thisGame["roundEmployed"]);
           newHapp = thisGame["happiness"];
           newPop = thisGame["population"];
+          newPop = newPop==0 ? 1: newPop;
           wealth = newRes["clay"] + newRes["lumber"] + newRes["copper"];
           pollHere = thisGame["pollution"] == 0 ? 1: newPoll;
-          happFactor = ((newRes["food"] / thisGame["population"]) + wealth) / ( + pollHere);
+          happFactor = ((newRes["food"] / newPop) + (wealth/(3*pollHere))) / newPop;
           // console.log("trying to update happiness " + thisGame["group"] + " " + happFactor);
           if (happFactor > 1) { newHapp +=  1; }
-          else if (happFactor < 0.5) { newHapp -= 1; }
+          else if (happFactor < 0.5 && newHapp > 0) { 
+            newHapp -= 1; 
+          }
           
-          popFactor = (newPop + newRes["food"]) / (newPop + pollHere);
-          if (popFactor > 1) { newPop += 1; }
-          else if (popFactor < 0.5) { if (newPop > 0) {newPop -= 1;} }  
+          popFactor = newHapp/newPop;
+          if (popFactor > 1.5) { newPop += 1; }
+          else if (popFactor < 1) { if (newPop > 0) {newPop -= 1;} }  
+
           await Games.update(
             {"_id": thisGame._id}, 
             {$set: {
@@ -1302,7 +1306,7 @@ const buildFeatures = {
 const prodCosts = {
   "claymine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
   "coppermine": { "lumber": 2, "clay" : 0, "copper": 0, "food": 2 },
-  "foodfarm": { "lumber": 1, "clay" : 1, "copper": 0, "food": 0 },
+  "foodfarm": { "lumber": 2, "clay" : 1, "copper": 0, "food": 0 },
   "foodfishing": { "lumber": 0, "clay" : 0, "copper": 1, "food": 0 },
   "foodhunting": { "lumber": 0, "clay" : 0, "copper": 0, "food": 0 },
   "lumbercamp": { "lumber": 0, "clay" : 1, "copper": 0, "food": 0 }
@@ -1311,7 +1315,7 @@ const prodCosts = {
 const prodVals = {
   "claymine": { "clay": 5, "pollution": 2 },
   "coppermine": {"copper": 5, "pollution": 2},
-  "foodfarm": {"food": 5},
+  "foodfarm": {"food": 3},
   "foodfishing": {"food": 5},
   "foodhunting": {"food": 3},
   "lumbercamp": {"lumber": 8}
@@ -1358,7 +1362,7 @@ const bonusProds = {
 const infoTexts = {
   "claymine":  "Produces: 5 clay, 2 pollution (or 8 clay and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
   "coppermine": "Produces: 5 copper, 2 pollution (or 8 copper and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
-  "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 1 lumber, 1 clay. ",
+  "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 2 lumber, 1 clay. ",
   "foodfishing": "Produces: 5 food, Uses: 1 copper, and 2 fish from nearby water. Can only be placed next to water.",
   "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest nearby). Needs forest nearby.",
   "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest nearby). Needs forest nearby."

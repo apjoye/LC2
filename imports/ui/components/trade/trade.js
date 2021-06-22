@@ -15,7 +15,7 @@ Template.trade.onCreated(function helloOnCreated() {
 Template.trade.helpers({
   resource() {
     thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}]});
-    console.log(thisGame);
+    // console.log(thisGame);
     Template.instance().gameInfo.set(thisGame);
     return [
       // {"name": "m1", "displayName": "Gold"}, 
@@ -49,7 +49,7 @@ Template.trade.helpers({
       "name": nameDict[game.group],
       "color": colorDict[game.group]
     }
-    console.log(retDict);
+    // console.log(retDict);
     return retDict;
   },
 
