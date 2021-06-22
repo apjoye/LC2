@@ -1395,7 +1395,8 @@ export const AddBuilding = new ValidatedMethod({
   validate ({}) {},
   run({gameCode, locx, locy, bidKind, buildingName, groupName}) {
     if (!this.isSimulation) {
- 
+      logObj = {"gameCode": gameCode, "locx": locx, "locy": locy, "bidKind": bidKind, "buildingName": buildingName, "groupName": groupName};
+      MakeLog.call({"key": "addBuilding", "log": logObj});
       prodCost = prodCosts[buildingName];
       prodCostArr = resDictToArr(prodCost);
       prodVal = prodVals[buildingName];
@@ -1479,6 +1480,8 @@ export const PlaceBuilding = new ValidatedMethod({
     //and location doesn't have a building
     // console.log(location);
     //place it
+    logObj = {"gameCode": gameCode, "buildingId": buildingId, "location": location, "userId": userId};
+    MakeLog.call({"key": "addBuilding", "log": logObj});
     mapLoc = Maps.findOne({$and: [{"gameCode": gameCode}, {"x": location[0]}, {"y": location[1]}]});
     building = Buildings.findOne({"_id": buildingId});
 
@@ -1498,6 +1501,7 @@ export const PlaceBuilding = new ValidatedMethod({
           Maps.update({"_id": mapLoc._id}, {$set: {"buildingId": building._id, "building": building}});
           logObj = {
             "building": building,
+            "newMap": Maps.findOne({"_id": mapLoc._id})
           }
           MakeLog.call({"key": "buildingPlace", "log": logObj});
         }
@@ -1575,11 +1579,13 @@ export const RemoveBuilding = new ValidatedMethod({
   run({gameCode = "", buildingId}) {
     console.log("removing building ");
     Buildings.remove({"_id": buildingId});
+    logObj = {"gameCode": gameCode, "buildingId": buildingId};
     Maps.update(
       // {$and: [{"gameCode": gameCode}, {"buildingId": buildingId}]}, 
       {$and: [{"buildingId": buildingId}]}, 
       {$unset: {"building": "", "buildingId": ""}
     });
+    MakeLog.call({"key": "removeBuilding", "log": logObj});
   }
 })
 
