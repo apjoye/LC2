@@ -531,6 +531,7 @@ export const MakeLog = new ValidatedMethod({
   validate ({}) {},
 
   run ({key, log}) {
+    console.log("logged " + key);
     log["key"] = key;
     log["time"] = (new Date()).getTime();
     Acts.insert(log);
@@ -892,11 +893,15 @@ export const RunBuildings = new ValidatedMethod({
         newPoll = thisGame["pollution"];
         roundEmployed = 0;
         running = false
-        // console.log("are we here?");
+        console.log("are we here?");
         if ("roundEmployed" in thisGame) { roundEmployed = thisGame["roundEmployed"]; }
         // console.log("employed " + roundEmployed);
         if (!("notes" in thisGame)) {
           thisGame["notes"] = [];
+        }
+        logObj = {
+          "game": thisGame,
+          "building": building
         }
 
         if (roundEmployed < thisGame["population"]) {
@@ -918,11 +923,15 @@ export const RunBuildings = new ValidatedMethod({
               else {
                 affordable = false;
                 console.log("neighboring needed resource is out of stock");
+                logObj["note"] = "neighboring resource out of stock";
+                logObj["res"] = nres;
               }
             }
             else {
               affordable = false;
               console.log("this building needed a neighbor to run and also be placed but doesn't have it?!?!? please fix")
+              logObj["note"] = "building needed neighbor but placed without one";
+
             }
           }
           if (affordable == false) {
@@ -930,6 +939,7 @@ export const RunBuildings = new ValidatedMethod({
             // console.log(thisGame["res"]);
             console.log("was unaffordable");
             thisGame["notes"].push(building.name + " was unaffordable and did not run");
+            // Acts.insert({"key": "buildingRun", "log": logObj, "time": new Date().getTime()});
             return true;
           }
           else {
@@ -948,6 +958,7 @@ export const RunBuildings = new ValidatedMethod({
               nres =  Resources.findOne({"_id": building["neighboringResource"]});
               newnres = nres["stats"];
               neighbUse = false;
+              logObj["notes"] = [];
               // console.log("found a neighboring resource");
               if ("neighborUse" in building) {
                 // console.log("gonna use a neighboring resource " + JSON.stringify(nres) + " " + JSON.stringify(building["neighborUse"]));
@@ -955,8 +966,10 @@ export const RunBuildings = new ValidatedMethod({
                   // console.log("neighboring resource available")
                   neighbUse = true;
                   /// Andrew? TODO: check that city resource is not becoming negative here - if it is, abort building use and log a BIG BUG in affordable check
-
                   newnres[building["neighborUse"]["res"]] -= building["neighborUse"]["amount"];
+                  logObj["notes"].push("using neighboring resource");
+                  logObj["oldNeighbRes"] = nres;
+                  logObj["newNeighbRes"] = newnres;
                 }
                 else {
 
@@ -1009,7 +1022,9 @@ export const RunBuildings = new ValidatedMethod({
           // newHapp = thisGame["happiness"] + deltaHapp;
           // newPop = thisGame["population"] + parseInt(((0.5 * newRes["food"]) - (0.5 * newPoll)  + (2 * newHapp)) / thisGame["population"]);
           
-          // console.log("trying to update game");
+          console.log("trying to update game");
+          MakeLog.call({"key": "buildingRun", "log": logObj});
+
           return Games.update(
             {"_id": thisGame._id}, 
             {$set: {
@@ -1081,9 +1096,7 @@ export const RunBuildings = new ValidatedMethod({
       }
 
       async function cityNatureEffects(gameCode) {
-        //NOTE TO FUTURE ME: to make this generic - look for all lakes! and then look for other resources that can be affected too 
-        // r = await Resources.findOne({$and: [{"gameCode": gameCode}, {"name": "lake"}]});
-        // gg = await Games.find({$and: [{"gameCode": gameCode}, {$in: }]})
+
 
         // for code ease, we're gonna do this in nature replenish
       }
