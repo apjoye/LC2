@@ -1154,8 +1154,7 @@ export const RefreshReplenishments = new ValidatedMethod ({
       newgg = Games.find({$and: [{"gameCode": gameCode}, {"role": "base"}]}).fetch();
       gr = Resources.find({"gameCode": gameCode}).fetch();
       function getCities(cs, ggs) {return (ggs.filter(g => cs.indexOf(g.playerName) > -1))};
-      // function addPollutions(cs, ggs) {return (ggs.reduce((a,b) => a.pollution + b.pollution))[0]};
-      function addPollutions(cs) {return cs.reduce((a,b) => a.pollution + b.pollution)};
+      function addPollutions(cs) {return cs.map(a => a.pollution).reduce((a,b) => (a + b))};
 
       for (r in gr) {
         res = gr[r];
@@ -1165,7 +1164,10 @@ export const RefreshReplenishments = new ValidatedMethod ({
             console.log("resetting water replenish factor");
             fishRep = 1.2 - 0.03*s["pollution"];   //fish reproduction factor  
             pollutionFactor = 0.7;
-            Resources.update({"_id": res["_id"]}, {$set: {"replenishFactors": {"fish": fishRep, "pollution": pollutionFactor}}}); 
+            riverPollution  = addPollutions(getCities(res["neighbors"].map(c => c.playerName), newgg), newgg);
+            riverPollution = parseInt(riverPollution / 6) + s["pollution"];
+            // Resources.update({"_id": res["_id"]}, {$set: {"pollution": riverPollution}});
+            Resources.update({"_id": res["_id"]}, {$set: {"replenishFactors": {"fish": fishRep, "pollution": pollutionFactor}, "stats.pollution": riverPollution}}); 
           }
           else {
             console.log("water resource didn't have pollution or fish????")
@@ -1200,9 +1202,6 @@ export const RefreshReplenishments = new ValidatedMethod ({
             console.log("lumbers resource didn't have lumber or animals????")
             console.log(res);
           }
-        }
-        else if (res["kind"] == "water") {
-          //TODO : add riverpollution from neighboring cities!!!
         }
       }
     // }
