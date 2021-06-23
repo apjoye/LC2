@@ -67,6 +67,7 @@ Template.city.onCreated(function helloOnCreated() {
   this.gameInfo = new ReactiveVar({});
   this.labelVisibility = new ReactiveVar({"index": 0, "list": ["visible", "hidden"]});
   this.population = new ReactiveVar(0);
+  this.localName = new ReactiveVar(localStorage.getItem("localName"));
   // this.roundProduction = new ReactiveVar({});
 });
 
@@ -343,8 +344,12 @@ Template.city.helpers({
 
   getName() {
     ln = localStorage.getItem("localName");
+    tln = Template.instance().localName.get(); 
     retObj = {"found": false};
-    if (ln != null) { 
+    console.log(ln)
+
+    if (ln != null && ln != "undefined" && tln != "") { 
+      Template.instance().localName.set(ln);
       retObj = {
         "name": ln,
         "found": true  
@@ -374,6 +379,14 @@ Template.city.events ({
     // console.log(gbc);
     CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": !gbc});
 
+  },
+
+  'submit .setUserName' (event, instance) {
+    event.preventDefault();
+    console.log(event.target)
+    name = event.target.localName.value;
+    localStorage.setItem("localName", name);
+    Template.instance().localName.set(name);
   }
 })
 
