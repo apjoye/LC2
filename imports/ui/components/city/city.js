@@ -402,6 +402,7 @@ Template.cityMap.onCreated(function helloOnCreated() {
   this.game = new ReactiveVar({});
   this.buildings = new ReactiveVar({});
   this.imageMode = new ReactiveVar(true);
+  this.localName = new ReactiveVar(localStorage.getItem("localName"));
 
   tileNameTitle = {
     "claymine": "Clay Mine",
