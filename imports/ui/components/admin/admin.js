@@ -268,8 +268,14 @@ Template.gameMap.helpers({
       cities[c]["style"] = "top:" + yloc + "px; left:" + xloc + "px";
       res = cities[c]["res"];
       cities[c]["wealth"] = res["lumber"] + res["food"] + res["clay"] + res["copper"]
+      cities[c]["food"] = res["food"];
+      cities[c]["clay"] = res["clay"];
+      cities[c]["copper"] = res["copper"];
+      console.log(cities[c]["copper"]);
+      cities[c]["lumber"] = res["lumber"];
       stats.push(cities[c]);
     }
+    console.log(stats);
     return stats;
   },
 

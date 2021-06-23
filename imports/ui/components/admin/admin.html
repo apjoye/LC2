@@ -276,6 +276,8 @@
 
     {{> gameMap}}
   </div>
+
+
 </template>
 
 <template name="gameMap">
@@ -360,6 +362,42 @@
         {{/each}}
         
         {{/if}}
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Details
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Team</th>
+                <th scope="col">food</th>
+                <th scope="col">lumber</th>
+                <th scope="col">clay</th>
+                <th scope="col">copper</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each cs in cityStats}}
+              <tr>
+                <th scope="row">{{cs.group}}</th>
+                <td>{{cs.food}}</td>
+                <td>{{cs.lumber}}</td>
+                <td>{{cs.clay}}</td>
+                <td>{{cs.copper}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

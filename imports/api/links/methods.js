@@ -1058,15 +1058,21 @@ export const RunBuildings = new ValidatedMethod({
           thisGame = gg[g];
           newRes = thisGame["res"];
           newPoll = thisGame["pollution"]; 
-          newPop = thisGame["population"]; newHapp = thisGame["happiness"];
+          newPop = thisGame["population"]; 
+          newPop = newPop==0 ? 1: newPop;
+          newHapp = thisGame["happiness"];
           newPoll += parseInt((newPop - 6) / 2);
           // console.log("what the what, employing " + thisGame["roundEmployed"]);
           newHapp = thisGame["happiness"];
           newPop = thisGame["population"];
-          newPop = newPop==0 ? 1: newPop;
+
+          newRes["food"] = newRes["food"] - parseInt(newPop/2);
+          if (newRes["food"] < 0) {newRes["food"] = 0;}
+
+          
           wealth = newRes["clay"] + newRes["lumber"] + newRes["copper"];
           pollHere = thisGame["pollution"] == 0 ? 1: newPoll;
-          happFactor = ((newRes["food"] / newPop) + (wealth/(3*pollHere))) / newPop;
+          happFactor = ((newFood / newPop) + (wealth/(3*pollHere))) / newPop;
           // console.log("trying to update happiness " + thisGame["group"] + " " + happFactor);
           if (happFactor > 1) { newHapp +=  1; }
           else if (happFactor < 0.5 && newHapp > 0) { 
