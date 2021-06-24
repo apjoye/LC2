@@ -310,7 +310,10 @@ Template.gameMap.helpers({
         if (["lumber", "water"].indexOf(res[r].kind) > -1) {
           if (s in res[r]["replenishFactors"]) {
             resObj["replenish"] = true;
-            resObj["replenishAmount"] = res[r]["replenishFactors"][s];
+            repAmt = parseInt(res[r]["stats"][s] * (res[r]["replenishFactors"][s] - 1));
+            if (repAmt > 0) { repAmt = "+" + repAmt;}
+            resObj["replenishAmount"] = repAmt;
+
           }
          }
         res[r]["statList"].push(resObj);
