@@ -359,39 +359,3 @@
 </template>
 
 
-<template name="cityFactory">
-  <div class="after-sticky">
-  <div class="row">
-    <div class="col-md-6 col-xs-6">
-      <!-- <div class="cityFactoryInner"> -->
-      <img class="factoryIcon" src="{{factoryIcon}}" style="width:100%;">
-      <!-- {{> factory}} -->
-      <br />
-
-      <button type="button" class="btn btn-light toggleRunning" data-toggle="button" aria-pressed="false" autocomplete="off">
-        {{runningStatus}}
-      </button>        
-      
-    </div>
-
-    <div class="col-md-6 col-xs-6">
-      <div class="productionValues">
-          <span class="productionLabel">Produces</span>
-          {{{CostInfo this.prodValues ""}}} 
-        </div>
-        <br />
-        <div class="consumptionValue">
-          <span class="productionLabel">Consumes</span>
-          {{{CostInfo this.prodCosts ""}}}
-        </div>
-    </div>
-        
-  </div>
-  
-  
-  <div class="cityFactoryNotes">
-    <button type="button" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="top" data-html="true" title="Events over last round" data-content="<ul>{{#each roundNotes}} <li>{{this}} </li> {{/each}}">Factory Log</button>
-  <!-- Factory log: {{#each roundNotes}}  {{this}} <br />   {{/each}} -->
-  </div>
-</div>
-</template>

@@ -846,7 +846,13 @@ Template.cityMap.events({
     // console.log(x + " " + y + " " + loc + " " + buildLoc);
     console.log(buildLoc);
     // console.log(event.target.id + " " + buildLoc);
-    PlaceBuilding.call({"gameCode": FlowRouter.getParam("gameCode"), "buildingId": event.target.id, "location": buildLoc, "userId": Meteor.userId()});
+    ln = localStorage.getItem("localName");
+    PlaceBuilding.call({
+      "localName": ln,
+      "gameCode": FlowRouter.getParam("gameCode"), 
+      "buildingId": event.target.id, 
+      "location": buildLoc, 
+      "userId": Meteor.userId()});
   },
   
   'click .startPlace': function (event, instance) {
@@ -881,7 +887,13 @@ Template.cityMap.events({
       alert("all the people have buildings to work at!");
     }
     else {
-      ToggleBuilding.call({"buildingId": bb["_id"], "currentStatus": bb["running"], "gameCode": bb["gameCode"], "ownerId": bb["ownerId"]});
+      ln = localStorage.getItem("localName");
+      ToggleBuilding.call({
+        "localName": ln,
+        "buildingId": bb["_id"], 
+        "currentStatus": bb["running"], 
+        "gameCode": bb["gameCode"], 
+        "ownerId": bb["ownerId"]});
     }
   },
 
@@ -898,7 +910,11 @@ Template.cityMap.events({
     event.preventDefault();
     console.log(event.target.id);
     console.log("removing building client " + (event.target.id).substr(7));
-    RemoveBuilding.call({"buildingId": (event.target.id).substr(7)});
+    ln = localStorage.getItem("localName");
+    RemoveBuilding.call({
+      "localName": ln,
+      "buildingId": (event.target.id).substr(7)
+    });
   },
 
   'click .cancelRemoval': function (event, instance) {
@@ -910,147 +926,6 @@ Template.cityMap.events({
 });
 
 
-Template.cityFactory.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  // this.counter = new ReactiveVar(0);
-  // Meteor.subscribe('cities.all');
-  // Meteor.subscribe('producers.public');
-  // Meteor.subscribe('producers.owned');
-  // Meteor.subscribe('games.running');
-
-});
-
-Template.cityFactory.helpers({
-  productionRes() {
-   retres = [];
-
-   // console.log(this.prodValues);
-   for (r in this.prodValues) {
-     if (r != "pollution" && this.prodValues[r] != 0) {
-       // prodText += this.prodValues[r] + " " + r + "   ";
-       retres.push({"resName": r, "resVal": this.prodValues[r], "resValArr": new Array(this.prodValues[r]).fill(0)});
-     }
-   }
-   return retres;
- },
-
-  productionValues() {
-    prodText = "";
-
-    // console.log(this.prodValues);
-    for (r in this.prodValues) {
-      if (r != "pollution" && this.prodValues[r] != 0) {
-        prodText += this.prodValues[r] + " " + r + "   ";
-      }
-    }
-
-    prodText += " Pollution: " + this.prodValues["pollution"];
-    // console.log(prodText);
-
-    return prodText;
-
-    // return Producers.find({$and: [{"owned": true}, {"owner": this.name}]});
-  },
-
-  CostInfo(costList, startText) {
-    // CostInfo() {
-     costText = "";
-     factoryOutputType = {
-      "m1": "../img/icons/gold_sml.png",
-      "f1": "../img/icons/food_sml.png",
-      "m2": "../img/icons/steel_sml.png",
-      "f2": "../img/icons/cotton_sml.png",
-      "food": "../img/icons/cotton_sml.png",
-      "clay": "../img/icons/clay.png",
-      "copper": "../img/icons/copper.png",
-      "lumber": "../img/icons/lumber.png",
-      "pollution": "../img/icons/pollution_sml.png"
-    };
-    for (r in costList) {
-     // console.log(r + " " + factoryOutputType[r]);
-      if (costList[r] != 0 && costList[r] != undefined) {
-       // costText += costList[r] + " " + r + ", ";
-
-      costText += costList[r];
-      costText += '<img class="resourceIcon" src="' + factoryOutputType[r] + '" />';
-      }
-    }
-
-  if (costText != "") {
-     costText = startText + "<br />" + costText;
-   }
-   else {
-     costText = '<br/> <img class="resourceIcon" src="../img/icons/blank.png" </br>';
-   }
-   return costText;
-  },
-
-  productionCosts() {
-    costText = "";
-    // console.log(this.prodCosts);
-    for (r in this.prodCosts) {
-      if (this.prodCosts[r] != 0) {
-        costText += this.prodCosts[r] + " " + r + "   ";
-      }
-    }
-    // prodText += " Pollution: " + this.prodValues["poll"];
-    // console.log(costText);
-
-    return costText;
-  },
-
-  factoryIcon() {
-    factoryIconSource = {
-      "p1": "../img/icons/park_med.png",
-      "p2": "../img/icons/park_med.png",
-      "m1": "../img/icons/factory_med.png",
-      "m2": "../img/icons/factory_med.png",
-      "f1": "../img/icons/farm_med.png",
-      "f2": "../img/icons/farm_med.png"
-    }
-    // console.log(this);
-    // console.log(factoryIconSource[this.kind]);
-    return factoryIconSource[this.kind];
-  },
-
-  runningStatus() {
-    if (this.running == true) {
-      return "Running";
-    }
-    else {
-      return "Turned Off";
-    }
-  }
-
-  // FactoryNotes() {
-
-  // }
-});
-
-Template.cityFactory.events({
-  'click .toggleRunning' (event,instance) {
-    event.preventDefault();
-    // console.log(instance);
-    // console.log(this.running);
-    // runners = Producers.find({$and: [{"running": true}, {"gameCode": FlowRouter.getParam("gameCode")}, {"owned": true}, {"ownerId": Meteor.userId()}]}).fetch();
-    // thisGame = Games.findOne({$and: [{"playerId": Meteor.userId()}, {"gameCode": FlowRouter.getParam("gameCode")}, {"status": "running"}, {"role": "base"}]});
-
-    // if (runners.length >= thisGame.population && this.running == false) {
-      // console.log("not enough people!!!");
-      //alert("Everybody's already employed!");
-    // }
-    // else {
-      ToggleFactory.call({"producerId": this._id, "currentStatus": this.running, "gameCode": FlowRouter.getParam("gameCode"), "baseId": Meteor.userId()}, function (err, res) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          // $('.factoryIcon').addClass('animated bounce');
-        }
-      });
-    // }
-  }
-});
 
 //sticky score bar function
 /*
