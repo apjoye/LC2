@@ -1392,7 +1392,7 @@ const neighborAffects = {
 
 const bonusProds = {
   "claymine": {"res": "clay", "amount" : 2, "pollution": -1},
-  "coppermine": {"res": "copper", "amount": 3, "pollution": 1},
+  "coppermine": {"res": "copper", "amount": 2, "pollution": -1},
   "foodfarm": {"res": "food", "amount": 2}
 };
 
@@ -1406,9 +1406,9 @@ const infoTexts = {
 };
 
 const bonusTexts = {
-  "claymine":  "+3 clay, +1 pollution if ore nearby",
-  "coppermine": "+3 copper, +1 pollution if ore nearby",
-  "foodfarm": "+3 food, 2 water pollution if river nearby",
+  "claymine":  "+2 clay, -1 pollution if ore nearby",
+  "coppermine": "+2 copper, -1 pollution if ore nearby",
+  "foodfarm": "+2 food, 2 water pollution if river nearby",
   "foodfishing": "Also uses: 2 fish from nearby water. Can only be placed next to water.",
   "foodhunting": "Also uses: 2 animals (from the forest nearby). Needs forest nearby.",
   "lumbercamp": "Uses: 3 lumber (from the forest nearby). Needs forest nearby."
