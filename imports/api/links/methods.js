@@ -155,11 +155,11 @@ export const UpdateBid = new ValidatedMethod({
 export const CommitBids = new ValidatedMethod({
   name: 'bids.commit',
   validate ({}) {},
-  run ({baseId, gameCode, commitState}) {
+  run ({baseId, gameCode, commitState, localName=""}) {
     if (!this.isSimulation) {
       console.log("changing bid commit state");
       // readyCities
-      logObj = {"gameCode": gameCode, "baseId": baseId, "commitState": commitState};
+      logObj = {"gameCode": gameCode, "localName": localName,  "baseId": baseId, "commitState": commitState};
       MakeLog.call({"key": "bidCommit", "log": logObj});
       if (commitState == true) {
         console.log("truing ready");
@@ -460,7 +460,7 @@ export const ToggleBuilding = new ValidatedMethod({
   name: 'toggle.build',
   validate ({}) {},
 
-  run ({buildingId, currentStatus, gameCode, ownerId, runningBuilds = []}) {
+  run ({buildingId, currentStatus, gameCode, ownerId, localName="", runningBuilds = []}) {
     
     //*** TODO: at client end, try to pass the runners into runningBuilds ***//
 
@@ -501,7 +501,8 @@ export const ToggleBuilding = new ValidatedMethod({
       "newStatus": newStatus,
       "gameCode": gameCode,
       "baseId": ownerId,
-      "changed": changed
+      "changed": changed,
+      "localName": localName
     };
     MakeLog.call({"key": "buildingToggle", "log": logObj})
     // Acts.insert({
@@ -1029,7 +1030,7 @@ export const RunBuildings = new ValidatedMethod({
             {"_id": thisGame._id}, 
             {$set: {
               "res": newRes, 
-              "pollChange": pollChange
+              "pollChange": pollChange,
               // "population": newPop, 
               // "happiness": newHapp, 
               "pollution": newPoll, 
@@ -1498,7 +1499,7 @@ export const AddBuilding = new ValidatedMethod({
 export const PlaceBuilding = new ValidatedMethod({
   name: 'place.build',
   validate ({}) {},
-  run ({gameCode, buildingId, location, userId}) {
+  run ({gameCode, buildingId, location, userId, localName = ""}) {
     //if map location belongs to city
     //and location doesn't have a building
     // console.log(location);
@@ -1524,6 +1525,7 @@ export const PlaceBuilding = new ValidatedMethod({
           Maps.update({"_id": mapLoc._id}, {$set: {"buildingId": building._id, "building": building}});
           logObj = {
             "building": building,
+            "localName": localName,
             "newMap": Maps.findOne({"_id": mapLoc._id})
           }
           MakeLog.call({"key": "buildingPlace", "log": logObj});
@@ -1599,10 +1601,10 @@ export const ResetMap = new ValidatedMethod({
 export const RemoveBuilding = new ValidatedMethod({
   name: 'remove.build',
   validate ({}) {},
-  run({gameCode = "", buildingId}) {
+  run({gameCode = "", localName = "", buildingId}) {
     console.log("removing building ");
     Buildings.remove({"_id": buildingId});
-    logObj = {"gameCode": gameCode, "buildingId": buildingId};
+    logObj = {"gameCode": gameCode, "buildingId": buildingId, "localName": localName};
     Maps.update(
       // {$and: [{"gameCode": gameCode}, {"buildingId": buildingId}]}, 
       {$and: [{"buildingId": buildingId}]}, 
@@ -2073,7 +2075,7 @@ export const BuildingToAuction = new ValidatedMethod({
 export const MakeBid2 = new ValidatedMethod({
   name: 'bid2.make',
   validate({}) {},
-  run({baseId, building, gameCode, oldVal, newVal, change, bidKind}) {
+  run({baseId, building, gameCode, oldVal, newVal, change, bidKind, localName=""}) {
     if (!this.isSimulation) {
       Bids.update(
         {$and: [{"baseId": baseId}, {"buildingId": building}]}, 
@@ -2087,7 +2089,8 @@ export const MakeBid2 = new ValidatedMethod({
         "change": change,
         "oldVal": oldVal,
         "newVal": newVal,
-        "bidKind": bidKind
+        "bidKind": bidKind,
+        "localName": localName
       };
       MakeLog.call({"key": "BidAct", "log": logObj}, function (err, res) {
         if (err) {console.log(err);}

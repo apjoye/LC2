@@ -1,6 +1,7 @@
 import '../trade/trade.js';
 import './city.html';
 import { ReactiveVar } from 'meteor/reactive-var';
+import { Session } from 'meteor/session'
 
 import { Cities } from '/imports/api/links/links.js';
 
@@ -67,7 +68,7 @@ Template.city.onCreated(function helloOnCreated() {
   this.gameInfo = new ReactiveVar({});
   this.labelVisibility = new ReactiveVar({"index": 0, "list": ["visible", "hidden"]});
   this.population = new ReactiveVar(0);
-  this.localName = new ReactiveVar(localStorage.getItem("localName"));
+  
   // this.roundProduction = new ReactiveVar({});
 });
 
@@ -343,13 +344,10 @@ Template.city.helpers({
   },
 
   getName() {
-    ln = localStorage.getItem("localName");
-    tln = Template.instance().localName.get(); 
+    ln = Session.get('localName');
     retObj = {"found": false};
     console.log(ln)
-
-    if (ln != null && ln != "undefined" && tln != "") { 
-      Template.instance().localName.set(ln);
+    if (ln != null && ln != "undefined") { 
       retObj = {
         "name": ln,
         "found": true  
@@ -385,8 +383,8 @@ Template.city.events ({
     event.preventDefault();
     console.log(event.target)
     name = event.target.localName.value;
-    localStorage.setItem("localName", name);
-    Template.instance().localName.set(name);
+    Session.set("localName", name);
+    // Template.instance().localName.set(name);
   }
 })
 
@@ -402,7 +400,6 @@ Template.cityMap.onCreated(function helloOnCreated() {
   this.game = new ReactiveVar({});
   this.buildings = new ReactiveVar({});
   this.imageMode = new ReactiveVar(true);
-  this.localName = new ReactiveVar(localStorage.getItem("localName"));
 
   tileNameTitle = {
     "claymine": "Clay Mine",
@@ -846,9 +843,8 @@ Template.cityMap.events({
     // console.log(x + " " + y + " " + loc + " " + buildLoc);
     console.log(buildLoc);
     // console.log(event.target.id + " " + buildLoc);
-    ln = localStorage.getItem("localName");
     PlaceBuilding.call({
-      "localName": ln,
+      "localName": Session.get("localName"),
       "gameCode": FlowRouter.getParam("gameCode"), 
       "buildingId": event.target.id, 
       "location": buildLoc, 
@@ -887,9 +883,8 @@ Template.cityMap.events({
       alert("all the people have buildings to work at!");
     }
     else {
-      ln = localStorage.getItem("localName");
       ToggleBuilding.call({
-        "localName": ln,
+        "localName": Session.get("localName"),
         "buildingId": bb["_id"], 
         "currentStatus": bb["running"], 
         "gameCode": bb["gameCode"], 
@@ -910,9 +905,8 @@ Template.cityMap.events({
     event.preventDefault();
     console.log(event.target.id);
     console.log("removing building client " + (event.target.id).substr(7));
-    ln = localStorage.getItem("localName");
     RemoveBuilding.call({
-      "localName": ln,
+      "localName": Session.get("localName"),
       "buildingId": (event.target.id).substr(7)
     });
   },

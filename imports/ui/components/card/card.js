@@ -1,5 +1,6 @@
 import './card.html';
 import { ReactiveVar } from 'meteor/reactive-var';
+import { Session } from 'meteor/session';
 
 import { Producers } from '/imports/api/links/links.js';
 import { Bids } from '/imports/api/links/links.js';
@@ -155,6 +156,7 @@ Template.factoryList.helpers({
         MakeBid2.call({
           "baseId": Meteor.userId(), 
           "building": bids[b]["buildingId"], 
+          "localName": Session.get("localName"), 
           // "group": thisGroup.group, 
           "gameCode": gc, 
           "change": "res change - auto reset", 
@@ -326,7 +328,11 @@ Template.factoryList.events({
   'click #bidToggle' (event, instance) {
     // event.preventDefault()
     console.log(`bid toggle ${event.target.checked}`);
-    CommitBids.call({"baseId": Meteor.userId(), "gameCode": FlowRouter.getParam("gameCode"), "commitState": event.target.checked});
+    CommitBids.call({
+      "baseId": Meteor.userId(), 
+      "localName": Session.get("localName"), 
+      "gameCode": FlowRouter.getParam("gameCode"), 
+      "commitState": event.target.checked});
 
   }
 });
