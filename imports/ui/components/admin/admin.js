@@ -311,7 +311,7 @@ Template.gameMap.helpers({
           if (s in res[r]["replenishFactors"]) {
             resObj["replenish"] = true;
             repAmt = parseInt(res[r]["stats"][s] * (res[r]["replenishFactors"][s] - 1));
-            if (repAmt > 0) { repAmt = "+" + repAmt;}
+            if (repAmt >= 0) { repAmt = "+" + repAmt;}
             resObj["replenishAmount"] = repAmt;
 
           }
