@@ -1026,6 +1026,7 @@ export const RunBuildings = new ValidatedMethod({
           console.log("trying to update game");
           MakeLog.call({"key": "buildingRun", "log": logObj});
           pollChange = (newPoll!=thisGame["pollution"] || thisGame.pollChange);
+          console.log("pollution change " + pollChange);
           return Games.update(
             {"_id": thisGame._id}, 
             {$set: {
@@ -1061,16 +1062,22 @@ export const RunBuildings = new ValidatedMethod({
           newRes = thisGame["res"];
           newPoll = thisGame["pollution"]; 
           newPop = thisGame["population"]; 
-          if (thisGame.pollChange == false) { newPoll = newPoll - 1; }
           newPop = newPop==0 ? 1: newPop;
           newHapp = thisGame["happiness"];
-          newPoll += parseInt((newPop - 6) / 2);
+          // console.log(newPoll);
+          if (thisGame.pollChange == false) { newPoll = newPoll - 1; }
+          // console.log(newPoll);
+          if (newPop > 7) {newPoll += parseInt((newPop - 6) / 2);}
+          // console.log(newPoll);
+          if (newPoll < 0) {newPoll = 0;}
+          // console.log(newPoll);
+          
           // console.log("what the what, employing " + thisGame["roundEmployed"]);
           newHapp = thisGame["happiness"];
           newPop = thisGame["population"];
 
           newRes["food"] = newRes["food"] - parseInt(newPop/2);
-          console.log(thisGame["res"]["food"] + " " + newRes["food"]);
+          // console.log(thisGame["res"]["food"] + " " + newRes["food"]);
           if (newRes["food"] < 0) {newRes["food"] = 0;}
 
           
@@ -1094,7 +1101,7 @@ export const RunBuildings = new ValidatedMethod({
               "res": newRes, 
               "population": newPop, 
               "happiness": newHapp, 
-              // "pollution": newPoll, 
+              "pollution": newPoll, 
               // "roundEmployed": roundEmployed, 
               // "running": running
             }
