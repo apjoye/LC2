@@ -1024,11 +1024,12 @@ export const RunBuildings = new ValidatedMethod({
           
           console.log("trying to update game");
           MakeLog.call({"key": "buildingRun", "log": logObj});
-
+          pollChange = (newPoll!=thisGame["pollution"] || thisGame.pollChange);
           return Games.update(
             {"_id": thisGame._id}, 
             {$set: {
               "res": newRes, 
+              "pollChange": pollChange
               // "population": newPop, 
               // "happiness": newHapp, 
               "pollution": newPoll, 
@@ -1059,6 +1060,7 @@ export const RunBuildings = new ValidatedMethod({
           newRes = thisGame["res"];
           newPoll = thisGame["pollution"]; 
           newPop = thisGame["population"]; 
+          if (thisGame.pollChange == false) { newPoll = newPoll - 1; }
           newPop = newPop==0 ? 1: newPop;
           newHapp = thisGame["happiness"];
           newPoll += parseInt((newPop - 6) / 2);
@@ -1073,7 +1075,8 @@ export const RunBuildings = new ValidatedMethod({
           
           wealth = newRes["clay"] + newRes["lumber"] + newRes["copper"];
           pollHere = thisGame["pollution"] == 0 ? 1: newPoll;
-          happFactor = ((newRes["food"] / newPop) + (wealth/(3*pollHere))) / newPop;
+          // happFactor = ((newRes["food"] / newPop) + (wealth/(3*pollHere))) / newPop;
+          happFactor = ((newRes["food"] / newPop) + wealth)/(pollHere * newPop);
           // console.log("trying to update happiness " + thisGame["group"] + " " + happFactor);
           if (happFactor > 1) { newHapp +=  1; }
           else if (happFactor < 0.5 && newHapp > 0) { 
@@ -1112,7 +1115,7 @@ export const RunBuildings = new ValidatedMethod({
       async function runThroughBuilds(buildings, gameCode) {
         // gameTeams = {};
 
-        await Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0}}, {multi: true});
+        await Games.update({$and: [{"gameCode": gameCode}, {"role": "base"}]}, {$set: {"roundEmployed": 0, "pollChange": false}}, {multi: true});
 
         for (b in buildings) {
           bb = buildings[b];
@@ -1348,10 +1351,10 @@ const prodCosts = {
 const prodVals = {
   "claymine": { "clay": 5, "pollution": 2 },
   "coppermine": {"copper": 5, "pollution": 2},
-  "foodfarm": {"food": 3},
+  "foodfarm": {"food": 4},
   "foodfishing": {"food": 5},
   "foodhunting": {"food": 3},
-  "lumbercamp": {"lumber": 8}
+  "lumbercamp": {"lumber": 5}
 };
 
 //neighborNeeds specifies requirement which restricts  placement
@@ -1387,18 +1390,18 @@ const neighborAffects = {
 }
 
 const bonusProds = {
-  "claymine": {"res": "clay", "amount" : 3, "pollution": 1},
+  "claymine": {"res": "clay", "amount" : 2, "pollution": -1},
   "coppermine": {"res": "copper", "amount": 3, "pollution": 1},
-  "foodfarm": {"res": "food", "amount": 3}
+  "foodfarm": {"res": "food", "amount": 2}
 };
 
 const infoTexts = {
   "claymine":  "Produces: 5 clay, 2 pollution (or 8 clay and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
   "coppermine": "Produces: 5 copper, 2 pollution (or 8 copper and 3 pollution if ore is nearby), Uses: 2 food and 2 lumber",
-  "foodfarm": "Produces: 5 food (8 food and 2 water pollution, if river nearby), Uses: 2 lumber, 1 clay. ",
+  "foodfarm": "Produces: 4 food (6 food and 2 water pollution, if river nearby), Uses: 2 lumber, 1 clay. ",
   "foodfishing": "Produces: 5 food, Uses: 1 copper, and 2 fish from nearby water. Can only be placed next to water.",
   "foodhunting": "Produces: 3 food, Uses: 2 animals (from the forest nearby). Needs forest nearby.",
-  "lumbercamp": "Produces: 8 lumber, Uses: 1 clay, 3 lumber (from the forest nearby). Needs forest nearby."
+  "lumbercamp": "Produces: 5 lumber, Uses: 1 clay, 3 lumber (from the forest nearby). Needs forest nearby."
 };
 
 const bonusTexts = {
@@ -1570,11 +1573,11 @@ export const ResetTeamResources = new ValidatedMethod({
   name: 'teamresources.reset',
   validate ({}) {},
   run({gameCode}) {
-    newres = {"lumber": 8, "clay": 8, "copper": 8, "food": 8};
+    newres = {"lumber": 4, "clay": 4, "copper": 4, "food": 4};
     Games.update(
       {$and: [{"gameCode": gameCode}, {"role": "base"}]},
       {$set: {"res": newres, 
-        "pollution": 0, "population": 5, "happiness": 5, "roundEmployed": 0}},
+        "pollution": 0, "population": 3, "happiness": 5, "roundEmployed": 0}},
       {multi: true});
     Games.update(
       {$and: [{"gameCode": gameCode}]},
